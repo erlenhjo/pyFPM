@@ -1,0 +1,12 @@
+[project]
+name = "pyFPM"
+version = "0.0.1"
+authors = [
+  {name="Erlend Hektoen Johansen", email="erlendhjohansen@gmail.com"},
+]
+description = "Fourier ptychography library"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.23",
+]
