@@ -1,21 +1,31 @@
 import os
+from enum import Enum
+
 from pyFPM.setup.components.led_arrays import LED_array
+from pyFPM.setup.components.cameras import Camera
+from pyFPM.setup.components.lenses import Lens
+from pyFPM.setup.components.slides import Slide
+
+class LED_patterns(Enum):
+    SQUARE = 0
+    CIRCULAR = 1
 
 class Setup_parameters(object):
-    def __init__(self, datadirpath, lens, camera, LED_array: LED_array, z_LED):
-        self.lens = lens
-        self.camera = camera
+    def __init__(self, datadirpath, lens: Lens, camera: Camera, slide: Slide, LED_array: LED_array, z_LED):
+        self.lens: Lens = lens
+        self.camera: Camera = camera
+        self.slide: Slide = slide
         self.z_LED = z_LED
-        self.LED_array = LED_array
+        self.LED_pitch = LED_array.LED_pitch
         #self.rotation = rotation
         #self.dark_image = "dark_image" ???
         #setup_params.raw_image_pixel_size = ccd_pixel_size / magnification;
 
     
-        self.read_parameters_from_file(datadirpath)
+        self.read_parameters_from_file(datadirpath,LED_array)
 
 
-    def read_parameters_from_file(self, datadirpath):
+    def read_parameters_from_file(self, datadirpath, LED_array: LED_array):
         with open(os.path.join(datadirpath,"setup.txt")) as file:
             data = file.read()
             data = data.split("\n")
@@ -31,14 +41,14 @@ class Setup_parameters(object):
         # LED color, wavelength and offset
         rgb = [int(val) for val in self.find_and_interpret(data, "RGB").split(",")]
         if rgb == [1,0,0]: # red
-            self.wavelength = self.LED_array.red.wavelength
-            self.offset = self.LED_array.red.offset
+            self.wavelength = LED_array.red.wavelength
+            self.LED_offset = LED_array.red.offset
         elif rgb == [0,1,0]: # green
-            self.wavelength = self.LED_array.green.wavelength
-            self.offset = self.LED_array.green.offset
+            self.wavelength = LED_array.green.wavelength
+            self.LED_offset = LED_array.green.offset
         elif rgb == [0,0,1]: # blue
-            self.wavelength = self.LED_array.blue.wavelength
-            self.offset = self.LED_array.blue.offset
+            self.wavelength = LED_array.blue.wavelength
+            self.LED_offset = LED_array.blue.offset
         else:
             raise Exception(f"Unsupported rgb: {rgb}")
 
@@ -48,15 +58,16 @@ class Setup_parameters(object):
         # LED array: shape and size
         shape = self.find_and_interpret(data,"LED shape")
         radius_width = float(self.find_and_interpret(data, "Radius/width"))
+        print(radius_width)
         if shape == "Circular":
             #file specifies radius
-            self.circular = True
+            self.LED_pattern = LED_patterns.CIRCULAR
             self.radius = radius_width + 0.5; # +0.5 for smoother circle?
-            self.arraysize = 2*self.radius +1
+            self.arraysize = int(2 * self.radius)
         elif shape == "Square":
             #file specifies width
-            self.circular = False
-            self.arraysize = radius_width
+            self.LED_pattern = LED_patterns.SQUARE
+            self.arraysize = int(radius_width)
             self.radius = radius_width / 2
         else: 
             raise Exception("Undefined LED shape")
@@ -64,7 +75,7 @@ class Setup_parameters(object):
         # Image format
         self.image_format = self.find_and_interpret(data, "Image format")
 
-    def find_and_interpret(self, data, parameter):
+    def find_and_interpret(self, data: list[str], parameter):
         for line in data:
             if line[:len(parameter)] != parameter:
                 continue
