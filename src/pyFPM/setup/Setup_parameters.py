@@ -17,10 +17,6 @@ class Setup_parameters(object):
         self.slide: Slide = slide
         self.z_LED = z_LED
         self.LED_pitch = LED_array.LED_pitch
-        #self.rotation = rotation
-        #self.dark_image = "dark_image" ???
-        #setup_params.raw_image_pixel_size = ccd_pixel_size / magnification;
-
     
         self.read_parameters_from_file(datadirpath,LED_array)
 
@@ -59,7 +55,7 @@ class Setup_parameters(object):
         shape = self.find_and_interpret(data,"LED shape")
         radius_width = float(self.find_and_interpret(data, "Radius/width"))
 
-        if shape == "Circular":
+        if shape == "Circle":
             #file specifies radius
             self.LED_pattern = LED_patterns.CIRCULAR
             self.radius = radius_width + 0.5; # +0.5 for smoother circle?

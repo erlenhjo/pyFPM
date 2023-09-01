@@ -8,7 +8,8 @@ slide = pyFPM.setup.components.slides.THIN_SLIDE
 LED_array = pyFPM.setup.components.led_arrays.MAIN_LED_ARRAY
 z_LED = 0.192
 
-datadirpath = "C:/Users/erlen/Documents/GitHub/pyFPM/data/20230825_USAFtarget"
+#datadirpath = "C:/Users/erlen/Documents/GitHub/pyFPM/data/20230825_USAFtarget"
+datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ290823_USAF1951_infcorr2x_hamamatsu"
 
 pixel_scale_factor = 4
 patch_start = [949, 899] # [x, y]
@@ -31,8 +32,12 @@ imaging_system = pyFPM.setup.Imaging_system.Imaging_system(
     rotation = 0
     )
 
-plt.matshow(imaging_system.low_res_CTF)
+rawdata = pyFPM.setup.Rawdata.Rawdata(
+    datadirpath = datadirpath,
+    image_format = setup_parameters.image_format,
+    background_filename = "dark_image"
+    )
 
-plt.matshow(imaging_system.high_res_CTF)
-
+plt.matshow(rawdata.array)
 plt.show()
+print(setup_parameters.LED_pattern)
