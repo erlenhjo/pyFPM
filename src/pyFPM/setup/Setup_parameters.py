@@ -58,7 +58,7 @@ class Setup_parameters(object):
         # LED array: shape and size
         shape = self.find_and_interpret(data,"LED shape")
         radius_width = float(self.find_and_interpret(data, "Radius/width"))
-        print(radius_width)
+
         if shape == "Circular":
             #file specifies radius
             self.LED_pattern = LED_patterns.CIRCULAR
