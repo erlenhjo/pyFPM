@@ -24,7 +24,7 @@ class Lens(object):
         self.lens_type: Lens_type = lens_type
 
 INFINITYCORRECTED_2X = Lens(
-    NA=0.055,
+    NA = 0.055,
     magnification = 2,
     diameter = None,
     focal_length = 100e-3,
