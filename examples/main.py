@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 import pyFPM
 
 camera = pyFPM.setup.components.cameras.HAMAMATSU
@@ -28,3 +30,9 @@ imaging_system = pyFPM.setup.Imaging_system.Imaging_system(
     patch_size = patch_size,
     rotation = 0
     )
+
+plt.matshow(imaging_system.low_res_CTF)
+
+plt.matshow(imaging_system.high_res_CTF)
+
+plt.show()

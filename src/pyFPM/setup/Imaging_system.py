@@ -7,11 +7,18 @@ class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
                   patch_start, patch_size, rotation):
         
+
+        
         spatial_frequency = 1 / setup_parameters.wavelength
+        spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
 
         raw_image_pixel_size = setup_parameters.camera.ccd_pixel_size / setup_parameters.lens.magnification
         final_image_pixel_size = raw_image_pixel_size / pixel_scale_factor
-        final_image_size = pixel_scale_factor * patch_size
+        final_image_size = [pixel_scale_factor * size for size in patch_size]
+
+        
+        if final_image_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency):
+            raise "Too low pixel scale factor"
 
         # calculate offsets
         x_offset, y_offset = calculate_offset(
@@ -33,15 +40,14 @@ class Imaging_system(object):
         
         # calculate frequency components for thin or thick sample/glass slide
         if setup_parameters.slide == THIN_SLIDE:
-            spatial_frequencies_x, spatial_frequencies_y = calculate_LED_frequencies_thin(
+            spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components_thin_sample(
                 x_locations = x_locations, 
                 y_locations = y_locations, 
                 z_LED = setup_parameters.z_LED, 
                 spatial_frequency = spatial_frequency
-
             )
         else:
-            spatial_frequencies_x, spatial_frequencies_y = calculate_LED_frequencies_thick(
+            spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components_thick_sample(
                 x_locations = x_locations, 
                 y_locations = y_locations, 
                 z_LED = setup_parameters.z_LED,
@@ -50,31 +56,43 @@ class Imaging_system(object):
             )
  
         low_res_CTF = calculate_coherent_transfer_function(
-
+            pixel_size = raw_image_pixel_size,
+            image_region_size = patch_size, 
+            spatial_cutoff_frequency = spatial_cutoff_frequency
         )
 
         high_res_CTF = calculate_coherent_transfer_function(
-
+            pixel_size = final_image_pixel_size,
+            image_region_size = final_image_size, 
+            spatial_cutoff_frequency = spatial_cutoff_frequency
         )
 
         # assign public variables
         self.setup = setup_parameters
 
-        self.spatial_frequency = spatial_frequency
-        self.spatial_frequencies_x = spatial_frequencies_x
-        self.spatial_frequencies_y = spatial_frequencies_y
+        self.frequency = spatial_frequency
+        self.cutoff_frequency = spatial_cutoff_frequency
+        self.LED_frequencies_x = spatial_LED_frequencies_x
+        self.LED_frequencies_y = spatial_LED_frequencies_y
 
         self.patch_size = patch_size
         self.final_image_size = final_image_size
         self.raw_image_pixel_size = raw_image_pixel_size
         self.final_image_pixel_size = final_image_pixel_size
         
+        self.low_res_CTF = low_res_CTF
+        self.high_res_CTF = high_res_CTF
 
 
+def calculate_spatial_cutoff_frequency(spatial_frequency, NA_sys):
+    return spatial_frequency * NA_sys
 
-
-
-
+def calculate_NA_sys(spatial_frequencies_x: np.ndarray, spatial_frequencies_y: np.ndarray, spatial_frequency, NA_lens):
+    NA_illumination = max(np.abs(spatial_frequencies_x).max(),np.abs(spatial_frequencies_y).max()) / spatial_frequency   # is mean or max the most correct?
+    return NA_lens + NA_illumination
+    
+def calculate_required_pixel_size(spatial_cutoff_frequency):
+    return 1 / (2.1 * spatial_cutoff_frequency)    #technically should be 2 for Nyquist criterion, but 2.1 gives some leeway
 
 
 def calculate_offset(LED_offset, image_size, patch_start, patch_size, raw_image_pixel_size):
@@ -85,8 +103,8 @@ def calculate_offset(LED_offset, image_size, patch_start, patch_size, raw_image_
     # find center of image and patch
     image_center_pixel_x = image_size[0] / 2
     image_center_pixel_y = image_size[1] / 2
-    patch_center_pixel_x = patch_start[0] + patch_size/2
-    patch_center_pixel_y = patch_start[1] + patch_size/2
+    patch_center_pixel_x = patch_start[0] + patch_size[0]/2
+    patch_center_pixel_y = patch_start[1] + patch_size[1]/2
 
     # calculate offset of selected patch with respect to image centre
     patch_offset_x = (image_center_pixel_x - patch_center_pixel_x) * raw_image_pixel_size
@@ -122,7 +140,7 @@ def calculate_LED_locations(arraysize, LED_pitch, x_offset, y_offset, rotation):
     return x_locations, y_locations
 
 
-def calculate_LED_frequencies_thin(x_locations, y_locations, z_LED, spatial_frequency):
+def calculate_spatial_LED_frequency_components_thin_sample(x_locations, y_locations, z_LED, spatial_frequency):
     # find relative values
     freqs_x_relative = -x_locations / np.sqrt(x_locations**2 + y_locations**2 + z_LED**2)
     freqs_y_relative = -y_locations / np.sqrt(x_locations**2 + y_locations**2 + z_LED**2)
@@ -134,12 +152,20 @@ def calculate_LED_frequencies_thin(x_locations, y_locations, z_LED, spatial_freq
     return spatial_frequencies_x, spatial_frequencies_y
 
 
-def calculate_LED_frequencies_thick(x_locations, y_locations, z_LED, f0, slide):
+def calculate_spatial_LED_frequency_components_thick_sample(x_locations, y_locations, z_LED, f0, slide):
     raise "Thick sample compensation by Zheng not implemented yet."
 
 
-def calculate_coherent_transfer_function(pixel_size, image_region_size):
-    df_x
-    df_y
+def calculate_coherent_transfer_function(pixel_size, image_region_size, spatial_cutoff_frequency):
+    max_frequency = 1 / (2 * pixel_size)
+    spatial_frequencies_x = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[0], endpoint = False)   # is enpoint setting correct?
+    spatial_frequencies_y = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[1], endpoint = False)
 
-    f_max
+    fx_mesh, fy_mesh = np.meshgrid(spatial_frequencies_x, spatial_frequencies_y)
+    
+    coherent_transfer_function = (fx_mesh**2 + fy_mesh**2) < spatial_cutoff_frequency**2
+
+    return coherent_transfer_function 
+
+def calculate_pupil():
+    raise "No pupil"
