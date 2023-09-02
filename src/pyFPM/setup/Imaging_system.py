@@ -1,13 +1,11 @@
 import numpy as np
 
 from pyFPM.setup.Setup_parameters import Setup_parameters
-from pyFPM.setup.components.slides import THIN_SLIDE
+from pyFPM.setup.components.Slide import THIN_SLIDE
 
 class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
                   patch_start, patch_size, rotation):
-        
-
         
         spatial_frequency = 1 / setup_parameters.wavelength
         spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
@@ -68,13 +66,14 @@ class Imaging_system(object):
         )
 
         # assign public variables
-        self.setup = setup_parameters
+        self.setup_parameters = setup_parameters
 
         self.frequency = spatial_frequency
         self.cutoff_frequency = spatial_cutoff_frequency
         self.LED_frequencies_x = spatial_LED_frequencies_x
         self.LED_frequencies_y = spatial_LED_frequencies_y
 
+        self.patch_start = patch_start
         self.patch_size = patch_size
         self.final_image_size = final_image_size
         self.raw_image_pixel_size = raw_image_pixel_size
@@ -82,6 +81,8 @@ class Imaging_system(object):
         
         self.low_res_CTF = low_res_CTF
         self.high_res_CTF = high_res_CTF
+
+        
 
 
 def calculate_spatial_cutoff_frequency(spatial_frequency, NA_sys):

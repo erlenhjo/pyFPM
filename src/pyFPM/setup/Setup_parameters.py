@@ -1,10 +1,10 @@
 import os
 from enum import Enum
 
-from pyFPM.setup.components.led_arrays import LED_array
-from pyFPM.setup.components.cameras import Camera
-from pyFPM.setup.components.lenses import Lens
-from pyFPM.setup.components.slides import Slide
+from pyFPM.setup.components.Led_array import LED_array
+from pyFPM.setup.components.Camera import Camera
+from pyFPM.setup.components.Lens import Lens
+from pyFPM.setup.components.Slide import Slide
 
 class LED_patterns(Enum):
     SQUARE = 0
@@ -17,6 +17,7 @@ class Setup_parameters(object):
         self.slide: Slide = slide
         self.z_LED = z_LED
         self.LED_pitch = LED_array.LED_pitch
+        self.LED_array_size = LED_array.size
     
         self.read_parameters_from_file(datadirpath,LED_array)
 
@@ -27,12 +28,12 @@ class Setup_parameters(object):
             data = data.split("\n")
 
         # Exposure times
-        self.BF_exposure_time = self.find_and_interpret(data, "Exposure time 1")
+        self.BF_exposure_time = float(self.find_and_interpret(data, "Exposure time 1"))
         if self.find_and_interpret(data, "Multiple exposure") == "TRUE":
             self.DF_exposure_time = float(self.find_and_interpret(data, "Exposure time 2"))
         else:
             self.DF_exposure_time = self.BF_exposure_time
-        self.BF_exposure_radius = self.find_and_interpret(data, "Exposure 1 radius");
+        self.BF_exposure_radius = float(self.find_and_interpret(data, "Exposure 1 radius"))
 
         # LED color, wavelength and offset
         rgb = [int(val) for val in self.find_and_interpret(data, "RGB").split(",")]
@@ -49,7 +50,7 @@ class Setup_parameters(object):
             raise Exception(f"Unsupported rgb: {rgb}")
 
         # Center LED
-        self.center_index = [int(n) for n in self.find_and_interpret(data,"Centre").split(",")]
+        self.center_indices = [int(n) for n in self.find_and_interpret(data,"Centre").split(",")]
 
         # LED array: shape and size
         shape = self.find_and_interpret(data,"LED shape")

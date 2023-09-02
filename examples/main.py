@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 
 import pyFPM
 
-camera = pyFPM.setup.components.cameras.HAMAMATSU
-lens = pyFPM.setup.components.lenses.INFINITYCORRECTED_2X
-slide = pyFPM.setup.components.slides.THIN_SLIDE
-LED_array = pyFPM.setup.components.led_arrays.MAIN_LED_ARRAY
+camera = pyFPM.setup.components.Camera.HAMAMATSU
+lens = pyFPM.setup.components.Lens.INFINITYCORRECTED_2X
+slide = pyFPM.setup.components.Slide.THIN_SLIDE
+LED_array = pyFPM.setup.components.Led_array.MAIN_LED_ARRAY
 z_LED = 0.192
 
-#datadirpath = "C:/Users/erlen/Documents/GitHub/pyFPM/data/20230825_USAFtarget"
-datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ290823_USAF1951_infcorr2x_hamamatsu"
+datadirpath = "C:/Users/erlen/Documents/GitHub/pyFPM/data/20230825_USAFtarget"
+#datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ290823_USAF1951_infcorr2x_hamamatsu"
 
 pixel_scale_factor = 4
 patch_start = [949, 899] # [x, y]
@@ -34,10 +34,18 @@ imaging_system = pyFPM.setup.Imaging_system.Imaging_system(
 
 rawdata = pyFPM.setup.Rawdata.Rawdata(
     datadirpath = datadirpath,
-    image_format = setup_parameters.image_format,
-    background_filename = "dark_image"
+    background_filename = "dark_image",
+    imaging_system = imaging_system
     )
 
-plt.matshow(rawdata.array)
-plt.show()
-print(setup_parameters.LED_pattern)
+processed_data = pyFPM.pre_processing.pre_process.pre_process_images(
+    rawdata = rawdata,
+    remove_background = False, 
+    threshold_value = 0, 
+    imaging_system = imaging_system
+    )
+
+
+print(processed_data[22])
+#plt.imshow(rawdata.images[0])
+#plt.show()
