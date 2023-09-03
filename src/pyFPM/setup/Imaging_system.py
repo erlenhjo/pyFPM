@@ -7,7 +7,7 @@ class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
                   patch_start, patch_size, rotation):
         
-        spatial_frequency = 1 / setup_parameters.wavelength
+        spatial_frequency = 1 / setup_parameters.LED_info.wavelength
         spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
 
         raw_image_pixel_size = setup_parameters.camera.ccd_pixel_size / setup_parameters.lens.magnification
@@ -20,7 +20,7 @@ class Imaging_system(object):
 
         # calculate offsets
         x_offset, y_offset = calculate_offset(
-            LED_offset = setup_parameters.LED_offset,
+            LED_offset = setup_parameters.LED_info.LED_offset,
             image_size = setup_parameters.camera.raw_image_size,
             patch_start = patch_start,
             patch_size = patch_size,
@@ -29,8 +29,9 @@ class Imaging_system(object):
 
         # calculate LED positions
         x_locations, y_locations = calculate_LED_locations(
-            arraysize = setup_parameters.arraysize, 
-            LED_pitch = setup_parameters.LED_pitch,
+            LED_array_size = setup_parameters.LED_info.LED_array_size,
+            center_indices = setup_parameters.LED_info.center_indices,
+            LED_pitch = setup_parameters.LED_info.LED_pitch,
             x_offset = x_offset,
             y_offset = y_offset,
             rotation = rotation
@@ -41,14 +42,14 @@ class Imaging_system(object):
             spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components_thin_sample(
                 x_locations = x_locations, 
                 y_locations = y_locations, 
-                z_LED = setup_parameters.z_LED, 
+                z_LED = setup_parameters.LED_info.array_to_object_distance, 
                 spatial_frequency = spatial_frequency
             )
         else:
             spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components_thick_sample(
                 x_locations = x_locations, 
                 y_locations = y_locations, 
-                z_LED = setup_parameters.z_LED,
+                z_LED = setup_parameters.LED_info.array_to_object_distance,
                 spatial_frequency = spatial_frequency,
                 slide = setup_parameters.slide
             )
@@ -66,8 +67,6 @@ class Imaging_system(object):
         )
 
         # assign public variables
-        self.setup_parameters = setup_parameters
-
         self.frequency = spatial_frequency
         self.cutoff_frequency = spatial_cutoff_frequency
         self.LED_frequencies_x = spatial_LED_frequencies_x
@@ -82,6 +81,14 @@ class Imaging_system(object):
         self.low_res_CTF = low_res_CTF
         self.high_res_CTF = high_res_CTF
 
+    def wavevectors_x(self):
+        return 2*np.pi*self.LED_frequencies_x
+    def wavevectors_y(self):
+        return 2*np.pi*self.LED_frequencies_y
+    def differential_wavevectors_x(self):
+        return 1 / (self.final_image_pixel_size * self.final_image_size[0])
+    def differential_wavevectors_y(self):
+        return 1 / (self.final_image_pixel_size * self.final_image_size[1])
         
 
 
@@ -118,18 +125,20 @@ def calculate_offset(LED_offset, image_size, patch_start, patch_size, raw_image_
     return x_offset, y_offset
 
 
-def calculate_LED_locations(arraysize, LED_pitch, x_offset, y_offset, rotation):
+def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, x_offset, y_offset, rotation):
     # note [y, x] indexing due to how matrix indexing works (row, col) -> (y, x)
+    # arraysize + 1 in case LED array is one indexed
+    x_size = LED_array_size[0] + 1 
+    y_size = LED_array_size[1] + 1
 
-    x_locations = np.zeros(shape = (arraysize,arraysize))
-    y_locations = np.zeros(shape = (arraysize,arraysize))
+    x_locations = np.zeros(shape = (y_size , x_size))
+    y_locations = np.zeros(shape = (y_size , x_size))
 
     # calculate locations relative center LED
-    center_index = (arraysize-1)/2
-    for x_index in range(arraysize):
-        for y_index in range(arraysize):
-            x_locations[y_index, x_index] = (x_index - center_index) * LED_pitch
-            y_locations[y_index, x_index] = (center_index - y_index) * LED_pitch    
+    for x_index in range(x_size):
+        for y_index in range(y_size):
+            x_locations[y_index, x_index] = (x_index - center_indices[0]) * LED_pitch
+            y_locations[y_index, x_index] = (center_indices[1] - y_index) * LED_pitch    
     
     if rotation != 0:
         raise "Rotation not implemented yet"
