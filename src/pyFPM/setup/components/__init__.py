@@ -1,1 +1,1 @@
-from . import cameras, led_arrays, lenses
+from . import Camera, Led_array, Lens, Slide
