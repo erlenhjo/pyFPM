@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.fft import fft2, ifft2, fftshift, ifftshift
 import matplotlib.pyplot as plt
 
 from pyFPM.pre_processing.Preprocessed_data import Preprocessed_data
@@ -9,9 +10,9 @@ from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 
 def primitive_fourier_ptychography_algorithm(
         preprocessed_data: Preprocessed_data,
-        setup_parameters: Setup_parameters,
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,
+        pupil,
         loops
     ) -> Algorithm_result :
 
@@ -20,29 +21,74 @@ def primitive_fourier_ptychography_algorithm(
     size_low_res_x = imaging_system.patch_size[0]
     size_low_res_y = imaging_system.patch_size[1]
     size_high_res_x = imaging_system.final_image_size[0]
-    size_hig_res_y = imaging_system.final_image_size[1]
+    size_high_res_y = imaging_system.final_image_size[1]
     k_x = imaging_system.wavevectors_x()
     k_y = imaging_system.wavevectors_y()
     dk_x = imaging_system.differential_wavevectors_x()
     dk_y = imaging_system.differential_wavevectors_y()
     low_res_CTF = imaging_system.low_res_CTF
 
+    LED_indices = preprocessed_data.LED_indices
 
-    # initialize recovered image with ones
-    recovered_object = np.ones(shape = (size_hig_res_y, size_high_res_x)) 
-    recovered_object_fourier_transform = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(recovered_object))) 
+    
+    if True: # initialize recovered image with ones
+        recovered_object_guess = np.ones(shape = (size_high_res_y, size_high_res_x))
+    else:
+        raise "insert better startpoint here"
+    
+    recovered_object_fourier_transform = fftshift(fft2(fftshift(recovered_object_guess)))  # why extra fftshift, should be ifftshift?    
+    
+    convergence_index = np.zeros(loops)
+    
 
-    convergence_index = np.empty(loops)
-
-    #print(np.argwhere(recovered_object_fourier_transform > 0))
-    #print(recovered_object_fourier_transform[128,128])
 
     for loop_nr in range(loops):
         for image_nr in range(len(update_order)):
             index = update_order[image_nr]
-            current_image = low_res_images[index]
-            #print(np.fft.fftshift(current_image))
-            #print(np.fft.fft2(np.fft.fftshift(current_image)))
-            print(np.fft.fftshift(np.fft.fft2(current_image)))
-            input()
-        continue
+            LED_index_x = LED_indices[index][0]
+            LED_index_y = LED_indices[index][1]
+
+            raw_low_res_image = low_res_images[index]
+
+            # calculate which wavevector-values are present in the current low res image
+            k_center_x = round((size_high_res_x - 1)/2 - k_x[LED_index_y, LED_index_x]/dk_x)
+            k_center_y = round((size_high_res_y - 1)/2 - k_y[LED_index_y, LED_index_x]/dk_y)
+            k_min_x = int(np.floor(k_center_x - (size_low_res_x - 1) / 2))
+            k_max_x = int(np.floor(k_center_x + (size_low_res_x - 1) / 2))
+            k_min_y = int(np.floor(k_center_y - (size_low_res_y - 1) / 2))
+            k_max_y = int(np.floor(k_center_y + (size_low_res_y - 1) / 2))
+
+            scaling_factor = (size_low_res_x*size_low_res_y) / (size_high_res_x*size_high_res_y)
+
+
+            recovered_low_res_fourier_transform = scaling_factor \
+                                                  * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] \
+                                                  * low_res_CTF \
+                                                  * pupil
+                                                
+            recovered_low_res_image = ifftshift(ifft2(ifftshift(recovered_low_res_fourier_transform))) # only inner should be ifftshift?
+
+            convergence_index[loop_nr] += np.mean(np.abs(recovered_low_res_image)) \
+                                            / np.sum(abs(abs(recovered_low_res_image) - raw_low_res_image))
+
+            new_recovered_low_res_image =  (1 / scaling_factor) * raw_low_res_image * np.exp(1j * np.angle(recovered_low_res_image))
+
+            new_recovered_low_res_fourier_transform = fftshift(fft2(fftshift(new_recovered_low_res_image))) \
+                                                      * low_res_CTF \
+                                                      / pupil
+
+            updated_region_of_recovered_object_fourier_transform = new_recovered_low_res_fourier_transform \
+                                                     + (1-low_res_CTF) * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]
+
+            recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] = updated_region_of_recovered_object_fourier_transform
+
+
+    recovered_object = ifftshift(ifft2(ifftshift(recovered_object_fourier_transform))) # only inner should be ifftshift?
+    return recovered_object
+
+
+
+
+
+
+

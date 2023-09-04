@@ -145,7 +145,7 @@ def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, x_offset,
     for x_index in range(x_size):
         for y_index in range(y_size):
             x_locations[y_index, x_index] = (x_index - center_indices[0]) * LED_pitch
-            y_locations[y_index, x_index] = (center_indices[1] - y_index) * LED_pitch    
+            y_locations[y_index, x_index] = (y_index - center_indices[1]) * LED_pitch    
     
     if rotation != 0:
         raise "Rotation not implemented yet"

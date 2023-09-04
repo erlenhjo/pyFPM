@@ -60,14 +60,8 @@ illumination_pattern = pyFPM.pre_processing.Illumination_pattern.Illumination_pa
     setup_parameters = setup_parameters
 )
 
-FP_results = pyFPM.recovery.algorithms.primitive_FP.primitive_fourier_ptychography_algorithm(
+pyFPM.calibration.defocus_calibration.primitive_defocus_calibration(
     preprocessed_data = preprocessed_data,
-    setup_parameters = setup_parameters,
     imaging_system = imaging_system,
-    illumination_pattern = illumination_pattern,
-    loops = 10
+    illumination_pattern = illumination_pattern
 )
-
-
-
-

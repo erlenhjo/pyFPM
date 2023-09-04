@@ -29,7 +29,7 @@ class Illumination_pattern(object):
         self.available_LEDs = available_LEDs
         self.BF_edge = BF_edge
 
-        self.update_order = matlab_indices(LED_indices = LED_indices)
+        self.update_order = matlab_indices(LED_indices = LED_indices, BF_edge = BF_edge)
 
 
 
@@ -53,9 +53,11 @@ def indices_NA_first(LED_indices, center):
     raise "Not implemented NA first ordering"
 
 
-def matlab_indices(LED_indices):
+def matlab_indices(LED_indices, BF_edge):
     # this follows a spiral from the center and out, starting up and then anti-clockwise
-    matlab_order = np.array([41,50,49,40,31,32,33,42,51,60,59,58,57,48,39,30,21,22,23,24,25,34,43,52,61,70,69,68,67,66,65,56,47,38,29,20,11,12,13,14,15,16,17,26,35,44,53,62,71,80,79,78,77,76,75,74,73,64,55,46,37,28,19,10,1,2,3,4,5,6,7,8,9,18,27,36,45,54,63,72,81])
+    matlab_order = np.array([41,50,49,40,31,32,33,42,51,60,59,58,57,48,39,30,21,22,23,24,25,34,43,52,61,\
+                             70,69,68,67,66,65,56,47,38,29,20,11,12,13,14,15,16,17,26,35,44,53,62,71,80,79,\
+                             78,77,76,75,74,73,64,55,46,37,28,19,10,1,2,3,4,5,6,7,8,9,18,27,36,45,54,63,72,81])
 
     index_matrix = np.zeros(shape=(33,33), dtype = int)
     ordered_matrix = np.zeros(shape=(33,33), dtype = int)
