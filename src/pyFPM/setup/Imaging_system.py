@@ -77,6 +77,7 @@ class Imaging_system(object):
         self.final_image_size = final_image_size
         self.raw_image_pixel_size = raw_image_pixel_size
         self.final_image_pixel_size = final_image_pixel_size
+        self.pixel_scale_factor = pixel_scale_factor
         
         self.low_res_CTF = low_res_CTF
         self.high_res_CTF = high_res_CTF
