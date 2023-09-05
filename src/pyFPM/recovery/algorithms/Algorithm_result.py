@@ -1,6 +1,6 @@
 class Algorithm_result(object):
-    def __init__(self, object, object_fourier_transform, pupil, loop_error):
-        self.object = object
-        self.object_fourier_transform = object_fourier_transform
+    def __init__(self, recovered_object, recovered_object_fourier_transform, pupil, convergence_index):
+        self.recovered_object = recovered_object
+        self.recovered_object_fourier_transform = recovered_object_fourier_transform
         self.pupil = pupil
-        self.loop_error = loop_error
+        self.convergence_index = convergence_index
