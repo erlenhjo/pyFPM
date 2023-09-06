@@ -27,7 +27,8 @@ def primitive_fourier_ptychography_algorithm(
     dk_x = imaging_system.differential_wavevectors_x()
     dk_y = imaging_system.differential_wavevectors_y()
     low_res_CTF = imaging_system.low_res_CTF
-    inverse_scaling_factor = 1 / imaging_system.pixel_scale_factor
+    inverse_scaling_factor_squared = (1 / imaging_system.pixel_scale_factor)**2
+    scaling_factor_squared = (imaging_system.pixel_scale_factor)**2
     scaling_factor = imaging_system.pixel_scale_factor
     LED_indices = preprocessed_data.LED_indices
 
@@ -57,8 +58,7 @@ def primitive_fourier_ptychography_algorithm(
             k_min_y = int(np.floor(k_center_y - (size_low_res_y - 1) / 2))
             k_max_y = int(np.floor(k_center_y + (size_low_res_y - 1) / 2))
 
-
-            recovered_low_res_fourier_transform = inverse_scaling_factor**2 \
+            recovered_low_res_fourier_transform = inverse_scaling_factor_squared \
                                                   * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] \
                                                   * low_res_CTF \
                                                   * pupil
@@ -68,7 +68,7 @@ def primitive_fourier_ptychography_algorithm(
             convergence_index[loop_nr] += np.mean(np.abs(recovered_low_res_image)) \
                                             / np.sum(abs(abs(recovered_low_res_image) - raw_low_res_image))
 
-            new_recovered_low_res_image =  scaling_factor**2 * raw_low_res_image * recovered_low_res_image / np.abs(recovered_low_res_image)
+            new_recovered_low_res_image =  scaling_factor_squared * raw_low_res_image * recovered_low_res_image / np.abs(recovered_low_res_image)
             
             new_recovered_low_res_fourier_transform = fftshift(fft2(fftshift(new_recovered_low_res_image))) \
                                                       * low_res_CTF \
@@ -78,7 +78,6 @@ def primitive_fourier_ptychography_algorithm(
                                                      + (1-low_res_CTF) * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]
 
             recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] = updated_region_of_recovered_object_fourier_transform
-
 
     algorithm_result = Algorithm_result(
         recovered_object = ifftshift(ifft2(ifftshift(recovered_object_fourier_transform))),  # only inner should be ifftshift?

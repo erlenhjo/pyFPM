@@ -12,7 +12,7 @@ datadirpath = "C:/Users/erlen/Documents/GitHub/pyFPM/data/20230825_USAFtarget"
 #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ290823_USAF1951_infcorr2x_hamamatsu"
 
 pixel_scale_factor = 4
-patch_start = [949, 899] # [x, y]
+patch_start = [949, 979] # [x, y]
 patch_size = [64, 64] # [x, y]
 
 background_filename = "dark_image"
@@ -67,3 +67,5 @@ pyFPM.calibration.defocus_calibration.primitive_defocus_calibration(
 )
 
 
+plt.imshow(rawdata.images[illumination_pattern.update_order[0]])
+plt.show()

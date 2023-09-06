@@ -42,6 +42,10 @@ def primitive_defocus_calibration(
 
         errors.append(sum_square_error)
 
+        if abs(defocus) < 1e-6:
+            plt.imshow(np.abs(FP_results.recovered_object)**2)
+            plt.show()
+
 
     plt.scatter(defocus_range*1e6,errors)
     plt.title("Sum square error per defocus")

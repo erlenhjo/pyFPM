@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import Imaging_system
@@ -77,6 +78,9 @@ def matlab_indices(LED_indices, BF_edge):
 
         ordered_matrix[y,x] = update_index
         ordered_list[update_index] = n
+
+    #plt.matshow(ordered_matrix)
+    #plt.show()
 
     return ordered_list
 
