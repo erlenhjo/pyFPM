@@ -30,7 +30,7 @@ class Illumination_pattern(object):
         self.available_LEDs = available_LEDs
         self.BF_edge = BF_edge
 
-        self.update_order, _ = matlab_indices(LED_indices=LED_indices)
+        #self.update_order, _ = matlab_indices(LED_indices=LED_indices)
         self.update_order, _ = spiral_indices(LED_indices = LED_indices, center_indices=center_indices)
 
         #l1, m1 = matlab_indices(LED_indices=LED_indices)
