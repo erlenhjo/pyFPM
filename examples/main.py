@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 import pyFPM
 
@@ -39,7 +40,7 @@ rawdata = pyFPM.setup.Rawdata.Rawdata(
     patch_size = patch_size
     )
 
-preprocessed_data = pyFPM.pre_processing.Preprocessed_data.Preprocessed_data(
+preprocessed_data = pyFPM.setup.Preprocessed_data.Preprocessed_data(
     rawdata = rawdata,
     setup_parameters = setup_parameters,
     remove_background = remove_background, 
@@ -54,7 +55,7 @@ imaging_system = pyFPM.setup.Imaging_system.Imaging_system(
     rotation = rotation
     )
 
-illumination_pattern = pyFPM.pre_processing.Illumination_pattern.Illumination_pattern(
+illumination_pattern = pyFPM.setup.Illumination_pattern.Illumination_pattern(
     LED_indices = preprocessed_data.LED_indices,
     imaging_system = imaging_system,
     setup_parameters = setup_parameters
@@ -66,6 +67,13 @@ pyFPM.calibration.defocus_calibration.primitive_defocus_calibration(
     illumination_pattern = illumination_pattern
 )
 
-
-plt.imshow(rawdata.images[illumination_pattern.update_order[0]])
-plt.show()
+#plt.figure()
+#plt.imshow(rawdata.images[illumination_pattern.update_order[0]])
+#plt.axis("off")
+#plt.matshow(imaging_system.low_res_CTF)
+#plt.axis("off")
+#plt.matshow(np.angle(imaging_system.get_pupil(100e-6))*imaging_system.low_res_CTF)
+#plt.axis("off")
+#plt.clim(0, np.pi)
+#plt.colorbar(label="Phase")
+#plt.show()

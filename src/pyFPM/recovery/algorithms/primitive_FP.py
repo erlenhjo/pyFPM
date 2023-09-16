@@ -2,8 +2,8 @@ import numpy as np
 from numpy.fft import fft2, ifft2, fftshift, ifftshift
 import matplotlib.pyplot as plt
 
-from pyFPM.pre_processing.Preprocessed_data import Preprocessed_data
-from pyFPM.pre_processing.Illumination_pattern import Illumination_pattern
+from pyFPM.setup.Preprocessed_data import Preprocessed_data
+from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
