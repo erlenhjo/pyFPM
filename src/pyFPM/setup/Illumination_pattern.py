@@ -31,6 +31,18 @@ class Illumination_pattern(object):
         self.BF_edge = BF_edge
 
         self.update_order, _ = matlab_indices(LED_indices=LED_indices)
+        self.update_order, _ = spiral_indices(LED_indices = LED_indices, center_indices=center_indices)
+
+        #l1, m1 = matlab_indices(LED_indices=LED_indices)
+        #l2, m2 = spiral_indices(LED_indices=LED_indices, center_indices=center_indices)
+        #print(l1)
+        #print(l2)
+        #print(l1 == l2)
+        #plt.matshow(m1)
+        #plt.matshow(m2[10:20,10:20])
+        #plt.matshow(m2-m1)
+        #plt.show()
+
 
 def determine_available_LEDs(LED_indices, LED_array_size):
     available_LEDs = np.zeros(shape = (LED_array_size[1] + 1, LED_array_size[0] + 1), dtype = bool)   # plus 1 in case array indices are one indexed
@@ -79,3 +91,44 @@ def matlab_indices(LED_indices):
 
     return order_list, order_matrix
 
+
+def spiral_indices(LED_indices, center_indices):
+    center_x_index = center_indices[0]
+    center_y_index = center_indices[1]
+
+    order_matrix = np.zeros(shape=(33,33), dtype = int)
+    order_list = np.empty(shape=len(LED_indices), dtype = int)
+
+
+    x_index = center_x_index
+    y_index = center_y_index
+    order_matrix[y_index,x_index] = 0  
+    update_index = 1  
+    direction = 0 #when mod4 = 0 up, 1 left, 2 down, 3 right, 4 up etc
+    while (0 < x_index) and (x_index < 33) and (0 < y_index) and (y_index < 33):
+        for n in range(int(np.ceil((direction)//2+1))):
+            if direction % 4 == 0:
+                y_index -= 1
+            elif direction % 4 == 1:
+                x_index -= 1
+            elif direction % 4 == 2:
+                y_index += 1
+            elif direction % 4 == 3:
+                x_index += 1
+
+            order_matrix[y_index, x_index] = update_index
+            update_index += 1
+
+        direction += 1
+
+    for n, indices in enumerate(LED_indices):
+        x = indices[0]
+        y = indices[1]
+
+        update_index = order_matrix[y,x]
+        order_list[update_index] = n
+
+    return order_list, order_matrix
+    
+    
+    
