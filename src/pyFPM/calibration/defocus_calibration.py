@@ -20,6 +20,8 @@ def primitive_defocus_calibration(
     loops = 10
     defocus_range = np.arange(-200,201,20) * 1e-6
 
+    best_image = None
+    best_image_defocus = None
     errors = []
 
     for defocus in defocus_range:
@@ -40,20 +42,31 @@ def primitive_defocus_calibration(
             algorithm_result=FP_results
         )
 
+        if best_image is None:
+            best_image = np.abs(FP_results.recovered_object)**2
+            best_image_defocus = defocus
+        elif sum_square_error < min(errors):
+            best_image = np.abs(FP_results.recovered_object)**2
+            best_image_defocus = defocus
+        
         errors.append(sum_square_error)
 
-        if abs(defocus) < 1e-6:
-            plt.figure()
-            plt.imshow(np.abs(FP_results.recovered_object)**2)
-            plt.axis("off")
+    plt.figure()
+    plt.title(f"Defocus {best_image_defocus*1e6:.1f} um")
+    plt.imshow(best_image)
+    plt.axis("off")
 
     plt.figure()
     plt.scatter(defocus_range*1e6,errors)
     plt.title("Sum square error per defocus")
     plt.xlabel("Defocus [µm]")
     plt.ylabel("SSE [a.u.]")
-    plt.tight_layout()
 
+    plt.figure()
+    plt.title(f"Preprocessed image")
+    plt.imshow(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]**2)
+    plt.axis("off")
+    plt.show()
 
 
         
