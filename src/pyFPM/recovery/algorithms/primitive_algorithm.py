@@ -13,7 +13,8 @@ def primitive_fourier_ptychography_algorithm(
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,
         pupil,
-        loops
+        loops,
+        use_epry = False
     ) -> Algorithm_result :
 
     low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
@@ -21,7 +22,33 @@ def primitive_fourier_ptychography_algorithm(
             scaling_factor, LED_indices = extract_variables(preprocessed_data, imaging_system, illumination_pattern)
     
     recovered_object_guess = initialize_high_res_image(low_res_images, update_order, scaling_factor)
-    recovered_object_fourier_transform = fftshift(fft2(fftshift(recovered_object_guess)))  # why extra fftshift, should be ifftshift?    
+    
+
+    recovered_object_fourier_transform, pupil, convergence_index \
+        = main_algorithm_loop(recovered_object_guess, loops, use_epry, update_order, low_res_images,  LED_indices,
+                        k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,
+                        inverse_scaling_factor_squared, scaling_factor_squared, low_res_CTF, pupil
+                        )
+
+    algorithm_result = Algorithm_result(
+        recovered_object = fftshift(ifft2(ifftshift(recovered_object_fourier_transform))),
+        recovered_object_fourier_transform = recovered_object_fourier_transform,
+        pupil = pupil,
+        convergence_index = convergence_index
+    ) 
+    return algorithm_result
+
+
+
+
+
+
+
+def main_algorithm_loop(recovered_object_guess, loops, use_epry, update_order, low_res_images,  LED_indices,
+                        k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,
+                        inverse_scaling_factor_squared, scaling_factor_squared, low_res_CTF, pupil
+                        ):
+    recovered_object_fourier_transform = fftshift(fft2(ifftshift(recovered_object_guess)))  
     convergence_index = np.zeros(loops)
 
     for loop_nr in range(loops):
@@ -38,30 +65,34 @@ def primitive_fourier_ptychography_algorithm(
                                                   * low_res_CTF \
                                                   * pupil
                                                 
-            recovered_low_res_image = ifftshift(ifft2(ifftshift(recovered_low_res_fourier_transform))) # only inner should be ifftshift?
+            recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))
 
             convergence_index[loop_nr] += np.mean(np.abs(recovered_low_res_image)) \
                                             / np.sum(abs(abs(recovered_low_res_image) - raw_low_res_image))
 
             new_recovered_low_res_image =  scaling_factor_squared * raw_low_res_image * recovered_low_res_image / np.abs(recovered_low_res_image)
             
-            new_recovered_low_res_fourier_transform = fftshift(fft2(fftshift(new_recovered_low_res_image))) \
+            new_recovered_low_res_fourier_transform = fftshift(fft2(ifftshift(new_recovered_low_res_image))) \
                                                       * low_res_CTF \
                                                       / pupil
 
-            updated_region_of_recovered_object_fourier_transform = new_recovered_low_res_fourier_transform \
-                                                     + (1-low_res_CTF) * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]
+            if not use_epry:
+                updated_region_of_recovered_object_fourier_transform = new_recovered_low_res_fourier_transform \
+                                                        + (1-low_res_CTF) * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]
 
-            recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] = updated_region_of_recovered_object_fourier_transform
+                recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] = updated_region_of_recovered_object_fourier_transform
+            else:
+                object_update_term = np.conj(pupil) \
+                                     / (np.max(np.abs(pupil)) ** 2) \
+                                     * (new_recovered_low_res_fourier_transform - recovered_low_res_fourier_transform)
+                recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] = recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] + object_update_term
+                
+                pupil_update_term = np.conj(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]) \
+                                    / (np.max(np.abs(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]) ** 2)) \
+                                    * (new_recovered_low_res_fourier_transform - recovered_low_res_fourier_transform) 
+                pupil = pupil + pupil_update_term
 
-    algorithm_result = Algorithm_result(
-        recovered_object = ifftshift(ifft2(ifftshift(recovered_object_fourier_transform))),  # only inner should be ifftshift?
-        recovered_object_fourier_transform = recovered_object_fourier_transform,
-        pupil = pupil,
-        convergence_index = convergence_index
-    ) 
-    return algorithm_result
-
+    return recovered_object_fourier_transform, pupil, convergence_index
 
 
 
@@ -85,11 +116,15 @@ def extract_variables(preprocessed_data: Preprocessed_data, imaging_system: Imag
     return low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, k_x, k_y, dk_y, dk_x,\
             low_res_CTF, inverse_scaling_factor_squared, scaling_factor_squared, scaling_factor, LED_indices
 
+
+
 def initialize_high_res_image(low_res_images, update_order, scaling_factor):
     ones = np.ones(shape = (scaling_factor, scaling_factor))
     first_image = low_res_images[update_order[0]]
     recovered_object_guess = np.kron(first_image, ones)
     return recovered_object_guess
+
+
 
 def calculate_k_vector_range(k_x, k_y, dk_x, dk_y, 
                              size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,

@@ -32,8 +32,6 @@ def computeFPMerror(preprocessed_data: Preprocessed_data, imaging_system: Imagin
     recovered_object_ft = fftshift(fft2(fftshift(weighted_object_ft)))
 
     error_estimate = 0
-    e1=0
-    e2=0
     for image_nr in range(len(update_order)):
         index = update_order[image_nr]
         LED_index_x = LED_indices[index][0]
