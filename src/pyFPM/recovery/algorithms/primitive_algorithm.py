@@ -14,7 +14,8 @@ def primitive_fourier_ptychography_algorithm(
         illumination_pattern: Illumination_pattern,
         pupil,
         loops,
-        use_epry = False
+        use_epry = False,
+        use_gradient_descent = False
     ) -> Algorithm_result :
 
     low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
@@ -25,7 +26,7 @@ def primitive_fourier_ptychography_algorithm(
     
 
     recovered_object_fourier_transform, pupil, convergence_index \
-        = main_algorithm_loop(recovered_object_guess, loops, use_epry, update_order, low_res_images,  LED_indices,
+        = main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_descent, update_order, low_res_images,  LED_indices,
                         k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,
                         inverse_scaling_factor_squared, scaling_factor_squared, low_res_CTF, pupil
                         )
@@ -44,7 +45,7 @@ def primitive_fourier_ptychography_algorithm(
 
 
 
-def main_algorithm_loop(recovered_object_guess, loops, use_epry, update_order, low_res_images,  LED_indices,
+def main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_descent, update_order, low_res_images,  LED_indices,
                         k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,
                         inverse_scaling_factor_squared, scaling_factor_squared, low_res_CTF, pupil
                         ):
@@ -81,7 +82,8 @@ def main_algorithm_loop(recovered_object_guess, loops, use_epry, update_order, l
                                                         + (1-low_res_CTF) * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]
 
                 recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] = updated_region_of_recovered_object_fourier_transform
-            else:
+
+            elif not use_gradient_descent:
                 object_update_term = np.conj(pupil) \
                                      / (np.max(np.abs(pupil)) ** 2) \
                                      * (new_recovered_low_res_fourier_transform - recovered_low_res_fourier_transform)
@@ -91,6 +93,16 @@ def main_algorithm_loop(recovered_object_guess, loops, use_epry, update_order, l
                                     / (np.max(np.abs(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]) ** 2)) \
                                     * (new_recovered_low_res_fourier_transform - recovered_low_res_fourier_transform) 
                 pupil = pupil + pupil_update_term
+
+            elif use_gradient_descent:
+                object_update_term = gradient_descent_step(pupil,new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, delta = 1)
+                recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] = recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] + object_update_term
+                
+                pupil_update_term = gradient_descent_step(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1],
+                                                          new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, delta = 1)
+                pupil = pupil + pupil_update_term
+
+
 
     return recovered_object_fourier_transform, pupil, convergence_index
 
@@ -142,3 +154,9 @@ def calculate_k_vector_range(k_x, k_y, dk_x, dk_y,
     k_max_y = int(np.floor(k_center_y + (size_low_res_y - 1) / 2))
 
     return k_min_x, k_max_x, k_min_y, k_max_y
+
+
+def gradient_descent_step(phi, new_FT, old_FT, delta):
+    numerator = np.abs(phi) * np.conj(phi)
+    denominator = np.max(np.abs(phi)) * (np.abs(phi)**2 + delta)
+    return numerator/denominator * (new_FT - old_FT)
