@@ -1,4 +1,10 @@
-import pyFPM
+from pyFPM.setup.Setup_parameters import Setup_parameters, setup_parameters_from_file
+from pyFPM.setup.Imaging_system import Imaging_system
+from pyFPM.setup.Rawdata import Rawdata
+from pyFPM.setup.Preprocessed_data import Preprocessed_data
+from pyFPM.setup.Illumination_pattern import Illumination_pattern
+from pyFPM.setup.components import Camera, Lens, Led_array, Slide
+
 
 def setup_2x_hamamatsu(
     datadirpath,
@@ -6,10 +12,10 @@ def setup_2x_hamamatsu(
     patch_size,
     pixel_scale_factor
 ):
-    camera = pyFPM.setup.components.Camera.HAMAMATSU
-    lens = pyFPM.setup.components.Lens.INFINITYCORRECTED_2X
-    slide = pyFPM.setup.components.Slide.THIN_SLIDE
-    LED_array = pyFPM.setup.components.Led_array.MAIN_LED_ARRAY
+    camera = Camera.HAMAMATSU
+    lens = Lens.INFINITYCORRECTED_2X
+    slide = Slide.THIN_SLIDE
+    LED_array = Led_array.MAIN_LED_ARRAY
     array_to_object_distance = 0.192  
 
     background_filename = "dark_image"
@@ -18,8 +24,7 @@ def setup_2x_hamamatsu(
     remove_background = False
     threshold_value = False
 
-    setup_parameters: pyFPM.setup.Setup_parameters.Setup_parameters \
-        = pyFPM.setup.Setup_parameters.setup_parameters_from_file(
+    setup_parameters: Setup_parameters = setup_parameters_from_file(
         datadirpath = datadirpath,
         lens = lens,
         camera = camera,
@@ -28,7 +33,7 @@ def setup_2x_hamamatsu(
         array_to_object_distance = array_to_object_distance
         )
 
-    rawdata = pyFPM.setup.Rawdata.Rawdata(
+    rawdata = Rawdata(
         datadirpath = datadirpath,
         background_filename = background_filename,
         image_format = image_format,
@@ -36,14 +41,14 @@ def setup_2x_hamamatsu(
         patch_size = patch_size
         )
 
-    preprocessed_data = pyFPM.setup.Preprocessed_data.Preprocessed_data(
+    preprocessed_data = Preprocessed_data(
         rawdata = rawdata,
         setup_parameters = setup_parameters,
         remove_background = remove_background, 
         threshold_value = threshold_value, 
         )
 
-    imaging_system = pyFPM.setup.Imaging_system.Imaging_system(
+    imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
         patch_start = patch_start,
@@ -51,7 +56,7 @@ def setup_2x_hamamatsu(
         rotation = rotation
         )
 
-    illumination_pattern = pyFPM.setup.Illumination_pattern.Illumination_pattern(
+    illumination_pattern = Illumination_pattern(
         LED_indices = preprocessed_data.LED_indices,
         imaging_system = imaging_system,
         setup_parameters = setup_parameters

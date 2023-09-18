@@ -7,7 +7,7 @@ from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.utility.FPM_error import computeFPMerror
 
 
-from pyFPM.recovery.algorithms.primitive_FP import primitive_fourier_ptychography_algorithm
+from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptychography_algorithm
 
 
 def primitive_defocus_calibration(
@@ -27,7 +27,7 @@ def primitive_defocus_calibration(
     for defocus in defocus_range:
         pupil = imaging_system.get_pupil(defocus = defocus)
 
-        FP_results = primitive_fourier_ptychography_algorithm(
+        algorithm_results = primitive_fourier_ptychography_algorithm(
             preprocessed_data = preprocessed_data,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -39,14 +39,14 @@ def primitive_defocus_calibration(
             preprocessed_data=preprocessed_data,
             imaging_system=imaging_system,
             illumination_pattern=illumination_pattern,
-            algorithm_result=FP_results
+            algorithm_result=algorithm_results
         )
 
         if best_image is None:
-            best_image = np.abs(FP_results.recovered_object)**2
+            best_image = np.abs(algorithm_results.recovered_object)**2
             best_image_defocus = defocus
         elif sum_square_error < min(errors):
-            best_image = np.abs(FP_results.recovered_object)**2
+            best_image = np.abs(algorithm_results.recovered_object)**2
             best_image_defocus = defocus
         
         errors.append(sum_square_error)
