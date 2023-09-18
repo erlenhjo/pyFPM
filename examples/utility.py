@@ -22,4 +22,9 @@ def plot_results(
     plt.title(f"Preprocessed image")
     plt.imshow(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]**2)
     plt.axis("off")
+
+    plt.figure()
+    plt.title(f"Pupil")
+    plt.imshow(np.angle(algorithm_result.pupil))
+    plt.axis("off")
     plt.show()
