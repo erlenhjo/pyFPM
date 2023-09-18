@@ -1,1 +1,1 @@
-from . import Algorithm_result, primitive_FP
+from . import Algorithm_result, primitive_algorithm
