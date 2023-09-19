@@ -21,29 +21,31 @@ def plot_results(
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Raw image")
-    axes[0].imshow(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]**2)
+    axes[0].matshow(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]**2)
     axes[0].axis("off")
 
     axes[1].set_title("Raw fourier spectrum")
-    axes[1].imshow(np.log(np.abs(fftshift(fft2(ifftshift(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]))))**2))
+    axes[1].matshow(np.log(np.abs(fftshift(fft2(ifftshift(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]))))**2))
     axes[1].axis("off")
 
-    axes[2].set_title("Coherent transfer function")
-    axes[2].imshow(imaging_system.low_res_CTF)
+    axes[2].set_title(f"Recovered pupil amplitude")
+    axes[2].matshow(np.abs(algorithm_result.pupil) * imaging_system.low_res_CTF)
     axes[2].axis("off")
 
     axes[3].set_title(f"Recovered image")
-    axes[3].imshow(np.abs(algorithm_result.recovered_object)**2)    
+    axes[3].matshow(np.abs(algorithm_result.recovered_object)**2)    
     axes[3].axis("off")
 
     axes[4].set_title(f"Recovered fourier spectrum")
-    axes[4].imshow(np.log(np.abs(algorithm_result.recovered_object_fourier_transform)**2))
+    axes[4].matshow(np.log(np.abs(algorithm_result.recovered_object_fourier_transform)**2))
     axes[4].axis("off")
 
-    axes[5].set_title(f"Recovered pupil")
-    axes[5].imshow(np.angle(algorithm_result.pupil) * imaging_system.low_res_CTF)
+    axes[5].set_title(f"Recovered pupil angle")
+    axes[5].matshow(np.angle(algorithm_result.pupil) * imaging_system.low_res_CTF)
     axes[5].axis("off")
 
     fig.tight_layout()
     plt.show()
+
+    plt.close()
 
