@@ -13,7 +13,9 @@ from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptyc
 def primitive_defocus_calibration(
         preprocessed_data: Preprocessed_data,
         imaging_system: Imaging_system,
-        illumination_pattern: Illumination_pattern
+        illumination_pattern: Illumination_pattern,
+        use_epry = False,
+        use_gradient_descent = False
     ):
     
 
@@ -32,8 +34,9 @@ def primitive_defocus_calibration(
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
             pupil = pupil,
-            loops = loops
-        )
+            loops = loops,
+            use_epry = use_epry,
+            use_gradient_descent = use_gradient_descent        )
         
         sum_square_error = computeFPMerror(
             preprocessed_data=preprocessed_data,
