@@ -93,6 +93,5 @@ def calculate_exposure_times(center_indices, BF_exposure_radius, BF_exposure_tim
                 exposure_times[y_index, x_index] = DF_exposure_time
             else:
                 exposure_times[y_index, x_index] = BF_exposure_time
-                print([x_index, y_index])
 
     return exposure_times
