@@ -36,8 +36,12 @@ def plot_results(
     axes[3].matshow(np.abs(algorithm_result.recovered_object)**2)    
     axes[3].axis("off")
 
+    nonzero_y, nonzero_x = np.nonzero(algorithm_result.recovered_object_fourier_transform)
+    min_x, max_x = np.min(nonzero_x), np.max(nonzero_x)
+    min_y, max_y = np.min(nonzero_y), np.max(nonzero_y)
+
     axes[4].set_title(f"Recovered fourier spectrum")
-    axes[4].matshow(np.log(np.abs(algorithm_result.recovered_object_fourier_transform)**2))
+    axes[4].matshow(np.log(np.abs(algorithm_result.recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1])**2))
     axes[4].axis("off")
 
     axes[5].set_title(f"Recovered pupil angle")
