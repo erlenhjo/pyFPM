@@ -21,7 +21,7 @@ pixel_scale_factor = 4
 patch_start = [949, 979] # [x, y]
 patch_size = [64, 64] # [x, y]
 
-method = Method.Epry_Gradient_Descent
+method = Method.Primitive
 
 setup_parameters, rawdata, preprocessed_data, imaging_system, illumination_pattern = setup_2x_hamamatsu(
     datadirpath = datadirpath,
