@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib.colors import SymLogNorm
+
 import numpy as np
 from numpy.fft import fft2, ifft2, fftshift, ifftshift
 
@@ -17,7 +17,7 @@ def plot_results(
         imaging_system: Imaging_system,
         algorithm_result: Algorithm_result
     ):
-    fig, axes = plt.subplots(nrows=2, ncols=3)
+    fig, axes = plt.subplots(nrows=2, ncols=4)
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Raw image")
@@ -32,24 +32,31 @@ def plot_results(
     axes[2].matshow(np.abs(algorithm_result.pupil) * imaging_system.low_res_CTF)
     axes[2].axis("off")
 
-    axes[3].set_title(f"Recovered image")
-    axes[3].matshow(np.abs(algorithm_result.recovered_object)**2)    
+    axes[3].set_title(f"Recovered pupil angle")
+    axes[3].matshow(np.angle(algorithm_result.pupil) * imaging_system.low_res_CTF)
     axes[3].axis("off")
+
+    axes[4].set_title(f"Recovered image")
+    axes[4].matshow(np.abs(algorithm_result.recovered_object)**2)    
+    axes[4].axis("off")
+
+    axes[5].set_title(f"Recovered phase")
+    axes[5].matshow(np.angle(algorithm_result.recovered_object))    
+    axes[5].axis("off")
 
     nonzero_y, nonzero_x = np.nonzero(algorithm_result.recovered_object_fourier_transform)
     min_x, max_x = np.min(nonzero_x), np.max(nonzero_x)
     min_y, max_y = np.min(nonzero_y), np.max(nonzero_y)
 
-    axes[4].set_title(f"Recovered fourier spectrum")
-    axes[4].matshow(np.log(np.abs(algorithm_result.recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1])**2))
-    axes[4].axis("off")
+    axes[6].set_title(f"Recovered FS intensity")
+    axes[6].matshow(np.log(np.abs(algorithm_result.recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1])**2))
+    axes[6].axis("off")
 
-    axes[5].set_title(f"Recovered pupil angle")
-    axes[5].matshow(np.angle(algorithm_result.pupil) * imaging_system.low_res_CTF)
-    axes[5].axis("off")
+    axes[7].set_title(f"Recovered FS phase")
+    axes[7].matshow(np.angle(algorithm_result.recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1]))
+    axes[7].axis("off")
 
     fig.tight_layout()
     plt.show()
 
     plt.close()
-
