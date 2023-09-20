@@ -2,21 +2,18 @@ from enum import Enum
 
 class LED_infos(object):
     def __init__(self, array_to_object_distance, LED_pitch, wavelength, LED_array_size,
-                 LED_offset, center_indices, BF_exposure_radius, BF_exposure_time,
-                 DF_exposure_time):
-        self.array_to_object_distance = array_to_object_distance
-        self.LED_pitch = LED_pitch
-        self.wavelength = wavelength   
-        self.LED_array_size = LED_array_size
-        self.LED_offset = LED_offset
-        self.center_indices = center_indices
-        self.BF_exposure_radius = BF_exposure_radius
-        self.BF_exposure_time = BF_exposure_time
-        self.DF_exposure_time = DF_exposure_time
+                 LED_offset, center_indices, exposure_times):
+        self.array_to_object_distance = array_to_object_distance # m
+        self.LED_pitch = LED_pitch # m
+        self.wavelength = wavelength # m
+        self.LED_array_size = LED_array_size # [x, y]
+        self.LED_offset = LED_offset # m, [x, y]
+        self.center_indices = center_indices # [x,y]
+        self.exposure_times = exposure_times # 2D array of exposure times of size (LED_array_size + 1)^2 where indexation correspondes to LED_indices
 
 class Camera(object):
-    def __init__(self, ccd_pixel_size, raw_image_size, bit_depth):
-        self.ccd_pixel_size = ccd_pixel_size # m
+    def __init__(self, camera_pixel_size, raw_image_size, bit_depth):
+        self.camera_pixel_size = camera_pixel_size # m
         self.raw_image_size = raw_image_size # number of pixels in [x, y]
         self.bit_depth = bit_depth
 
@@ -37,15 +34,15 @@ class Lens(object):
         ):
         self.NA = NA
         self.magnification = magnification
-        self.diameter = diameter
-        self.focal_length = focal_length
-        self.working_distance = working_distance
-        self.depth_of_field = depth_of_field
+        self.diameter = diameter # m
+        self.focal_length = focal_length # m
+        self.working_distance = working_distance # m
+        self.depth_of_field = depth_of_field # m
         self.lens_type: Lens_type = lens_type
 
 class Slide(object):
     def __init__(self, thickness, refractive_index):
-        self.thickness = thickness #m
+        self.thickness = thickness # m
         self.refractive_index = refractive_index
 
 class Setup_parameters(object):

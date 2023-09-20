@@ -9,10 +9,7 @@ class Preprocessed_data(object):
         LED_indices = rawdata.LED_indices
         images = rawdata.images
         background_image = rawdata.background_image
-        BF_exposure_time = setup_parameters.LED_info.BF_exposure_time
-        DF_exposure_time = setup_parameters.LED_info.DF_exposure_time
-        BF_exposure_radius = setup_parameters.LED_info.BF_exposure_radius
-        center_indices = setup_parameters.LED_info.center_indices
+        exposure_times = setup_parameters.LED_info.exposure_times
         bit_depth = setup_parameters.camera.bit_depth
 
         images, background_image = normalize_images(
@@ -21,16 +18,13 @@ class Preprocessed_data(object):
             bit_depth = bit_depth
             )
 
-        images = compensate_for_exposure_times(
-            images = images,
-            BF_exposure_time = BF_exposure_time,
-            DF_exposure_time = DF_exposure_time,
-            BF_exposure_radius=BF_exposure_radius,
-            LED_indices=LED_indices,
-            center_indices=center_indices
-            )
+        if exposure_times is not None:
+            images = compensate_for_exposure_times(
+                images = images,
+                LED_indices=LED_indices,
+                exposure_times=exposure_times
+                )
         
-
         if remove_background:
             subtract_background_image()
 
@@ -49,11 +43,9 @@ def normalize_images(images, background_image, bit_depth):
     return images/bit_depth, background_image/bit_depth
 
 
-def compensate_for_exposure_times(images, BF_exposure_time, DF_exposure_time, BF_exposure_radius, LED_indices, center_indices):
+def compensate_for_exposure_times(images, LED_indices, exposure_times):
     for n, [x_index, y_index] in enumerate(LED_indices):
-        if (x_index - center_indices[0])**2 + (y_index - center_indices[1])**2 > BF_exposure_radius**2:
-            images[n] = images[n]*BF_exposure_time/DF_exposure_time
-
+        images[n] = images[n] / exposure_times[y_index, x_index]
     return images
 
 

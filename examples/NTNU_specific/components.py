@@ -16,7 +16,7 @@ class LED_array(object):
 
 
 HAMAMATSU = Camera(
-    ccd_pixel_size = 6.5e-6,
+    camera_pixel_size = 6.5e-6,
     raw_image_size = [2048, 2048],
     bit_depth = int(2**16 - 1)
     )

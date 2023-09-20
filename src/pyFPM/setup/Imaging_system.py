@@ -9,7 +9,7 @@ class Imaging_system(object):
         spatial_frequency = 1 / setup_parameters.LED_info.wavelength
         spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
 
-        raw_image_pixel_size = setup_parameters.camera.ccd_pixel_size / setup_parameters.lens.magnification
+        raw_image_pixel_size = setup_parameters.camera.camera_pixel_size / setup_parameters.lens.magnification
         final_image_pixel_size = raw_image_pixel_size / pixel_scale_factor
         final_image_size = [pixel_scale_factor * size for size in patch_size]
 

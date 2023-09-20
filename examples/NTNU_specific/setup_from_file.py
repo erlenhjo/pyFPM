@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 from pyFPM.setup.Setup_parameters import Setup_parameters, Lens, Camera, LED_infos, Slide
 from .components import LED_array
@@ -9,7 +10,9 @@ def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera,
 
     BF_exposure_time, DF_exposure_time, \
         BF_exposure_radius, wavelength, \
-            LED_offset,center_indices = read_parameters_from_file(datadirpath, LED_array)
+            LED_offset, center_indices = read_parameters_from_file(datadirpath, LED_array)
+    
+    exposure_times = calculate_exposure_times(center_indices, BF_exposure_radius, BF_exposure_time, DF_exposure_time, LED_array.array_size)
 
     LED_info: LED_infos = LED_infos(
             array_to_object_distance = array_to_object_distance, 
@@ -18,9 +21,7 @@ def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera,
             LED_array_size = LED_array.array_size,
             LED_offset = LED_offset, 
             center_indices = center_indices, 
-            BF_exposure_radius = BF_exposure_radius, 
-            BF_exposure_time = BF_exposure_time,
-            DF_exposure_time = DF_exposure_time
+            exposure_times = exposure_times
         )
 
     setup_parameters: Setup_parameters = Setup_parameters(
@@ -79,3 +80,19 @@ def read_parameters_from_file(datadirpath, LED_array: LED_array):
 
     return BF_exposure_time, DF_exposure_time, BF_exposure_radius, \
             wavelength, LED_offset, center_indices
+
+def calculate_exposure_times(center_indices, BF_exposure_radius, BF_exposure_time, DF_exposure_time, array_size):
+    x_size = array_size[0]
+    y_size = array_size[1]
+
+    exposure_times = np.zeros(shape = (y_size + 1, x_size + 1))
+
+    for y_index in range(y_size + 1):
+        for x_index in range(x_size + 1):
+            if (x_index - center_indices[0])**2 + (y_index - center_indices[1])**2 > (BF_exposure_radius + 1/2)**2:
+                exposure_times[y_index, x_index] = DF_exposure_time
+            else:
+                exposure_times[y_index, x_index] = BF_exposure_time
+                print([x_index, y_index])
+
+    return exposure_times
