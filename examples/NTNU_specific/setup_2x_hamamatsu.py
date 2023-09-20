@@ -1,10 +1,10 @@
-from pyFPM.setup.Setup_parameters import Setup_parameters, setup_parameters_from_file
+from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.setup.Rawdata import Rawdata
 from pyFPM.setup.Preprocessed_data import Preprocessed_data
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.setup.components import Camera, Lens, Led_array, Slide
-
+from .components import HAMAMATSU, INFINITYCORRECTED_2X, MAIN_LED_ARRAY
+from .setup_from_file import setup_parameters_from_file
 
 def setup_2x_hamamatsu(
     datadirpath,
@@ -12,10 +12,10 @@ def setup_2x_hamamatsu(
     patch_size,
     pixel_scale_factor
 ):
-    camera = Camera.HAMAMATSU
-    lens = Lens.INFINITYCORRECTED_2X
-    slide = Slide.THIN_SLIDE
-    LED_array = Led_array.MAIN_LED_ARRAY
+    camera = HAMAMATSU
+    lens = INFINITYCORRECTED_2X
+    slide = None
+    LED_array = MAIN_LED_ARRAY
     array_to_object_distance = 0.192  
 
     background_filename = "dark_image"

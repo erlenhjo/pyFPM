@@ -1,7 +1,6 @@
 import numpy as np
 
 from pyFPM.setup.Setup_parameters import Setup_parameters
-from pyFPM.setup.components.Slide import THIN_SLIDE
 
 class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
@@ -38,7 +37,7 @@ class Imaging_system(object):
         )
         
         # calculate frequency components for thin or thick sample/glass slide
-        if setup_parameters.slide == THIN_SLIDE:
+        if setup_parameters.slide is None:
             spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components_thin_sample(
                 x_locations = x_locations, 
                 y_locations = y_locations, 

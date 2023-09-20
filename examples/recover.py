@@ -1,7 +1,7 @@
 from enum import Enum
 
 # setup imports
-from setup_2x_hamamatsu import setup_2x_hamamatsu
+from NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
 
 # recovery method imports
 from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptychography_algorithm

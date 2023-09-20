@@ -1,7 +1,7 @@
 from enum import Enum
 
 # setup imports
-from setup_2x_hamamatsu import setup_2x_hamamatsu
+from NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
 
 # calibration imports
 from pyFPM.recovery.calibration.defocus_calibration import primitive_defocus_calibration
