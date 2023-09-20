@@ -4,7 +4,7 @@ from enum import Enum
 from setup_2x_hamamatsu import setup_2x_hamamatsu
 
 # calibration imports
-from pyFPM.calibration.defocus_calibration import primitive_defocus_calibration
+from pyFPM.recovery.calibration.defocus_calibration import primitive_defocus_calibration
 
 class Method(Enum):
     Primitive = 1
