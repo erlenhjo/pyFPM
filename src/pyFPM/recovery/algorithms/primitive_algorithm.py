@@ -164,12 +164,10 @@ def calculate_k_vector_range(k_x, k_y, dk_x, dk_y,
 
 
 def calculate_recovered_CTF(update_order, LED_indices, k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, low_res_CTF):
-    recovered_CTF = np.zeros(shape=(size_high_res_y, size_high_res_x), dtype=bool)
     low_res_CTF = low_res_CTF.astype(bool)
+    recovered_CTF = np.zeros(shape=(size_high_res_y, size_high_res_x), dtype=bool)
 
-    for image_nr in range(len(update_order)):
-        index = update_order[image_nr]
-        
+    for index in update_order:
         k_min_x, k_max_x, k_min_y, k_max_y = calculate_k_vector_range(k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y,
                                                                         size_high_res_x, size_high_res_y, LED_indices, index)
 
