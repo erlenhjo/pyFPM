@@ -1,10 +1,16 @@
 import numpy as np
 from PIL import Image
+import matplotlib.pyplot as plt
 
-from aberration_detection.Dot_array import EO_DOT_ARRAY, get_dot_array_image, \
-                                           locate_dots, plot_located_dots, \
-                                           assemble_dots_in_grid, plot_located_dots_vs_grid
-from NTNU_specific.components import HAMAMATSU, INFINITYCORRECTED_2X
+from pyFPM.aberration_detection.dot_array.Dot_array import (EO_DOT_ARRAY, 
+                                                            get_dot_array_image)
+from pyFPM.aberration_detection.dot_array.plot_dot_array import (plot_located_dots,
+                                                                 plot_located_dots_vs_grid,
+                                                                 plot_located_dot_error)
+from pyFPM.aberration_detection.dot_array.locate_dot_array import (locate_dots, 
+                                                                   assemble_dots_in_grid)                                           
+from pyFPM.NTNU_specific.components import (HAMAMATSU, 
+                                            INFINITYCORRECTED_2X)
 
 def simulate_dots_and_locate():
     dot_radius = EO_DOT_ARRAY.diameter / 2 # m
@@ -25,23 +31,23 @@ def simulate_dots_and_locate():
 def locate_and_plot_dots():
     filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf\0_10-16_16.tiff"
 
-    image = np.array(Image.open(filepath))[750:1200, 750:1200]
+    image = np.array(Image.open(filepath))#[750:1200, 750:1200]
 
     dot_radius = EO_DOT_ARRAY.diameter/2
     dot_spacing = EO_DOT_ARRAY.spacing
     pixel_size = HAMAMATSU.camera_pixel_size
     magnification = INFINITYCORRECTED_2X.magnification
 
-    imaged_dot_radius = dot_radius * magnification
-    imaged_dot_spacing = dot_spacing * magnification
+    object_pixel_size = pixel_size / magnification
 
-    detected_blobs = locate_dots(image, imaged_dot_radius, pixel_size)
+    filtered_blobs, blobs_LoG, blobs_DoG = locate_dots(image, dot_radius, object_pixel_size)
 
-
-    #plot_located_dots(image, [detected_blobs])
-    blob_grid, grid = assemble_dots_in_grid(image.shape, detected_blobs, imaged_dot_spacing, pixel_size)
-    plot_located_dots_vs_grid(image, detected_blobs, grid)
-
+    plot_located_dots(image, [filtered_blobs, blobs_LoG, blobs_DoG])
+    blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, filtered_blobs, dot_spacing, object_pixel_size)
+    print(f"The total rotation was {rotation} degrees")
+    plot_located_dots_vs_grid(image, blobs, grid_points)
+    plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size)
+    plt.show()
 
 
 if __name__ == "__main__":

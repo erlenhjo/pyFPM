@@ -1,15 +1,13 @@
 import numpy as np
 from numpy.fft import fft2, ifft2, fftshift, ifftshift
-import matplotlib.pyplot as plt
 
-
-from pyFPM.setup.Preprocessed_data import Preprocessed_data
+from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 
 def primitive_fourier_ptychography_algorithm(
-        preprocessed_data: Preprocessed_data,
+        data_patch: Data_patch,
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,
         pupil,
@@ -20,7 +18,7 @@ def primitive_fourier_ptychography_algorithm(
 
     low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
         k_x, k_y, dk_y, dk_x, low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices \
-                = extract_variables(preprocessed_data, imaging_system, illumination_pattern)
+                = extract_variables(data_patch, imaging_system, illumination_pattern)
     
     recovered_object_guess = initialize_high_res_image(low_res_images, update_order, scaling_factor)
     
@@ -116,8 +114,8 @@ def gradient_descent_step(phi, new_FT, old_FT, delta):
     return numerator/denominator * (new_FT - old_FT)
 
 
-def extract_variables(preprocessed_data: Preprocessed_data, imaging_system: Imaging_system, illumination_pattern: Illumination_pattern):
-    low_res_images = preprocessed_data.amplitude_images
+def extract_variables(data_patch: Data_patch, imaging_system: Imaging_system, illumination_pattern: Illumination_pattern):
+    low_res_images = data_patch.amplitude_images
     update_order = illumination_pattern.update_order
     size_low_res_x = imaging_system.patch_size[0]
     size_low_res_y = imaging_system.patch_size[1]
@@ -130,7 +128,7 @@ def extract_variables(preprocessed_data: Preprocessed_data, imaging_system: Imag
     low_res_CTF = imaging_system.low_res_CTF
     scaling_factor_squared = (imaging_system.pixel_scale_factor)**2
     scaling_factor = imaging_system.pixel_scale_factor
-    LED_indices = preprocessed_data.LED_indices
+    LED_indices = data_patch.LED_indices
 
     return low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, k_x, k_y, dk_y, dk_x,\
             low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices

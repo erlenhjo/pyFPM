@@ -1,15 +1,11 @@
 import os
-
-from PIL import Image
 import numpy as np
+from PIL import Image
 
-from pyFPM.setup.Imaging_system import Imaging_system
-from pyFPM.setup.Setup_parameters import Setup_parameters
+from pyFPM.setup.Data import Rawdata
 
 
-
-class Rawdata(object):
-    def __init__(self, datadirpath, background_filename, image_format, patch_start, patch_size):
+def get_rawdata_from_files(datadirpath, background_filename, image_format):
                 
         image_files, background_file = get_image_filenames(
             datadirpath = datadirpath,
@@ -19,24 +15,19 @@ class Rawdata(object):
         
         background_image = load_single_image(
             datadirpath = datadirpath,
-            file = background_file,
-            patch_start = patch_start,
-            patch_size = patch_size
+            file = background_file
             )
 
         LED_indices, images = load_images(
             datadirpath = datadirpath,
-            image_files = image_files,
-            patch_start = patch_start,
-            patch_size = patch_size
+            image_files = image_files
         )
 
-        self.LED_indices = LED_indices
-        self.images = images
-        self.background_image = background_image
+        return Rawdata(LED_indices=LED_indices, images=images, background_image=background_image)
 
- 
-            
+        
+        
+
 def get_image_filenames(datadirpath, image_format, background_filename):
     image_files = []
     background_file = None
@@ -67,37 +58,21 @@ def indices_from_image_title(filename: str):
     return x_index, y_index
     
 
-def load_images(datadirpath, image_files, patch_start, patch_size):
-    nr_of_images = len(image_files)
+def load_images(datadirpath, image_files):
     LED_indices = []
-    images = np.empty(shape = (nr_of_images, patch_size[1], patch_size[0]))
+    images = []
     
     for n, file in enumerate(image_files):
         x, y = indices_from_image_title(file)
         LED_indices.append([x,y])  
         image = load_single_image(
             datadirpath = datadirpath,
-            file = file,
-            patch_start = patch_start,
-            patch_size = patch_size
+            file = file
             )
-        images[n, :, :] = image
+        images.append(image)
 
-    return LED_indices, images
+    return LED_indices, np.array(images)
      
 
-def load_single_image(datadirpath, file, patch_start, patch_size):
-    image = np.array(Image.open(os.path.join(datadirpath, file)))
-    
-    # select patch
-    x_start = patch_start[0]
-    x_end = patch_start[0] + patch_size[0]
-    y_start = patch_start[1]
-    y_end = patch_start[1] + patch_size[1]
-    image = image[y_start:y_end, x_start:x_end]
-
-    return image
-
-
-
-
+def load_single_image(datadirpath, file):
+    return np.array(Image.open(os.path.join(datadirpath, file)))

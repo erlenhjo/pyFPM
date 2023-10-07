@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
 
 import numpy as np
-from numpy.fft import fft2, ifft2, fftshift, ifftshift
+from numpy.fft import fft2, fftshift, ifftshift
 
 # setup imports
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.setup.Preprocessed_data import Preprocessed_data
+from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Imaging_system import Imaging_system
 
 # recovery method imports
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 
 def plot_results(
-        preprocessed_data: Preprocessed_data, 
+        data_patch: Data_patch, 
         illumination_pattern: Illumination_pattern,
         imaging_system: Imaging_system,
         algorithm_result: Algorithm_result
@@ -21,11 +21,11 @@ def plot_results(
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Raw image")
-    axes[0].matshow(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]**2)
+    axes[0].matshow(data_patch.amplitude_images[illumination_pattern.update_order[0]]**2)
     axes[0].axis("off")
 
     axes[1].set_title("Raw fourier spectrum")
-    axes[1].matshow(np.log(np.abs(fftshift(fft2(ifftshift(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]))))**2))
+    axes[1].matshow(np.log(np.abs(fftshift(fft2(ifftshift(data_patch.amplitude_images[illumination_pattern.update_order[0]]))))**2))
     axes[1].axis("off")
 
     axes[2].set_title(f"Recovered pupil amplitude")

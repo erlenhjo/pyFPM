@@ -1,24 +1,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pyFPM.setup.Preprocessed_data import Preprocessed_data
+from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
-from pyFPM.recovery.utility.FPM_error import computeFPMerror
+from pyFPM.recovery.error_measures.sum_square_error import compute_sum_square_error
 
 
 from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptychography_algorithm
 
 
 def primitive_defocus_calibration(
-        preprocessed_data: Preprocessed_data,
+        data_patch: Data_patch,
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,
         use_epry = False,
         use_gradient_descent = False
     ):
     
-
     loops = 10
     defocus_range = np.arange(-200,201,20) * 1e-6
 
@@ -30,7 +29,7 @@ def primitive_defocus_calibration(
         pupil = imaging_system.get_pupil(defocus = defocus)
 
         algorithm_results = primitive_fourier_ptychography_algorithm(
-            preprocessed_data = preprocessed_data,
+            data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
             pupil = pupil,
@@ -38,8 +37,8 @@ def primitive_defocus_calibration(
             use_epry = use_epry,
             use_gradient_descent = use_gradient_descent        )
         
-        sum_square_error = computeFPMerror(
-            preprocessed_data=preprocessed_data,
+        sum_square_error = compute_sum_square_error(
+            data_patch = data_patch,
             imaging_system=imaging_system,
             illumination_pattern=illumination_pattern,
             algorithm_result=algorithm_results
@@ -67,7 +66,7 @@ def primitive_defocus_calibration(
 
     plt.figure()
     plt.title(f"Preprocessed image")
-    plt.imshow(preprocessed_data.amplitude_images[illumination_pattern.update_order[0]]**2)
+    plt.imshow(data_patch.amplitude_images[illumination_pattern.update_order[0]]**2)
     plt.axis("off")
     plt.show()
 

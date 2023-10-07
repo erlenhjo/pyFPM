@@ -6,42 +6,34 @@ from pyFPM.setup.Imaging_system import Imaging_system
 
 class Illumination_pattern(object):
     def __init__(self, LED_indices, imaging_system: Imaging_system, setup_parameters: Setup_parameters):
-        LED_array_size = setup_parameters.LED_info.LED_array_size
+        # LED_array_size = setup_parameters.LED_info.LED_array_size
         center_indices = setup_parameters.LED_info.center_indices
-        LED_frequencies_x = imaging_system.LED_frequencies_x
-        LED_frequencies_y = imaging_system.LED_frequencies_y
-        cutoff_frequency = imaging_system.cutoff_frequency
-
-        available_LEDs = determine_available_LEDs(
-            LED_indices = LED_indices, 
-            LED_array_size = LED_array_size
-            )
         
-        relative_NAs = calculate_relative_NA(
-            LED_frequencies_x = LED_frequencies_x,
-            LED_frequencies_y = LED_frequencies_y,
-            cutoff_frequency = cutoff_frequency
-        )
+        # LED_frequencies_x = imaging_system.LED_frequencies_x
+        # LED_frequencies_y = imaging_system.LED_frequencies_y
+        # cutoff_frequency = imaging_system.cutoff_frequency
 
-        BF_edge = determine_BF_edge(
-            relative_NAs = relative_NAs
-        )
+        # available_LEDs = determine_available_LEDs(
+        #     LED_indices = LED_indices, 
+        #     LED_array_size = LED_array_size
+        #     )
+        
+        # relative_NAs = calculate_relative_NA(
+        #     LED_frequencies_x = LED_frequencies_x,
+        #     LED_frequencies_y = LED_frequencies_y,
+        #     cutoff_frequency = cutoff_frequency
+        # )
 
-        self.available_LEDs = available_LEDs
-        self.BF_edge = BF_edge
+        # BF_edge = determine_BF_edge(
+        #     relative_NAs = relative_NAs
+        # )
 
-        #self.update_order, _ = matlab_indices(LED_indices=LED_indices)
+        # available_LEDs = available_LEDs
+        # BF_edge = BF_edge
+
         self.update_order, _ = spiral_indices(LED_indices = LED_indices, center_indices=center_indices)
 
-        #l1, m1 = matlab_indices(LED_indices=LED_indices)
-        #l2, m2 = spiral_indices(LED_indices=LED_indices, center_indices=center_indices)
-        #print(l1)
-        #print(l2)
-        #print(l1 == l2)
-        #plt.matshow(m1)
-        #plt.matshow(m2[10:20,10:20])
-        #plt.matshow(m2-m1)
-        #plt.show()
+
 
 
 def determine_available_LEDs(LED_indices, LED_array_size):
@@ -62,34 +54,6 @@ def determine_BF_edge(relative_NAs):
 
 def indices_NA_first(LED_indices, center):
     raise "Not implemented NA first ordering"
-
-
-def matlab_indices(LED_indices):
-    # this follows a spiral from the center and out, starting up and then anti-clockwise
-    matlab_order = np.array([41,50,49,40,31,32,33,42,51,60,59,58,57,48,39,30,21,22,23,24,25,34,43,52,61,\
-                             70,69,68,67,66,65,56,47,38,29,20,11,12,13,14,15,16,17,26,35,44,53,62,71,80,79,\
-                             78,77,76,75,74,73,64,55,46,37,28,19,10,1,2,3,4,5,6,7,8,9,18,27,36,45,54,63,72,81])
-
-    index_matrix = np.zeros(shape=(33,33), dtype = int)
-    order_matrix = np.zeros(shape=(33,33), dtype = int)
-    order_list = np.empty(shape=len(LED_indices), dtype = int)
-
-    nr = 1
-    for y_index in range(20,11,-1):
-        for x_index in range(12, 21):
-            index_matrix[y_index, x_index] = nr
-            nr += 1
-
-    for n, indices in enumerate(LED_indices):
-        x = indices[0]
-        y = indices[1]
-
-        update_index = np.argwhere(matlab_order == index_matrix[y,x])
-
-        order_matrix[y,x] = update_index
-        order_list[update_index] = n
-
-    return order_list, order_matrix
 
 
 def spiral_indices(LED_indices, center_indices):

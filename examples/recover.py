@@ -1,4 +1,6 @@
 from enum import Enum
+import matplotlib.pyplot as plt
+import numpy as np
 
 # setup imports
 from NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
@@ -17,18 +19,18 @@ class Method(Enum):
     Fresnel = 4
     Fresnel_Epry = 5
 
-#datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
-datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf"
+datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
+#datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf"
 
 pixel_scale_factor = 4
-patch_start = [1, 1]#[939, 969] # [x, y]
+patch_start = [870, 870] # [x, y]
 patch_size = [256, 256] # [x, y]
 
-method = Method.Epry_Gradient_Descent
-defocus_guess = 0e-6
-loops = 1
+method = Method.Primitive
+defocus_guess = 20e-6
+loops = 3
 
-setup_parameters, rawdata, preprocessed_data, imaging_system, illumination_pattern = setup_2x_hamamatsu(
+setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_hamamatsu(
     datadirpath = datadirpath,
     patch_start = patch_start,
     patch_size = patch_size,
@@ -37,7 +39,7 @@ setup_parameters, rawdata, preprocessed_data, imaging_system, illumination_patte
 
 if method == Method.Primitive:
     algorithm_result = primitive_fourier_ptychography_algorithm(
-        preprocessed_data = preprocessed_data,
+        data_patch = data_patch,
         imaging_system = imaging_system,
         illumination_pattern = illumination_pattern,
         pupil = imaging_system.get_pupil(defocus = defocus_guess),
@@ -45,7 +47,7 @@ if method == Method.Primitive:
     )
 elif method == Method.Epry:
     algorithm_result = primitive_fourier_ptychography_algorithm(
-        preprocessed_data = preprocessed_data,
+        data_patch = data_patch,
         imaging_system = imaging_system,
         illumination_pattern = illumination_pattern,
         pupil = imaging_system.get_pupil(defocus = defocus_guess),
@@ -55,7 +57,7 @@ elif method == Method.Epry:
     )
 elif method == Method.Epry_Gradient_Descent:
     algorithm_result = primitive_fourier_ptychography_algorithm(
-        preprocessed_data = preprocessed_data,
+        data_patch = data_patch,
         imaging_system = imaging_system,
         illumination_pattern = illumination_pattern,
         pupil = imaging_system.get_pupil(defocus = defocus_guess),
@@ -66,5 +68,5 @@ elif method == Method.Epry_Gradient_Descent:
 else:
     raise "Recovery with specified method not implemented"
 
-plot_results(preprocessed_data, illumination_pattern, imaging_system, algorithm_result)
-print(algorithm_result.convergence_index)
+
+plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result)

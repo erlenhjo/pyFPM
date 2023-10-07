@@ -1,15 +1,15 @@
 import numpy as np
 from numpy.fft import ifft2, ifftshift, fft2, fftshift
 
-from pyFPM.setup.Preprocessed_data import Preprocessed_data
+from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 
-def computeFPMerror(preprocessed_data: Preprocessed_data, imaging_system: Imaging_system, 
+def compute_sum_square_error(data_patch: Data_patch, imaging_system: Imaging_system, 
                             illumination_pattern: Illumination_pattern, algorithm_result: Algorithm_result):
     
-    low_res_images = preprocessed_data.amplitude_images
+    low_res_images = data_patch.amplitude_images
     recovered_object = algorithm_result.recovered_object
     pupil = algorithm_result.pupil
 
@@ -24,7 +24,7 @@ def computeFPMerror(preprocessed_data: Preprocessed_data, imaging_system: Imagin
     dk_y = imaging_system.differential_wavevectors_y()
     low_res_CTF = imaging_system.low_res_CTF
     inverse_scaling_factor = 1 / imaging_system.pixel_scale_factor
-    LED_indices = preprocessed_data.LED_indices
+    LED_indices = data_patch.LED_indices
 
     weighted_object_ft = np.mean(low_res_images[update_order[0]])\
                     / np.mean((np.abs(recovered_object))) * recovered_object

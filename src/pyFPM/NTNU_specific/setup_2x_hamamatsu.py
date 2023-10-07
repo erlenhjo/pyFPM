@@ -1,21 +1,21 @@
-from pyFPM.setup.Setup_parameters import Setup_parameters, setup_parameters_from_file
+from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import Imaging_system
-from pyFPM.setup.Rawdata import Rawdata
-from pyFPM.setup.Preprocessed_data import Preprocessed_data
+from pyFPM.setup.Data import Preprocessed_data, Rawdata, Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.setup.components import Camera, Lens, Led_array, Slide
+from pyFPM.NTNU_specific.components import HAMAMATSU, INFINITYCORRECTED_2X, MAIN_LED_ARRAY
+from pyFPM.NTNU_specific.setup_from_file import setup_parameters_from_file
+from pyFPM.NTNU_specific.rawdata_from_files import get_rawdata_from_files
 
-
-def simulate_2x_hamamatsu(
+def setup_2x_hamamatsu(
     datadirpath,
     patch_start,
     patch_size,
     pixel_scale_factor
 ):
-    camera = Camera.HAMAMATSU
-    lens = Lens.INFINITYCORRECTED_2X
-    slide = Slide.THIN_SLIDE
-    LED_array = Led_array.MAIN_LED_ARRAY
+    camera = HAMAMATSU
+    lens = INFINITYCORRECTED_2X
+    slide = None
+    LED_array = MAIN_LED_ARRAY
     array_to_object_distance = 0.192  
 
     background_filename = "dark_image"
@@ -33,12 +33,10 @@ def simulate_2x_hamamatsu(
         array_to_object_distance = array_to_object_distance
         )
 
-    rawdata = Rawdata(
+    rawdata: Rawdata = get_rawdata_from_files(
         datadirpath = datadirpath,
         background_filename = background_filename,
-        image_format = image_format,
-        patch_start = patch_start,
-        patch_size = patch_size
+        image_format = image_format
         )
 
     preprocessed_data = Preprocessed_data(
@@ -46,6 +44,12 @@ def simulate_2x_hamamatsu(
         setup_parameters = setup_parameters,
         remove_background = remove_background, 
         threshold_value = threshold_value, 
+        )
+    
+    data_patch = Data_patch(
+        preprocessed_data = preprocessed_data,
+        patch_start = patch_start,
+        patch_size = patch_size
         )
 
     imaging_system = Imaging_system(
@@ -57,24 +61,9 @@ def simulate_2x_hamamatsu(
         )
 
     illumination_pattern = Illumination_pattern(
-        LED_indices = preprocessed_data.LED_indices,
+        LED_indices = data_patch.LED_indices,
         imaging_system = imaging_system,
         setup_parameters = setup_parameters
     )
 
-    return setup_parameters, rawdata, preprocessed_data, imaging_system, illumination_pattern
-
-
-
-
-
-if __name__ == "__main__":
-    dot_radius = 62.5e-6 / 2 # m
-    dot_spacing = 125e-6 # m
-    pixel_number = 8192
-    nr_of_dots = 4
-
-    dot_array_image = dot_array(dot_radius=dot_radius, 
-                                dot_spacing=dot_spacing, 
-                                pixel_number=pixel_number,
-                                nr_of_dots=nr_of_dots)
+    return setup_parameters, data_patch, imaging_system, illumination_pattern

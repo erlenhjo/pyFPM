@@ -1,0 +1,1 @@
+from . import dot_array

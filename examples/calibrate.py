@@ -1,7 +1,7 @@
 from enum import Enum
 
 # setup imports
-from NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
+from pyFPM.NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
 
 # calibration imports
 from pyFPM.recovery.calibration.defocus_calibration import primitive_defocus_calibration
@@ -23,7 +23,7 @@ patch_size = [64, 64] # [x, y]
 
 method = Method.Primitive
 
-setup_parameters, rawdata, preprocessed_data, imaging_system, illumination_pattern = setup_2x_hamamatsu(
+setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_hamamatsu(
     datadirpath = datadirpath,
     patch_start = patch_start,
     patch_size = patch_size,
@@ -32,13 +32,13 @@ setup_parameters, rawdata, preprocessed_data, imaging_system, illumination_patte
 
 if method == Method.Primitive:
     primitive_defocus_calibration(
-        preprocessed_data = preprocessed_data,
+        data_patch = data_patch,
         imaging_system = imaging_system,
         illumination_pattern = illumination_pattern
     )
 elif method == Method.Epry:
     primitive_defocus_calibration(
-        preprocessed_data = preprocessed_data,
+        data_patch = data_patch,
         imaging_system = imaging_system,
         illumination_pattern = illumination_pattern,
         use_epry = True,
@@ -46,7 +46,7 @@ elif method == Method.Epry:
     )
 elif method == Method.Epry_Gradient_Descent:
     primitive_defocus_calibration(
-        preprocessed_data = preprocessed_data,
+        data_patch = data_patch,
         imaging_system = imaging_system,
         illumination_pattern = illumination_pattern,
         use_epry = True,
