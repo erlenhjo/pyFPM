@@ -2,12 +2,12 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 
-from pyFPM.aberration_detection.dot_array.Dot_array import (EO_DOT_ARRAY, 
+from pyFPM.aberrations.dot_array.Dot_array import (EO_DOT_ARRAY, 
                                                             get_dot_array_image)
-from pyFPM.aberration_detection.dot_array.plot_dot_array import (plot_located_dots,
+from pyFPM.aberrations.dot_array.plot_dot_array import (plot_located_dots,
                                                                  plot_located_dots_vs_grid,
                                                                  plot_located_dot_error)
-from pyFPM.aberration_detection.dot_array.locate_dot_array import (locate_dots, 
+from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots, 
                                                                    assemble_dots_in_grid)                                           
 from pyFPM.NTNU_specific.components import (HAMAMATSU, 
                                             INFINITYCORRECTED_2X)

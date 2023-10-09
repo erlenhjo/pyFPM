@@ -4,7 +4,7 @@ from matplotlib import patches
 import numpy as np
 import time
 
-from pyFPM.aberration_detection.zernike_polynomials.synthesise_zernike_polynomials import (sympy_convert_zernike_polynomial_to_xy, 
+from pyFPM.aberrations.zernike_polynomials.synthesise_zernike_polynomials import (sympy_convert_zernike_polynomial_to_xy, 
                                                                                 sympy_zernike_polynomial, 
                                                                                 get_Noll_indices, 
                                                                                 get_xy_zernike_polynomial_function)

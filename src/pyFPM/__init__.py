@@ -1,1 +1,1 @@
-from . import setup, recovery, NTNU_specific, aberration_detection
+from . import setup, recovery, NTNU_specific, aberrations
