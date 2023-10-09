@@ -4,7 +4,7 @@ from pyFPM.setup.Setup_parameters import Setup_parameters
 
 class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
-                  patch_start, patch_size, rotation):
+                  patch_start, patch_size):
         
         spatial_frequency = 1 / setup_parameters.LED_info.wavelength
         spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
@@ -32,8 +32,7 @@ class Imaging_system(object):
             center_indices = setup_parameters.LED_info.center_indices,
             LED_pitch = setup_parameters.LED_info.LED_pitch,
             x_offset = x_offset,
-            y_offset = y_offset,
-            rotation = rotation
+            y_offset = y_offset
         )
         
         # calculate frequency components for thin or thick sample/glass slide
@@ -132,7 +131,7 @@ def calculate_offset(LED_offset, image_size, patch_start, patch_size, raw_image_
     return x_offset, y_offset
 
 
-def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, x_offset, y_offset, rotation):
+def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, x_offset, y_offset):
     # note [y, x] indexing due to how matrix indexing works (row, col) -> (y, x)
     # arraysize + 1 in case LED array is one indexed
     x_size = LED_array_size[0] + 1 
@@ -146,9 +145,6 @@ def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, x_offset,
         for y_index in range(y_size):
             x_locations[y_index, x_index] = (x_index - center_indices[0]) * LED_pitch
             y_locations[y_index, x_index] = (y_index - center_indices[1]) * LED_pitch    
-    
-    if rotation != 0:
-        raise "Rotation not implemented yet"
 
     # apply offset
     x_locations = x_locations + x_offset

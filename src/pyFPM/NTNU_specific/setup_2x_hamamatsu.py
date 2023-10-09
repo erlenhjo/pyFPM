@@ -56,8 +56,7 @@ def setup_2x_hamamatsu(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
         patch_start = patch_start,
-        patch_size = patch_size,
-        rotation = rotation
+        patch_size = patch_size
         )
 
     illumination_pattern = Illumination_pattern(
