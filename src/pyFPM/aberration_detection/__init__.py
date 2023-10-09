@@ -1,1 +1,1 @@
-from . import dot_array
+from . import dot_array, zernike_polynomials
