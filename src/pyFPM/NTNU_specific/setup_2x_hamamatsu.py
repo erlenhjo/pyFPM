@@ -47,7 +47,7 @@ def setup_2x_hamamatsu(
         )
     
     data_patch = Data_patch(
-        preprocessed_data = preprocessed_data,
+        data = preprocessed_data,
         patch_start = patch_start,
         patch_size = patch_size
         )

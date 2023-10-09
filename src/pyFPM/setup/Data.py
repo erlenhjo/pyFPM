@@ -47,7 +47,7 @@ class Simulated_data:
     amplitude_images: np.ndarray
 
 class Data_patch:
-    def __init__(self, preprocessed_data: Preprocessed_data, patch_start, patch_size):
+    def __init__(self, data: Preprocessed_data|Simulated_data, patch_start, patch_size):
         x_start = patch_start[0]
         x_end = patch_start[0] + patch_size[0]
         y_start = patch_start[1]
@@ -55,8 +55,8 @@ class Data_patch:
 
         self.patch_start = patch_start
         self.patch_size = patch_size
-        self.amplitude_images = preprocessed_data.amplitude_images[:, y_start:y_end, x_start:x_end]
-        self.LED_indices = preprocessed_data.LED_indices
+        self.amplitude_images = data.amplitude_images[:, y_start:y_end, x_start:x_end]
+        self.LED_indices = data.LED_indices
 
 
 
