@@ -5,6 +5,8 @@ from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
+from pyFPM.recovery.utility.k_space import calculate_k_vector_range, calculate_recovered_CTF
+from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables
 
 def primitive_fourier_ptychography_algorithm(
         data_patch: Data_patch,
@@ -61,13 +63,7 @@ def main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_de
                                                   * low_res_CTF \
                                                   * pupil
                                                 
-            recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))
-
-            #intensity_correction = np.mean(np.abs(recovered_low_res_image))/np.mean(raw_low_res_image) 
-            #if loop_nr>2:
-            #    low_res_images[index] *= intensity_correction
-            #    print(intensity_correction)
-            
+            recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))            
 
             convergence_index[loop_nr] += np.mean(np.abs(recovered_low_res_image)) \
                                             / np.sum(abs(abs(recovered_low_res_image) - raw_low_res_image))
@@ -114,61 +110,3 @@ def gradient_descent_step(phi, new_FT, old_FT, delta):
     return numerator/denominator * (new_FT - old_FT)
 
 
-def extract_variables(data_patch: Data_patch, imaging_system: Imaging_system, illumination_pattern: Illumination_pattern):
-    low_res_images = data_patch.amplitude_images
-    update_order = illumination_pattern.update_order
-    size_low_res_x = imaging_system.patch_size[0]
-    size_low_res_y = imaging_system.patch_size[1]
-    size_high_res_x = imaging_system.final_image_size[0]
-    size_high_res_y = imaging_system.final_image_size[1]
-    k_x = imaging_system.wavevectors_x()
-    k_y = imaging_system.wavevectors_y()
-    dk_x = imaging_system.differential_wavevectors_x()
-    dk_y = imaging_system.differential_wavevectors_y()
-    low_res_CTF = imaging_system.low_res_CTF
-    scaling_factor_squared = (imaging_system.pixel_scale_factor)**2
-    scaling_factor = imaging_system.pixel_scale_factor
-    LED_indices = data_patch.LED_indices
-
-    return low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, k_x, k_y, dk_y, dk_x,\
-            low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices
-
-
-
-def initialize_high_res_image(low_res_images, update_order, scaling_factor):
-    ones = np.ones(shape = (scaling_factor, scaling_factor))
-    first_image = low_res_images[update_order[0]]
-    recovered_object_guess = np.kron(first_image, ones)
-    return recovered_object_guess
-
-
-
-def calculate_k_vector_range(k_x, k_y, dk_x, dk_y, 
-                             size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,
-                             LED_indices, index 
-                            ):
-    LED_index_x = LED_indices[index][0]
-    LED_index_y = LED_indices[index][1]
-
-    # calculate which wavevector-values are present in the current low res image
-    k_center_x = np.round((size_high_res_x - 1)/2 - k_x[LED_index_y, LED_index_x]/dk_x)
-    k_center_y = np.round((size_high_res_y - 1)/2 - k_y[LED_index_y, LED_index_x]/dk_y)
-    k_min_x = int(np.floor(k_center_x - (size_low_res_x - 1) / 2))
-    k_max_x = int(np.floor(k_center_x + (size_low_res_x - 1) / 2))
-    k_min_y = int(np.floor(k_center_y - (size_low_res_y - 1) / 2))
-    k_max_y = int(np.floor(k_center_y + (size_low_res_y - 1) / 2))
-
-    return k_min_x, k_max_x, k_min_y, k_max_y
-
-
-def calculate_recovered_CTF(update_order, LED_indices, k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, low_res_CTF):
-    low_res_CTF = low_res_CTF.astype(bool)
-    recovered_CTF = np.zeros(shape=(size_high_res_y, size_high_res_x), dtype=bool)
-
-    for index in update_order:
-        k_min_x, k_max_x, k_min_y, k_max_y = calculate_k_vector_range(k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y,
-                                                                        size_high_res_x, size_high_res_y, LED_indices, index)
-
-        recovered_CTF[k_min_y:k_max_y+1, k_min_x:k_max_x+1] += low_res_CTF
-                                            
-    return recovered_CTF
