@@ -8,15 +8,14 @@ from pyFPM.recovery.error_measures.sum_square_error import compute_sum_square_er
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 
 
-from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptychography_algorithm
+from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 
 
 def primitive_defocus_calibration(
         data_patch: Data_patch,
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,
-        use_epry = False,
-        use_gradient_descent = False
+        method: Method
     ):
     
     loops = 10
@@ -29,14 +28,14 @@ def primitive_defocus_calibration(
     for defocus in defocus_range:
         pupil_guess = get_defocused_pupil(imaging_system=imaging_system, defocus=defocus)
 
-        algorithm_results = primitive_fourier_ptychography_algorithm(
+        algorithm_results = recover(
+            method = method,
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
-            pupil = pupil,
-            loops = loops,
-            use_epry = use_epry,
-            use_gradient_descent = use_gradient_descent        )
+            pupil_guess = pupil_guess,
+            loops = loops
+            )
         
         sum_square_error = compute_sum_square_error(
             data_patch = data_patch,
@@ -71,5 +70,3 @@ def primitive_defocus_calibration(
     plt.axis("off")
     plt.show()
 
-
-        

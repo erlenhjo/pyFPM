@@ -1,17 +1,9 @@
-from enum import Enum
-
-# setup imports
+# pyFPM imports
 from pyFPM.NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
-
-# calibration imports
 from pyFPM.recovery.calibration.defocus_calibration import primitive_defocus_calibration
+from pyFPM.recovery.algorithms.run_algorithm import Method
 
-class Method(Enum):
-    Primitive = 1
-    Epry = 2
-    Epry_Gradient_Descent = 3
-    Fresnel = 4
-    Fresnel_Epry = 5
+
 
 #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
 #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ290823_USAF1951_infcorr2x_hamamatsu"
@@ -30,31 +22,13 @@ setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_ha
     pixel_scale_factor = pixel_scale_factor
 )
 
-if method == Method.Primitive:
-    primitive_defocus_calibration(
-        data_patch = data_patch,
-        imaging_system = imaging_system,
-        illumination_pattern = illumination_pattern
+primitive_defocus_calibration(
+    data_patch = data_patch,
+    imaging_system = imaging_system,
+    illumination_pattern = illumination_pattern,
+    method = method
     )
-elif method == Method.Epry:
-    primitive_defocus_calibration(
-        data_patch = data_patch,
-        imaging_system = imaging_system,
-        illumination_pattern = illumination_pattern,
-        use_epry = True,
-        use_gradient_descent = False
-    )
-elif method == Method.Epry_Gradient_Descent:
-    primitive_defocus_calibration(
-        data_patch = data_patch,
-        imaging_system = imaging_system,
-        illumination_pattern = illumination_pattern,
-        use_epry = True,
-        use_gradient_descent = True
-    )
-        
-else:
-    raise "Calibration for specified method not implemented"
+
 
 
 
