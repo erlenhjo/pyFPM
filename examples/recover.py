@@ -7,6 +7,7 @@ from pyFPM.NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
 
 # recovery method imports
 from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptychography_algorithm
+from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 
 # utility imports
 from utility import plot_results
@@ -27,7 +28,6 @@ patch_start = [870, 870] # [x, y]
 patch_size = [256, 256] # [x, y]
 
 method = Method.Primitive
-defocus_guess = 20e-6
 loops = 3
 
 setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_hamamatsu(
@@ -67,6 +67,10 @@ elif method == Method.Epry_Gradient_Descent:
     )
 else:
     raise "Recovery with specified method not implemented"
+# define pupil
+defocus_guess = 20e-6
+pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = defocus_guess)
+
 
 
 plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result)

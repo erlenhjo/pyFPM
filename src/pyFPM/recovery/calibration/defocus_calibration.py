@@ -5,6 +5,7 @@ from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.error_measures.sum_square_error import compute_sum_square_error
+from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 
 
 from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptychography_algorithm
@@ -26,7 +27,7 @@ def primitive_defocus_calibration(
     errors = []
 
     for defocus in defocus_range:
-        pupil = imaging_system.get_pupil(defocus = defocus)
+        pupil_guess = get_defocused_pupil(imaging_system=imaging_system, defocus=defocus)
 
         algorithm_results = primitive_fourier_ptychography_algorithm(
             data_patch = data_patch,

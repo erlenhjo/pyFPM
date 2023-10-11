@@ -88,14 +88,6 @@ class Imaging_system(object):
         return 2*np.pi / (self.final_image_pixel_size * self.final_image_size[0])
     def differential_wavevectors_y(self):
         return 2*np.pi / (self.final_image_pixel_size * self.final_image_size[1])
-    def get_pupil(self, defocus):
-        pupil = calculate_pupil(
-            defocus = defocus,
-            pixel_size = self.raw_image_pixel_size,
-            frequency = self.frequency,
-            image_region_size = self.patch_size
-        )
-        return pupil
 
 
 def calculate_spatial_cutoff_frequency(spatial_frequency, NA_sys):
@@ -170,23 +162,17 @@ def calculate_spatial_LED_frequency_components_thick_sample(x_locations, y_locat
 
 
 def calculate_coherent_transfer_function(pixel_size, image_region_size, spatial_cutoff_frequency):
+    fx_mesh, fy_mesh = calculate_frequency_mesh_grids(pixel_size=pixel_size, image_region_size=image_region_size)
+    
+    coherent_transfer_function = (fx_mesh**2 + fy_mesh**2) < spatial_cutoff_frequency**2
+
+    return coherent_transfer_function 
+
+def calculate_frequency_mesh_grids(pixel_size, image_region_size):
     max_frequency = 1 / (2 * pixel_size)
     spatial_frequencies_x = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[0], endpoint = False)   # is enpoint setting correct?
     spatial_frequencies_y = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[1], endpoint = False)
 
     fx_mesh, fy_mesh = np.meshgrid(spatial_frequencies_x, spatial_frequencies_y)
     
-    coherent_transfer_function = (fx_mesh**2 + fy_mesh**2) < spatial_cutoff_frequency**2
-
-    return coherent_transfer_function 
-
-def calculate_pupil(defocus, pixel_size, frequency, image_region_size):
-    max_frequency = 1 / (2 * pixel_size)
-    spatial_frequencies_x = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[0], endpoint = False)   # is enpoint setting correct?
-    spatial_frequencies_y = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[1], endpoint = False)
-
-    fx_mesh, fy_mesh = np.meshgrid(spatial_frequencies_x, spatial_frequencies_y)
-    fz_mesh = np.emath.sqrt(frequency**2 - fx_mesh**2 - fy_mesh**2)
-
-    return np.exp(1j*2*np.pi*defocus*np.real(fz_mesh)) * np.exp(-(abs(defocus)*2*np.pi*abs(np.imag(fz_mesh))))
-
+    return fx_mesh, fy_mesh
