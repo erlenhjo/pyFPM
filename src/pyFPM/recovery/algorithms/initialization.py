@@ -3,6 +3,7 @@ from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
 
 import numpy as np
+from scipy.ndimage import zoom
 
 
 def extract_variables(data_patch: Data_patch, imaging_system: Imaging_system, illumination_pattern: Illumination_pattern):
@@ -26,7 +27,17 @@ def extract_variables(data_patch: Data_patch, imaging_system: Imaging_system, il
 
 
 def initialize_high_res_image(low_res_images, update_order, scaling_factor):
-    ones = np.ones(shape = (scaling_factor, scaling_factor))
     first_image = low_res_images[update_order[0]]
-    recovered_object_guess = np.kron(first_image, ones)
+    
+    #alternative 1
+    recovered_object_guess = np.ones(shape = [size*scaling_factor for size in first_image.shape])
+
+    #alternative 2
+    #ones = np.ones(shape = (scaling_factor, scaling_factor))
+    #recovered_object_guess = np.kron(first_image, ones)
+    #recovered_object_guess = recovered_object_guess*0 + 1
+    
+    #alternative 3
+    #recovered_object_guess = zoom(input=first_image, zoom=scaling_factor)
+
     return recovered_object_guess
