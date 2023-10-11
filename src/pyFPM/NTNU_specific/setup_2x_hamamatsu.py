@@ -2,7 +2,7 @@ from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.setup.Data import Preprocessed_data, Rawdata, Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.NTNU_specific.components import HAMAMATSU, INFINITYCORRECTED_2X, MAIN_LED_ARRAY
+from pyFPM.NTNU_specific.components import HAMAMATSU_C11440_42U30, INFINITYCORRECTED_2X, MAIN_LED_ARRAY
 from pyFPM.NTNU_specific.setup_from_file import setup_parameters_from_file
 from pyFPM.NTNU_specific.rawdata_from_files import get_rawdata_from_files
 
@@ -12,7 +12,7 @@ def setup_2x_hamamatsu(
     patch_size,
     pixel_scale_factor
 ):
-    camera = HAMAMATSU
+    camera = HAMAMATSU_C11440_42U30
     lens = INFINITYCORRECTED_2X
     slide = None
     LED_array = MAIN_LED_ARRAY
@@ -20,7 +20,6 @@ def setup_2x_hamamatsu(
 
     background_filename = "dark_image"
     image_format = "tiff"
-    rotation = False
     remove_background = False
     threshold_value = False
 

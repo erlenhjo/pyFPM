@@ -1,6 +1,6 @@
 from pyFPM.setup.Setup_parameters import Camera, Lens, Lens_type
 
-
+###### LED array ######
 class LED_type(object):
     def __init__(self, wavelength, offset):
         self.wavelength = wavelength #m
@@ -14,13 +14,6 @@ class LED_array(object):
         self.green = green
         self.blue = blue
 
-
-HAMAMATSU = Camera(
-    camera_pixel_size = 6.5e-6,
-    raw_image_size = [2048, 2048],
-    bit_depth = int(2**16 - 1)
-    )
-
 # offsets are relative green LEDs
 MAIN_LED_ARRAY = LED_array(
     LED_pitch = 6e-3,
@@ -29,6 +22,22 @@ MAIN_LED_ARRAY = LED_array(
     green = LED_type(wavelength = 520e-9, offset = [0, 0]),
     blue = LED_type(wavelength = 470e-9, offset = [50e-6, 100e-6])
 )
+
+###### Cameras ######
+
+HAMAMATSU_C11440_42U30 = Camera(
+    camera_pixel_size = 6.5e-6,
+    raw_image_size = [2048, 2048],
+    bit_depth = int(2**16 - 1)
+    )
+
+UI3580CP_REV2 = Camera(
+    camera_pixel_size = 2.2e-6,
+    raw_image_size = [2560, 1920],
+    bit_depth = int(2**8-1)
+)
+
+###### Lenses ######
 
 INFINITYCORRECTED_2X = Lens(
     NA = 0.055,

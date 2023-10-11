@@ -9,7 +9,7 @@ from pyFPM.aberrations.dot_array.plot_dot_array import (plot_located_dots,
                                                                  plot_located_dot_error)
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots, 
                                                                    assemble_dots_in_grid)                                           
-from pyFPM.NTNU_specific.components import (HAMAMATSU, 
+from pyFPM.NTNU_specific.components import (HAMAMATSU_C11440_42U30, 
                                             INFINITYCORRECTED_2X)
 
 def simulate_dots_and_locate():
@@ -35,7 +35,7 @@ def locate_and_plot_dots():
 
     dot_radius = EO_DOT_ARRAY.diameter/2
     dot_spacing = EO_DOT_ARRAY.spacing
-    pixel_size = HAMAMATSU.camera_pixel_size
+    pixel_size = HAMAMATSU_C11440_42U30.camera_pixel_size
     magnification = INFINITYCORRECTED_2X.magnification
 
     object_pixel_size = pixel_size / magnification
