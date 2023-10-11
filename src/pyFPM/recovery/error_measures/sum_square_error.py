@@ -17,7 +17,7 @@ def compute_sum_square_error(data_patch: Data_patch, imaging_system: Imaging_sys
 
     recovered_low_res_images \
         = simulate_fraunhofer_imaging(
-            high_resolution_image=recovered_object,
+            high_resolution_object = recovered_object,
             pupil = pupil,
             LED_indices = LED_indices,
             imaging_system = imaging_system
@@ -30,7 +30,9 @@ def compute_sum_square_error(data_patch: Data_patch, imaging_system: Imaging_sys
         raw_low_res_image = low_res_images[index]
         recovered_low_res_image = recovered_low_res_images[index]
 
-        error_estimate += np.sum((raw_low_res_image - recovered_low_res_image)**2)
+        error_estimate += np.mean((raw_low_res_image - recovered_low_res_image)**2)
+
+    error_estimate = error_estimate/len(update_order)
         
     return error_estimate
 
