@@ -17,29 +17,34 @@ EO_DOT_ARRAY = Dot_array(
 )
 
 
-def get_dot_array_image(dot_radius, dot_spacing, pixel_number, nr_of_dots):
+def get_dot_array_image(dot_radius, dot_spacing, image_size, object_pixel_size):
 
-    dot_image = np.zeros(shape = (pixel_number, pixel_number))
+    dot_image = np.zeros(shape = (image_size[1], image_size[0]))
     dot_blobs = []
 
-    image_size = nr_of_dots * dot_spacing
-    pixel_size = image_size / pixel_number
+    area_size_x = image_size[0] * object_pixel_size
+    area_size_y = image_size[1] * object_pixel_size
+    positions_x = np.arange(image_size[0]) * object_pixel_size
+    positions_y = np.arange(image_size[1]) * object_pixel_size
 
-    positions = np.arange(pixel_number)*pixel_size
+    X, Y = np.meshgrid(positions_x, positions_y)
 
-    X, Y = np.meshgrid(positions, positions)
+    nr_of_dots_x = int(area_size_x // dot_spacing)
+    nr_of_dots_y = int(area_size_y // dot_spacing)
+    dot_buffer_x = area_size_x % dot_spacing / 2
+    dot_buffer_y = area_size_y % dot_spacing / 2
 
-    for y_dot in range(nr_of_dots):
-        for x_dot in range(nr_of_dots):
-            dot_center_x = (1/2 + x_dot) * dot_spacing
-            dot_center_y = (1/2 + y_dot) * dot_spacing
+    for y_dot in range(nr_of_dots_y):
+        for x_dot in range(nr_of_dots_x):
+            dot_center_x = (x_dot + 1/2) * dot_spacing + dot_buffer_x
+            dot_center_y = (y_dot + 1/2) * dot_spacing + dot_buffer_y
 
             dot_image += (X-dot_center_x)**2 + (Y - dot_center_y)**2 < dot_radius**2
-            dot_blobs.append([dot_center_x/pixel_size, dot_center_y/pixel_size, dot_radius/pixel_size])
+            dot_blobs.append([dot_center_x/object_pixel_size, dot_center_y/object_pixel_size, dot_radius/object_pixel_size])
                 
     dot_image = 1-dot_image # invert as the dot array is an absorbtion target
 
-    return dot_image, dot_blobs, pixel_size       
+    return dot_image, dot_blobs   
      
 
 

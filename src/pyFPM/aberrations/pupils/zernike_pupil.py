@@ -28,12 +28,12 @@ def calculate_zernike_pupil(zernike_coefficients, pixel_size, spatial_cutoff_fre
         wavefront_error += zernike_coefficient * zernike_mode
  
     pupil_phase = np.exp(1j * wavefront_error)
-    unit_disk = normalized_fx_mesh**2 + normalized_fy_mesh**2 <=1
-    print(unit_disk)
-    plt.matshow(wavefront_error)
-    plt.title("Wavefront")
-    plt.matshow(np.angle(pupil_phase)*unit_disk, vmin=-np.pi, vmax=np.pi)
-    plt.title("Pupil phase")
-    plt.show()
+    # unit_disk = normalized_fx_mesh**2 + normalized_fy_mesh**2 <=1
+    # print(unit_disk)
+    # plt.matshow(wavefront_error)
+    # plt.title("Wavefront")
+    # plt.matshow(np.angle(pupil_phase)*unit_disk, vmin=-np.pi, vmax=np.pi)
+    # plt.title("Pupil phase")
+    # plt.show()
 
     return pupil_phase

@@ -25,7 +25,7 @@ def simulate_cameraman_2x(zernike_coefficients, noise_fraction):
             bit_depth = int(2**8-1)
             )
 
-    setup_parameters, simulated_data, pupil = simulate_imaging(
+    setup_parameters, simulated_data, pupil, _ = simulate_imaging(
         high_res_complex_object = high_res_complex_object,
         zernike_coefficients = zernike_coefficients,
         noise_fraction = noise_fraction,

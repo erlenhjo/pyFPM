@@ -59,7 +59,7 @@ def simulate_imaging(
 
     simulated_data = Simulated_data(LED_indices=LED_indices, amplitude_images=low_res_images)
     
-    return setup_parameters, simulated_data, pupil
+    return setup_parameters, simulated_data, pupil, full_image_imaging_system.low_res_CTF
 
 def finalize_simulation_setup(
     setup_parameters,
