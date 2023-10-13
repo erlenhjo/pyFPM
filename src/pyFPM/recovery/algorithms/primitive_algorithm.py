@@ -1,5 +1,6 @@
 import numpy as np
-from numpy.fft import fft2, ifft2, fftshift, ifftshift
+from numpy.fft import fft2, ifft2#, fftshift, ifftshift
+from numba import njit, guvectorize, complex128, float64
 
 from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
@@ -7,6 +8,7 @@ from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 from pyFPM.recovery.utility.k_space import calculate_k_vector_range, calculate_recovered_CTF
 from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables
+from pyFPM.numba_helper.jitable_fftshifts import fftshift, ifftshift
 
 def primitive_fourier_ptychography_algorithm(
         data_patch: Data_patch,
@@ -49,6 +51,8 @@ def main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_de
     recovered_object_fourier_transform = fftshift(fft2(ifftshift(recovered_object_guess)))  
     convergence_index = np.zeros(loops)
     low_res_images = low_res_images * scaling_factor_squared
+    object_update_term = np.zeros(shape = low_res_CTF.shape, dtype=np.complex128)
+    pupil_update_term = np.zeros(shape = low_res_CTF.shape, dtype=np.complex128)
 
     for loop_nr in range(loops):
         for image_nr in range(len(update_order)):
@@ -72,8 +76,6 @@ def main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_de
             
             new_recovered_low_res_fourier_transform = fftshift(fft2(ifftshift(new_recovered_low_res_image)))
 
-
-
             if not use_epry:
                 updated_region_of_recovered_object_fourier_transform = low_res_CTF * new_recovered_low_res_fourier_transform / pupil\
                                                         + (1-low_res_CTF) * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]
@@ -94,19 +96,25 @@ def main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_de
                     pupil = (pupil + pupil_update_term) * low_res_CTF
 
             elif use_gradient_descent:
-                object_update_term = gradient_descent_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, delta = 1)
-                pupil_update_term = gradient_descent_step(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1],
-                                                          new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, delta = 1)
+                gradient_descent_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1.0, object_update_term)
+                #print(object_update_term)
+                #print(np.sum(object_update_term))
+                #input()
                 recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] += object_update_term * low_res_CTF
-                if loop_nr > 1:
+                if loop_nr > 100:
+                    gradient_descent_step(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1],
+                                                          new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1.0, pupil_update_term)
                     pupil = (pupil + pupil_update_term) * low_res_CTF
 
 
     return recovered_object_fourier_transform, pupil, convergence_index
 
-def gradient_descent_step(phi, new_FT, old_FT, delta):
+
+#@njit(cache=True)
+@guvectorize([(complex128[:,:], complex128[:,:], complex128[:,:], float64, complex128[:,:])], '(n,m),(n,m),(n,m),()->(n,m)')
+def gradient_descent_step(phi, new_FT, old_FT, delta, result):
     numerator = np.abs(phi) * np.conj(phi)
     denominator = np.max(np.abs(phi)) * (np.abs(phi)**2 + delta)
-    return numerator/denominator * (new_FT - old_FT)
+    result[:,:] = numerator/denominator * (new_FT - old_FT)
 
 
