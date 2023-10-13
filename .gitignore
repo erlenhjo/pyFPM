@@ -153,4 +153,4 @@ cython_debug/
 
 ##################
 data/
-examples/profiling_data/
+profiling_data/
