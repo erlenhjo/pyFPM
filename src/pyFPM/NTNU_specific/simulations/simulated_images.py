@@ -1,6 +1,6 @@
 from pyFPM.NTNU_specific.components import INFINITYCORRECTED_2X, MAIN_LED_ARRAY
 from pyFPM.setup.Setup_parameters import Camera
-from pyFPM.NTNU_specific.simulate_imaging import simulate_imaging, finalize_simulation_setup
+from pyFPM.NTNU_specific.simulations.simulate_imaging import simulate_imaging, finalize_simulation_setup
 
 import numpy as np
 import skimage

@@ -1,32 +1,11 @@
 from pyFPM.NTNU_specific.components import INFINITYCORRECTED_2X, MAIN_LED_ARRAY, HAMAMATSU_C11440_42U30
-from pyFPM.NTNU_specific.simulate_imaging import simulate_imaging
+from pyFPM.NTNU_specific.simulations.simulate_imaging import simulate_imaging
 from pyFPM.aberrations.dot_array.Dot_array import EO_DOT_ARRAY, get_dot_array_image
 from pyFPM.setup.Setup_parameters import Camera
 
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.fft import fft2, ifftshift, fftshift
-import skimage
-
-def plot_abberated_dot_arrays():
-    zernike_coefficients_list = []
-    N = 10
-    magnitude = 0.1
-    for j in range(1, 10):
-        zernike_coefficients = np.zeros(N+1)
-        zernike_coefficients[j] = magnitude
-        zernike_coefficients_list.append(zernike_coefficients)
-
-    simulated_datas, pupils, CTF = simulate_abberated_dot_arrays(zernike_coefficients_list, arraysize=1)
-
-    for j, (simulated_data, pupil) in enumerate(zip(simulated_datas, pupils)):
-        image = simulated_data.amplitude_images[0]
-        fig, axes = plt.subplots(nrows=1,ncols=3)
-        axes[0].matshow(image)
-        axes[1].matshow(np.log(np.abs(fftshift(fft2(ifftshift(image))))**2*CTF))
-        axes[2].matshow(np.angle(pupil)*CTF)
-
-    plt.show()
 
 def simulate_dot_array(image_size, pixel_size, magnification):
     dot_radius = EO_DOT_ARRAY.diameter / 2 # m
@@ -84,6 +63,25 @@ def simulate_abberated_dot_arrays(zernike_coefficients_list, arraysize):
     
     return simulated_datas, pupils, CTF
 
+def plot_abberated_dot_arrays():
+    zernike_coefficients_list = []
+    N = 10
+    magnitude = 0.1
+    for j in range(1, 10):
+        zernike_coefficients = np.zeros(N+1)
+        zernike_coefficients[j] = magnitude
+        zernike_coefficients_list.append(zernike_coefficients)
+
+    simulated_datas, pupils, CTF = simulate_abberated_dot_arrays(zernike_coefficients_list, arraysize=1)
+
+    for j, (simulated_data, pupil) in enumerate(zip(simulated_datas, pupils)):
+        image = simulated_data.amplitude_images[0]
+        fig, axes = plt.subplots(nrows=1,ncols=3)
+        axes[0].matshow(image)
+        axes[1].matshow(np.log(np.abs(fftshift(fft2(ifftshift(image))))**2*CTF))
+        axes[2].matshow(np.angle(pupil)*CTF)
+
+    plt.show()
 
 if __name__ == "__main__":
     plot_abberated_dot_arrays()
