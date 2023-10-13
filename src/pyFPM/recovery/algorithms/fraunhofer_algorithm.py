@@ -10,7 +10,7 @@ from pyFPM.recovery.utility.k_space import calculate_k_vector_range, calculate_r
 from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables
 #from pyFPM.numba_helper.jitable_fftshifts import fftshift, ifftshift
 
-def primitive_fourier_ptychography_algorithm(
+def fraunhofer_recovery_algorithm(
         data_patch: Data_patch,
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,

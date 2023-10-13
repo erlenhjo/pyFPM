@@ -8,7 +8,7 @@ from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 
 # utility imports
-from examples.plotting.plot_experimental_results import plot_experimental_results
+from plotting.plot_experimental_results import plot_experimental_results
 
 
 datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"

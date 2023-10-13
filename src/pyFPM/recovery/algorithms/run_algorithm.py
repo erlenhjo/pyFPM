@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pyFPM.recovery.algorithms.primitive_algorithm import primitive_fourier_ptychography_algorithm
+from pyFPM.recovery.algorithms.fraunhofer_algorithm import fraunhofer_recovery_algorithm
 
 class Method(Enum):
     Primitive = 1
@@ -12,7 +12,7 @@ class Method(Enum):
 def recover(method, data_patch, imaging_system, illumination_pattern, pupil_guess, loops):
 
     if method == Method.Primitive:
-        algorithm_result = primitive_fourier_ptychography_algorithm(
+        algorithm_result = fraunhofer_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -20,7 +20,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             loops = loops
         )
     elif method == Method.Epry:
-        algorithm_result = primitive_fourier_ptychography_algorithm(
+        algorithm_result = fraunhofer_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -30,7 +30,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             use_gradient_descent = False
         )
     elif method == Method.Epry_Gradient_Descent:
-        algorithm_result = primitive_fourier_ptychography_algorithm(
+        algorithm_result = fraunhofer_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
