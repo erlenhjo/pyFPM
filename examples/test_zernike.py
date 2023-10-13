@@ -4,11 +4,12 @@ from matplotlib import patches
 import numpy as np
 import time
 
-from pyFPM.aberrations.zernike_polynomials.synthesise_zernike_polynomials import (sympy_convert_zernike_polynomial_to_xy, 
-                                                                                sympy_zernike_polynomial, 
-                                                                                get_Noll_indices, 
-                                                                                get_xy_zernike_polynomial_function)
-
+from pyFPM.aberrations.zernike_polynomials.symbolic_synthesis import (sympy_convert_zernike_polynomial_to_xy, 
+                                                                      sympy_zernike_polynomial, 
+                                                                      get_Noll_indices, 
+                                                                      get_xy_zernike_polynomial_function)
+from pyFPM.aberrations.zernike_polynomials.fast_synthesis import evaluate_zernike_polynomial
+ 
 def print_zernike_polynomials():
     rho = symbols("ρ", real=True, positive=True)
     theta = symbols("θ", real = True)  
@@ -33,6 +34,16 @@ def get_image_of_zernike_polynomial(j):
 
     return zernike_mode
 
+def get_fast_image_of_zernike_polynomial(j):
+    points = 1001
+    x = np.linspace(-1,1,points, endpoint=True)
+    y = np.linspace(-1,1,points, endpoint=True)
+    x_mesh, y_mesh = np.meshgrid(x,y)
+    
+    unit_disk = x_mesh**2 + y_mesh**2 <= 1
+    zernike_mode = evaluate_zernike_polynomial(x_mesh, y_mesh, j) * unit_disk
+
+    return zernike_mode
 
 def plot_zernike_pyramid():
     j_range = np.arange(1, 22)
@@ -63,7 +74,7 @@ def plot_zernike_pyramid():
         y_stop = y_start + subplot_size
         ax = plt.subplot(gs[x_start:x_stop ,y_start:y_stop])
 
-        zernike_mode_image = get_image_of_zernike_polynomial(j)
+        zernike_mode_image = get_fast_image_of_zernike_polynomial(j)
         im_size = zernike_mode_image.shape[0]
         image = ax.imshow(zernike_mode_image)
         clip_circle = patches.Circle(xy=(im_size//2, im_size//2), radius = im_size//2-im_size//100, transform=ax.transData)
@@ -72,19 +83,46 @@ def plot_zernike_pyramid():
 
     plt.show()
 
-def time_function_creation():
+def time_symbolic_function_evaluation():
     total_time_start = time.perf_counter()
     J=50
     for j in range(1, J+1):
         start = time.perf_counter() 
-        get_xy_zernike_polynomial_function(j)
+        image = get_image_of_zernike_polynomial(j)
         end = time.perf_counter()
-        print(f"Time for j={j} was {end-start} s")
-
+        #print(f"Time for j={j} was {end-start} s")
     total_time_end = time.perf_counter()
     print(f"Time for all j between {1} and {J} was {total_time_end-total_time_start} s")
 
+def time_fast_function_evaluation():
+    total_time_start = time.perf_counter()
+    J=50
+    for j in range(1, J+1):
+        start = time.perf_counter() 
+        image = get_fast_image_of_zernike_polynomial(j)
+        end = time.perf_counter()
+        #print(f"Time for j={j} was {end-start} s")
+    total_time_end = time.perf_counter()
+    print(f"Time for all j between {1} and {J} was {total_time_end-total_time_start} s")
+
+def compare_symbolic_and_fast_evaluation():
+    J=50
+    for j in range(1, J+1):
+        image_symbolic = get_image_of_zernike_polynomial(j)
+        image_fast = get_fast_image_of_zernike_polynomial(j)
+        rms_error = np.sqrt(np.mean((image_fast-image_symbolic)**2))
+        rms_value = np.sqrt(np.mean(image_symbolic**2))
+        print(f"Normalized RMS error in term {j} = {rms_error:.5e} as compared to RMS value {rms_value:.5e}")
+        print(f"Max deviation of {np.max(np.abs(image_fast-image_symbolic))}")
+
+def test_performance_and_validity():
+    time_symbolic_function_evaluation()
+    time_symbolic_function_evaluation()
+    time_fast_function_evaluation()
+    time_fast_function_evaluation()
+    compare_symbolic_and_fast_evaluation()
+
 if __name__ == "__main__":
     plot_zernike_pyramid()
-    #time_function_creation()
-    #time_function_creation()
+    #test_performance_and_validity()
+    

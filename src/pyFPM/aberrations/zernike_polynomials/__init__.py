@@ -1,1 +1,1 @@
-from . import synthesise_zernike_polynomials, decompose_zernike_polynomials
+from . import symbolic_synthesis, decompose, fast_synthesis

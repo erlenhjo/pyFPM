@@ -1,5 +1,5 @@
 from pyFPM.setup.Imaging_system import Imaging_system, calculate_frequency_mesh_grids
-from pyFPM.aberrations.zernike_polynomials.synthesise_zernike_polynomials import get_xy_zernike_polynomial_function
+from pyFPM.aberrations.zernike_polynomials.fast_synthesis import evaluate_zernike_polynomial
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,8 +23,7 @@ def calculate_zernike_pupil(zernike_coefficients, pixel_size, spatial_cutoff_fre
     for j, zernike_coefficient in enumerate(zernike_coefficients):
         if j < 1:
             continue
-        zernike_function = get_xy_zernike_polynomial_function(j)
-        zernike_mode = zernike_function(normalized_fx_mesh, normalized_fy_mesh)
+        zernike_mode = evaluate_zernike_polynomial(normalized_fx_mesh, normalized_fy_mesh, j)
         wavefront_error += zernike_coefficient * zernike_mode
  
     pupil_phase = np.exp(1j * wavefront_error)
