@@ -18,7 +18,7 @@ pixel_scale_factor = 4
 patch_start = [870, 870] # [x, y]
 patch_size = [256, 256] # [x, y]
 
-method = Method.Primitive
+method = Method.Fraunhofer
 loops = 3
 
 setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_hamamatsu(

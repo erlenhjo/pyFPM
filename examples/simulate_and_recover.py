@@ -11,7 +11,7 @@ from plotting.plot_simulation_results import plot_simulation_results
 
 
 def main():
-    method = Method.Epry_Gradient_Descent
+    method = Method.Fraunhofer_Epry_Gradient_Descent
     loops = 100
 
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil\
