@@ -97,11 +97,8 @@ def main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_de
 
             elif use_gradient_descent:
                 gradient_descent_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1.0, object_update_term)
-                #print(object_update_term)
-                #print(np.sum(object_update_term))
-                #input()
                 recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] += object_update_term * low_res_CTF
-                if loop_nr > 100:
+                if loop_nr > 1:
                     gradient_descent_step(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1],
                                                           new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1.0, pupil_update_term)
                     pupil = (pupil + pupil_update_term) * low_res_CTF
