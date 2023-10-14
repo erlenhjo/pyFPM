@@ -112,13 +112,11 @@ def compare_symbolic_and_fast_evaluation():
         image_fast = get_fast_image_of_zernike_polynomial(j)
         rms_error = np.sqrt(np.mean((image_fast-image_symbolic)**2))
         rms_value = np.sqrt(np.mean(image_symbolic**2))
-        print(f"Normalized RMS error in term {j} = {rms_error:.5e} as compared to RMS value {rms_value:.5e}")
+        print(f"RMS error in term {j} = {rms_error:.5e} as compared to RMS value {rms_value:.5e}")
         print(f"Max deviation of {np.max(np.abs(image_fast-image_symbolic))}")
 
 def test_performance_and_validity():
     time_symbolic_function_evaluation()
-    time_symbolic_function_evaluation()
-    time_fast_function_evaluation()
     time_fast_function_evaluation()
     compare_symbolic_and_fast_evaluation()
 
