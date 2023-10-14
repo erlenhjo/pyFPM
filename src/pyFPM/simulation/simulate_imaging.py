@@ -1,34 +1,21 @@
-from pyFPM.setup.Setup_parameters import Setup_parameters, LED_infos, Lens, Slide, Camera
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.setup.Data import Simulated_data, Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.NTNU_specific.components import LED_array
-from pyFPM.recovery.simulation.fraunhofer_simulator import simulate_fraunhofer_imaging
+from pyFPM.simulation.fraunhofer_simulator import simulate_fraunhofer_imaging
 from pyFPM.aberrations.pupils.zernike_pupil import get_zernike_pupil
 
 import numpy as np
+
 
 def simulate_imaging(
     high_res_complex_object,
     zernike_coefficients,
     noise_fraction,
-    camera,
-    lens,
-    LED_array,
-    array_to_object_distance,
+    setup_parameters,
     arraysize,
     pixel_scale_factor
 ):
-    slide = None # for now
-    
-    setup_parameters: Setup_parameters = simulate_setup_parameters(
-        lens = lens,
-        camera = camera,
-        slide = slide,
-        LED_array = LED_array,
-        array_to_object_distance = array_to_object_distance
-        )    
-
+      
     # Define simulated data set
     center_LED = setup_parameters.LED_info.center_indices
     x_start = center_LED[0] - arraysize//2
@@ -59,7 +46,7 @@ def simulate_imaging(
 
     simulated_data = Simulated_data(LED_indices=LED_indices, amplitude_images=low_res_images)
     
-    return setup_parameters, simulated_data, pupil, full_image_imaging_system.low_res_CTF
+    return simulated_data, pupil, full_image_imaging_system.low_res_CTF
 
 def finalize_simulation_setup(
     setup_parameters,
@@ -92,35 +79,4 @@ def finalize_simulation_setup(
 
 
 
-def simulate_setup_parameters(lens: Lens, camera: Camera, 
-                               slide: Slide, LED_array: LED_array, array_to_object_distance):
 
-    x_size = LED_array.array_size[0]
-    y_size = LED_array.array_size[1]
-
-    exposure_times = np.zeros(shape = (y_size + 1, x_size + 1))
-
-    # assume green LED
-    wavelength = LED_array.green.wavelength
-    LED_offset = LED_array.green.offset
-    center_indices = [16,16]
-    
-
-    LED_info: LED_infos = LED_infos(
-            array_to_object_distance = array_to_object_distance, 
-            LED_pitch = LED_array.LED_pitch, 
-            wavelength = wavelength, 
-            LED_array_size = LED_array.array_size,
-            LED_offset = LED_offset, 
-            center_indices = center_indices, 
-            exposure_times = exposure_times
-        )
-
-    setup_parameters: Setup_parameters = Setup_parameters(
-        lens = lens,
-        camera = camera,
-        slide = slide,
-        LED_info = LED_info
-    )
-
-    return setup_parameters

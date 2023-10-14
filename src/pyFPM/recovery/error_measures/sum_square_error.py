@@ -4,7 +4,7 @@ from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
-from pyFPM.recovery.simulation.fraunhofer_simulator import simulate_fraunhofer_imaging
+from pyFPM.simulation.fraunhofer_simulator import simulate_fraunhofer_imaging
 
 def compute_sum_square_error(data_patch: Data_patch, imaging_system: Imaging_system, 
                             illumination_pattern: Illumination_pattern, algorithm_result: Algorithm_result):

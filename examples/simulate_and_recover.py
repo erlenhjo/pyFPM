@@ -1,9 +1,5 @@
-from enum import Enum
-import matplotlib.pyplot as plt
-import numpy as np
-
 # FPM imports
-from pyFPM.NTNU_specific.simulations.simulated_images import simulate_cameraman_2x
+from pyFPM.NTNU_specific.simulate_images.cameraman import simulate_cameraman_2x
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 
 # import plotting

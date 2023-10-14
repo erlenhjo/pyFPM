@@ -62,7 +62,7 @@ def determine_dot_centers(dot_radius, dot_spacing, object_pixel_size, image_size
 
             dot_blobs.append([dot_center_x, dot_center_y, dot_radius/object_pixel_size])
 
-    return dot_centers, dot_blobs
+    return dot_centers, np.array(dot_blobs)
 
 def create_single_dot_mask(dot_radius, object_pixel_size):
     positions = np.arange(2 * dot_radius//object_pixel_size + 2)
