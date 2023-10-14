@@ -13,49 +13,6 @@ class Dot_array(object):
      
 
 def get_dot_array_image(dot_radius, dot_spacing, image_size, object_pixel_size):
-
-    area_size_x = image_size[0] * object_pixel_size
-    area_size_y = image_size[1] * object_pixel_size
-    positions_x = np.arange(image_size[0]) * object_pixel_size
-    positions_y = np.arange(image_size[1]) * object_pixel_size
-
-    nr_of_dots_x = int(area_size_x // dot_spacing)
-    nr_of_dots_y = int(area_size_y // dot_spacing)
-    dot_buffer_x = area_size_x % dot_spacing / 2
-    dot_buffer_y = area_size_y % dot_spacing / 2
-
-    image_size_x = image_size[0]
-    image_size_y = image_size[1]
-
-    X, Y = np.meshgrid(positions_x, positions_y)
-
-    dot_image, dot_blobs = paint_dots(X, Y, nr_of_dots_x, nr_of_dots_y, 
-               image_size_x, image_size_y, dot_spacing, dot_buffer_x, dot_buffer_y,
-               dot_radius, object_pixel_size)
-
-    return dot_image, dot_blobs
-
-@njit(cache=True)
-def paint_dots(X, Y, nr_of_dots_x, nr_of_dots_y, 
-               image_size_x, image_size_y, dot_spacing, dot_buffer_x, dot_buffer_y,
-               dot_radius, object_pixel_size):
-
-    dot_image = np.zeros(shape = (image_size_y, image_size_x))
-    dot_blobs = []
-
-    for y_dot in range(nr_of_dots_y):
-        for x_dot in range(nr_of_dots_x):
-            dot_center_x = (x_dot + 1/2) * dot_spacing + dot_buffer_x
-            dot_center_y = (y_dot + 1/2) * dot_spacing + dot_buffer_y
-
-            dot_image += (X-dot_center_x)**2 + (Y - dot_center_y)**2 < dot_radius**2
-            dot_blobs.append([dot_center_x/object_pixel_size, dot_center_y/object_pixel_size, dot_radius/object_pixel_size])
-                
-    dot_image = 1-dot_image # invert as the dot array is an absorbtion target
-
-    return dot_image, dot_blobs   
-
-def get_dot_array_image_alternative(dot_radius, dot_spacing, image_size, object_pixel_size):
     # create a mask corresponding to a single dot
     single_dot_mask = create_single_dot_mask(dot_radius, object_pixel_size)
     # place "delta functions" at desired positions
@@ -136,36 +93,10 @@ def simulate_dot_array(image_size):
 
     return dot_array_image
 
-def simulate_dot_array_alternative(image_size):
-    pixel_size = 6.5e-6 
-    magnification = 2
-    dot_radius = EO_DOT_ARRAY.diameter / 2 # m
-    dot_spacing = EO_DOT_ARRAY.spacing # m
-
-    pixel_scale_factor = 2
-    high_res_image_size = [size * pixel_scale_factor for size in image_size]
-    high_res_pixel_size = pixel_size / pixel_scale_factor
-
-    dot_array_image, _ = get_dot_array_image_alternative(
-                            dot_radius=dot_radius, 
-                            dot_spacing=dot_spacing, 
-                            image_size=high_res_image_size,
-                            object_pixel_size=high_res_pixel_size/magnification
-                            )
-
-    return dot_array_image
-
 
 def main_test():
-    image_size = [512,512]#[2048,2048]
-    image_old = simulate_dot_array(image_size)
-    image_new = simulate_dot_array_alternative(image_size)
-    
-    import matplotlib.pyplot as plt
-    plt.matshow(image_old[30:72,30:72])
-    plt.matshow(image_new[30:72,30:72])
-    plt.matshow((image_new-image_old)[30:72,30:72])
-    plt.show()
+    image_size = [4096,4096]
+    image = simulate_dot_array(image_size)
 
 
 def profile_main_test():

@@ -34,7 +34,7 @@ def simulate_dots():
 def locate_and_plot_dots():
     filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf\0_10-16_16.tiff"
 
-    image = np.array(Image.open(filepath))#[750:1200, 750:1200]
+    image = np.array(Image.open(filepath))
 
     dot_radius = EO_DOT_ARRAY.diameter/2
     dot_spacing = EO_DOT_ARRAY.spacing
@@ -61,7 +61,7 @@ def profile_main():
         plot_abberated_dot_arrays()
     stats = pstats.Stats(pr)
     stats.sort_stats(pstats.SortKey.TIME)
-    stats.dump_stats(filename=r"profiling_data\dot_array_512.prof")
+    stats.dump_stats(filename=r"profiling_data\aberrate_dot_array_full.prof")
 
 
 if __name__ == "__main__":

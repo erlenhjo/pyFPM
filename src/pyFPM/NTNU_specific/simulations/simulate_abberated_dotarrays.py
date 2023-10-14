@@ -26,14 +26,9 @@ def simulate_abberated_dot_arrays(zernike_coefficients_list, arraysize):
     LED_array = MAIN_LED_ARRAY
     array_to_object_distance = 0.200 # m
     dummy_camera = HAMAMATSU_C11440_42U30
-    dummy_camera = Camera(
-            camera_pixel_size = 6.5e-6,
-            raw_image_size = [512, 512],
-            bit_depth = int(2**8-1)
-            )
-
+    
     low_res_image_size = dummy_camera.raw_image_size
-    pixel_scale_factor = 2
+    pixel_scale_factor = 4
     high_res_image_size = [size * pixel_scale_factor for size in low_res_image_size]
     high_res_pixel_size = dummy_camera.camera_pixel_size / pixel_scale_factor
 
