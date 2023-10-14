@@ -2,15 +2,16 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 
-from pyFPM.aberrations.dot_array.Dot_array import (EO_DOT_ARRAY, 
-                                                   get_dot_array_image)
+from pyFPM.aberrations.dot_array.Dot_array import get_dot_array_image
 from pyFPM.aberrations.dot_array.plot_dot_array import (plot_located_dots,
                                                         plot_located_dots_vs_grid,
                                                         plot_located_dot_error)
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots,
                                                           assemble_dots_in_grid)                                           
 from pyFPM.NTNU_specific.components import (HAMAMATSU_C11440_42U30, 
-                                            INFINITYCORRECTED_2X)
+                                            INFINITYCORRECTED_2X,
+                                            EO_DOT_ARRAY)
+from pyFPM.NTNU_specific.simulations.simulate_abberated_dotarrays import plot_abberated_dot_arrays
 
 def simulate_dots():
     dot_radius = EO_DOT_ARRAY.diameter / 2 # m
@@ -52,6 +53,18 @@ def locate_and_plot_dots():
     plt.show()
 
 
+def profile_main():
+    import cProfile
+    import pstats
+
+    with cProfile.Profile() as pr:
+        plot_abberated_dot_arrays()
+    stats = pstats.Stats(pr)
+    stats.sort_stats(pstats.SortKey.TIME)
+    stats.dump_stats(filename=r"profiling_data\dot_array_512.prof")
+
+
 if __name__ == "__main__":
-    simulate_dots()
+    #simulate_dots()
     #locate_and_plot_dots()
+    profile_main()

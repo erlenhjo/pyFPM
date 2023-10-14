@@ -1,6 +1,6 @@
-from pyFPM.NTNU_specific.components import INFINITYCORRECTED_2X, MAIN_LED_ARRAY, HAMAMATSU_C11440_42U30
+from pyFPM.NTNU_specific.components import INFINITYCORRECTED_2X, MAIN_LED_ARRAY, HAMAMATSU_C11440_42U30, EO_DOT_ARRAY
 from pyFPM.NTNU_specific.simulations.simulate_imaging import simulate_imaging
-from pyFPM.aberrations.dot_array.Dot_array import EO_DOT_ARRAY, get_dot_array_image
+from pyFPM.aberrations.dot_array.Dot_array import get_dot_array_image
 from pyFPM.setup.Setup_parameters import Camera
 
 import numpy as np
@@ -83,5 +83,3 @@ def plot_abberated_dot_arrays():
 
     plt.show()
 
-if __name__ == "__main__":
-    plot_abberated_dot_arrays()

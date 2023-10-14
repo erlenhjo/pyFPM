@@ -1,4 +1,5 @@
 from pyFPM.setup.Setup_parameters import Camera, Lens, Lens_type
+from pyFPM.aberrations.dot_array.Dot_array import Dot_array
 
 ###### LED array ######
 class LED_type(object):
@@ -49,3 +50,11 @@ INFINITYCORRECTED_2X = Lens(
     lens_type = Lens_type.INFINITY_CORRECTED
 )
 
+###### Aberration target ######
+
+EO_DOT_ARRAY = Dot_array(
+    spacing = 125e-6,
+    spacing_tolerance = 2e-6,
+    diameter = 62.5e-6,
+    diameter_tolerance = 2e-6  
+)
