@@ -35,7 +35,6 @@ def initialize_high_res_image(low_res_images, update_order, scaling_factor):
     #alternative 2
     #ones = np.ones(shape = (scaling_factor, scaling_factor))
     #recovered_object_guess = np.kron(first_image, ones)
-    #recovered_object_guess = recovered_object_guess*0 + 1
     
     #alternative 3
     #recovered_object_guess = zoom(input=first_image, zoom=scaling_factor)
