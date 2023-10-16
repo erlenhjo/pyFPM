@@ -64,3 +64,18 @@ def plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size):
     cax = ax.matshow(error)
     fig.colorbar(cax)
     ax.set_title("Error in micrometers")
+
+
+def plot_dot_error(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_size):
+    max_index = grid_indices.max()
+    error = np.zeros(shape = (max_index+1, max_index+1))
+    values = zip(blobs, grid_points, grid_indices)
+    for blob, grid_point, indices in values:
+        Y = indices[0]
+        X = indices[1]
+        distance_error = np.linalg.norm(blob-grid_point) * object_pixel_size *1e6
+        error[Y, X] = distance_error
+
+    cax = ax.matshow(error)
+    plt.colorbar(cax, ax=ax)
+    ax.set_title("Error in micrometers")
