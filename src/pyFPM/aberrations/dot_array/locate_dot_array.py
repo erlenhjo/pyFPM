@@ -1,33 +1,38 @@
+from pyFPM.aberrations.dot_array.Dot_array import Dot_array
+
 import numpy as np
-from skimage.feature import blob_log, blob_dog
+from skimage.feature import blob_log
 from scipy.spatial.transform import Rotation
 
-def locate_dots(image, dot_radius, pixel_size):
+def locate_dots(image, dot_array: Dot_array, pixel_size):
     inverted_image = np.max(image) - image
     
+    dot_radius = dot_array.diameter/2
     pixel_radius = dot_radius/pixel_size
+    sigma_factor = 0.8
+    sigma = sigma_factor * pixel_radius
+    desired_precision_increase = 10
 
     # find blobs with Laplacian of Gaussian algorithm
-    blobs_LoG = blob_log(inverted_image, min_sigma=pixel_radius*0.6, max_sigma=pixel_radius*0.8, num_sigma=10, threshold=.1)
+    blobs_LoG = blob_log(inverted_image, min_sigma=sigma, max_sigma=sigma, num_sigma=1, threshold_rel=.1)
     blobs_LoG[:, 2] = blobs_LoG[:, 2] * np.sqrt(2) # converts the returned sigma into a radius equivalent
 
-    # find blobs with Difference of Gaussian algorithm
-    blobs_DoG = blob_dog(inverted_image, min_sigma=pixel_radius*0.6, max_sigma=pixel_radius*0.8, threshold=.1)
-    blobs_DoG[:, 2] = blobs_DoG[:, 2] * np.sqrt(4) # converts the returned sigma into a radius equivalent
-
-    filtered_blobs = filter_blobs(blobs_DoG=blobs_LoG, 
-                                  blobs_LoG=blobs_LoG, 
+    filtered_blobs = filter_blobs(blobs=blobs_LoG,
                                   filter_edge=True,
-                                  filter_identical=True,
                                   pixel_radius=pixel_radius,
                                   image_shape=image.shape)
     
-    return [filtered_blobs, blobs_LoG, blobs_DoG]
+    filtered_blobs = get_precise_location(image=inverted_image,
+                                          blobs=filtered_blobs,
+                                          low_res_sigma=sigma,
+                                          scaling_factor=desired_precision_increase)
+    
+    return [filtered_blobs, blobs_LoG]
 
-def filter_blobs(blobs_DoG, blobs_LoG, filter_edge, filter_identical, pixel_radius, image_shape):
+def filter_blobs(blobs, filter_edge, pixel_radius, image_shape):
     # filtering
     filtered_blobs = []
-    for blob in blobs_DoG:
+    for blob in blobs:
         y, x, r = blob
 
         if filter_edge:
@@ -40,19 +45,39 @@ def filter_blobs(blobs_DoG, blobs_LoG, filter_edge, filter_identical, pixel_radi
                 continue
             elif x > image_shape[1] - 1.5 * pixel_radius:
                 continue
-
-        if filter_identical:
-            # filter out blobs where the two methods do not get the same result
-            potential_indices_y = np.argwhere(blobs_LoG[:,0]==np.array(y))
-            potential_indices_x = np.argwhere(blobs_LoG[:,1]==np.array(x))
-            for index_y in potential_indices_y:
-                for index_x in potential_indices_x:
-                    if index_x == index_y:
-                        filtered_blobs.append(blob)
-        else:
-            filtered_blobs.append(blob)
+        
+        filtered_blobs.append(blob)
 
     return np.array(filtered_blobs)
+
+def increase_pixel_count(image, scaling_factor):
+    ones = np.ones(shape = (scaling_factor, scaling_factor))
+    return np.kron(image, ones)
+
+def get_precise_location(image, blobs, low_res_sigma, scaling_factor):
+    high_pixel_count_image = increase_pixel_count(image=image, scaling_factor=scaling_factor)
+    high_pixel_count_sigma = low_res_sigma * scaling_factor
+    high_pixel_count_blobs = blobs * scaling_factor
+
+    more_precise_blobs = []
+
+    for blob in high_pixel_count_blobs:
+        y, x, _ = blob
+        delta = 2 * high_pixel_count_sigma
+        y_min, y_max = int(y-delta), int(y+delta)
+        x_min, x_max = int(x-delta), int(x+delta)
+        sub_image = high_pixel_count_image[y_min:y_max, x_min:x_max]
+        
+        more_precise_blob = blob_log(sub_image, 
+                                     min_sigma=high_pixel_count_sigma, 
+                                     max_sigma=high_pixel_count_sigma,
+                                     num_sigma=1, 
+                                     threshold_rel=.1)
+        
+        more_precise_blobs.append(more_precise_blob[0] + np.array([y_min, x_min, 0]))
+
+
+    return np.array(more_precise_blobs) / scaling_factor - np.array([0.5, 0.5, 0])
 
 
 def assemble_dots_in_grid(image_size, blobs, dot_spacing, pixel_size):

@@ -24,9 +24,9 @@ def locate_and_plot_dots():
 
     object_pixel_size = pixel_size / magnification
 
-    filtered_blobs, blobs_LoG, blobs_DoG = locate_dots(image, dot_radius, object_pixel_size)
+    filtered_blobs, unfiltered_blobs = locate_dots(image, dot_radius, object_pixel_size)
 
-    plot_located_dots(image, [filtered_blobs, blobs_LoG, blobs_DoG])
+    #plot_located_dots(image, [filtered_blobs, unfiltered_blobs])
     blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, filtered_blobs, dot_spacing, object_pixel_size)
     print(f"The total rotation was {rotation} degrees")
     plot_located_dots_vs_grid(image, blobs, grid_points)

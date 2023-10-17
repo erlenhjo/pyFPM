@@ -38,7 +38,7 @@ def plot_abberated_dot_arrays():
 
     setup_parameters = aberrated_dot_array_setup()
     dot_array = EO_DOT_ARRAY
-    pixel_scale_factor = 1
+    pixel_scale_factor = 4
 
     simulated_datas, pupils, low_res_dot_blobs, \
     high_res_complex_object, high_res_dot_blobs, CTF \
@@ -56,11 +56,7 @@ def plot_abberated_dot_arrays():
 
         object_pixel_size = setup_parameters.camera.camera_pixel_size / setup_parameters.lens.magnification
         
-        a=4
-        image_with_more_pixels = increase_pixel_count(image=image, scaling_factor=a)
-        filtered_blobs, blobs_LoG, blobs_DoG = locate_dots(image_with_more_pixels, dot_array.diameter/2, object_pixel_size/a)
-        filtered_blobs, blobs_LoG, blobs_DoG = filtered_blobs/a, blobs_LoG/a, blobs_DoG/a
-        #filtered_blobs, blobs_LoG, blobs_DoG = locate_dots(image, dot_array.diameter/2, object_pixel_size)
+        filtered_blobs, blobs_LoG, blobs_DoG = locate_dots(image, dot_array.diameter/2, object_pixel_size)
 
         #plot_located_dots(image, [filtered_blobs, blobs_LoG, blobs_DoG])
         blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, filtered_blobs, dot_array.spacing, object_pixel_size)
@@ -73,9 +69,32 @@ def plot_abberated_dot_arrays():
 
     plt.show()
 
-def increase_pixel_count(image, scaling_factor):
-    ones = np.ones(shape = (scaling_factor, scaling_factor))
-    return np.kron(image, ones)
+
+def locate_and_plot_simulated_dots():
+    setup_parameters = aberrated_dot_array_setup()
+    dot_array = EO_DOT_ARRAY
+
+    zernike_coefficients_list = [[0,0,0,0,0,0,0]]
+    pixel_scale_factor = 4
+
+    simulated_datas, pupils, low_res_dot_blobs, \
+    high_res_complex_object, high_res_dot_blobs, CTF \
+        = simulate_abberated_dot_arrays(zernike_coefficients_list, dot_array=dot_array, arraysize=1, 
+                                        setup_parameters=setup_parameters, pixel_scale_factor=pixel_scale_factor)
+
+    image = simulated_datas[0].amplitude_images[0]
+    pixel_size = setup_parameters.camera.camera_pixel_size
+    magnification = setup_parameters.lens.magnification
+    object_pixel_size = pixel_size / magnification
+
+    filtered_blobs, unfiltered_blobs = locate_dots(image, dot_array, object_pixel_size)
+
+    blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, filtered_blobs, dot_array.spacing, object_pixel_size)
+    print(f"The total rotation was {rotation} degrees")
+    plot_located_dots_vs_grid(image, blobs, grid_points)
+    plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size)
+    plt.show()
+
 
 def profile_main():
     import cProfile
@@ -85,11 +104,11 @@ def profile_main():
         main()
     stats = pstats.Stats(pr)
     stats.sort_stats(pstats.SortKey.TIME)
-    stats.dump_stats(filename=r"profiling_data\dot_array_profile_all.prof")
+    stats.dump_stats(filename=r"profiling_data\dot_locating.prof")
 
 def main():
-    #locate_and_plot_dots()
-    plot_abberated_dot_arrays()
+    locate_and_plot_simulated_dots()
+    #plot_abberated_dot_arrays()
 
 if __name__ == "__main__":
     profile_main()
