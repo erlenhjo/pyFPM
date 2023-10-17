@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pyFPM.aberrations.dot_array.plot_dot_array import (plot_located_dots,
-                                                        plot_located_dots_vs_grid,
+from pyFPM.aberrations.dot_array.plot_dot_array import (plot_located_dots_vs_grid,
                                                         plot_located_dot_error,
                                                         plot_dot_error)
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots,
@@ -39,6 +38,7 @@ def plot_abberated_dot_arrays():
     setup_parameters = aberrated_dot_array_setup()
     dot_array = EO_DOT_ARRAY
     pixel_scale_factor = 4
+    sub_precision = 4
 
     simulated_datas, pupils, low_res_dot_blobs, \
     high_res_complex_object, high_res_dot_blobs, CTF \
@@ -56,10 +56,9 @@ def plot_abberated_dot_arrays():
 
         object_pixel_size = setup_parameters.camera.camera_pixel_size / setup_parameters.lens.magnification
         
-        filtered_blobs, blobs_LoG, blobs_DoG = locate_dots(image, dot_array.diameter/2, object_pixel_size)
+        located_blobs = locate_dots(image, dot_array.diameter/2, object_pixel_size, sub_precision)
 
-        #plot_located_dots(image, [filtered_blobs, blobs_LoG, blobs_DoG])
-        blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, filtered_blobs, dot_array.spacing, object_pixel_size)
+        blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, located_blobs, dot_array.spacing, object_pixel_size)
         print(f"The total rotation was {rotation} degrees")
         plot_located_dots_vs_grid(image, blobs, grid_points)
 
@@ -87,9 +86,9 @@ def locate_and_plot_simulated_dots():
     magnification = setup_parameters.lens.magnification
     object_pixel_size = pixel_size / magnification
 
-    filtered_blobs, unfiltered_blobs = locate_dots(image, dot_array, object_pixel_size)
+    located_blobs = locate_dots(image, dot_array, object_pixel_size, sub_precision=4)
 
-    blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, filtered_blobs, dot_array.spacing, object_pixel_size)
+    blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, located_blobs, dot_array.spacing, object_pixel_size)
     print(f"The total rotation was {rotation} degrees")
     plot_located_dots_vs_grid(image, blobs, grid_points)
     plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size)

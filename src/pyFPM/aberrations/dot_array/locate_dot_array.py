@@ -4,14 +4,13 @@ import numpy as np
 from skimage.feature import blob_log
 from scipy.spatial.transform import Rotation
 
-def locate_dots(image, dot_array: Dot_array, pixel_size):
+def locate_dots(image, dot_array: Dot_array, pixel_size, sub_precision):
     inverted_image = np.max(image) - image
     
     dot_radius = dot_array.diameter/2
     pixel_radius = dot_radius/pixel_size
     sigma_factor = 0.8
     sigma = sigma_factor * pixel_radius
-    desired_precision_increase = 10
 
     # find blobs with Laplacian of Gaussian algorithm
     blobs_LoG = blob_log(inverted_image, min_sigma=sigma, max_sigma=sigma, num_sigma=1, threshold_rel=.1)
@@ -25,9 +24,9 @@ def locate_dots(image, dot_array: Dot_array, pixel_size):
     filtered_blobs = get_precise_location(image=inverted_image,
                                           blobs=filtered_blobs,
                                           low_res_sigma=sigma,
-                                          scaling_factor=desired_precision_increase)
+                                          scaling_factor=sub_precision)
     
-    return [filtered_blobs, blobs_LoG]
+    return filtered_blobs
 
 def filter_blobs(blobs, filter_edge, pixel_radius, image_shape):
     # filtering
@@ -55,29 +54,32 @@ def increase_pixel_count(image, scaling_factor):
     return np.kron(image, ones)
 
 def get_precise_location(image, blobs, low_res_sigma, scaling_factor):
-    high_pixel_count_image = increase_pixel_count(image=image, scaling_factor=scaling_factor)
     high_pixel_count_sigma = low_res_sigma * scaling_factor
-    high_pixel_count_blobs = blobs * scaling_factor
 
-    more_precise_blobs = []
+    precise_blobs = []
 
-    for blob in high_pixel_count_blobs:
+    for blob in blobs:
         y, x, _ = blob
-        delta = 2 * high_pixel_count_sigma
+        delta = 1.5 * low_res_sigma
         y_min, y_max = int(y-delta), int(y+delta)
         x_min, x_max = int(x-delta), int(x+delta)
-        sub_image = high_pixel_count_image[y_min:y_max, x_min:x_max]
         
-        more_precise_blob = blob_log(sub_image, 
+        sub_image = image[y_min:y_max, x_min:x_max]
+        high_pixel_count_sub_image = increase_pixel_count(image=sub_image, scaling_factor=scaling_factor)
+        
+        precise_blob_sub_location = blob_log(image=high_pixel_count_sub_image, 
                                      min_sigma=high_pixel_count_sigma, 
                                      max_sigma=high_pixel_count_sigma,
                                      num_sigma=1, 
-                                     threshold_rel=.1)
+                                     threshold_rel=.1)[0]
         
-        more_precise_blobs.append(more_precise_blob[0] + np.array([y_min, x_min, 0]))
+        # downscale to low res pixel values, where the subvalues within a pixel goes from -0.5 to 0.5
+        precise_blob = precise_blob_sub_location / scaling_factor + np.array([y_min-0.5, x_min-0.5, 0])
+
+        precise_blobs.append(precise_blob)
 
 
-    return np.array(more_precise_blobs) / scaling_factor - np.array([0.5, 0.5, 0])
+    return np.array(precise_blobs) 
 
 
 def assemble_dots_in_grid(image_size, blobs, dot_spacing, pixel_size):

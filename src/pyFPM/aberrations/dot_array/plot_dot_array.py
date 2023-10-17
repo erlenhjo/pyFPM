@@ -61,7 +61,7 @@ def plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size):
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    cax = ax.matshow(error)
+    cax = ax.matshow(error, vmin=0, vmax = max(10, error.max()))
     fig.colorbar(cax)
     ax.set_title("Error in micrometers")
 
@@ -76,6 +76,6 @@ def plot_dot_error(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_
         distance_error = np.linalg.norm(blob-grid_point) * object_pixel_size *1e6
         error[Y, X] = distance_error
 
-    cax = ax.matshow(error)
+    cax = ax.matshow(error, vmin=0, vmax = max(10, error.max()))
     plt.colorbar(cax, ax=ax)
     ax.set_title("Error in micrometers")
