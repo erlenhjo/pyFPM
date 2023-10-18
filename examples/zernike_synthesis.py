@@ -9,6 +9,7 @@ from pyFPM.aberrations.zernike_polynomials.symbolic_synthesis import (sympy_conv
                                                                       get_Noll_indices, 
                                                                       get_xy_zernike_polynomial_function)
 from pyFPM.aberrations.zernike_polynomials.fast_synthesis import evaluate_zernike_polynomial
+
  
 def print_zernike_polynomials():
     rho = symbols("ρ", real=True, positive=True)
@@ -123,4 +124,3 @@ def test_performance_and_validity():
 if __name__ == "__main__":
     plot_zernike_pyramid()
     #test_performance_and_validity()
-    
