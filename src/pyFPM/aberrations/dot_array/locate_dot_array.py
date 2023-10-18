@@ -82,8 +82,10 @@ def get_precise_location(image, blobs, low_res_sigma, scaling_factor):
     return np.array(precise_blobs) 
 
 
-def assemble_dots_in_grid(image_size, blobs, dot_spacing, pixel_size):
+def assemble_dots_in_grid(image: np.ndarray, blobs, dot_array: Dot_array, pixel_size):
     rotation_tolerance = 1e-3 # degrees
+    image_size = image.shape
+    dot_spacing = dot_array.spacing
 
     # do not care about radius, but will need a z=0 coordinate
     blobs = blobs * np.array([1, 1, 0]) 

@@ -25,7 +25,7 @@ def locate_and_plot_dots():
 
     located_blobs = locate_dots(image, dot_array, object_pixel_size, sub_precision=4)
 
-    blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, located_blobs, dot_array.spacing, object_pixel_size)
+    blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image, located_blobs, dot_array, object_pixel_size)
     print(f"The total rotation was {rotation} degrees")
     plot_located_dots_vs_grid(image, blobs, grid_points)
     plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size)

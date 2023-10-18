@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 from pyFPM.aberrations.dot_array.plot_dot_array import (plot_located_dots_vs_grid,
                                                         plot_located_dot_error,
-                                                        plot_dot_error)
+                                                        plot_dot_error,
+                                                        plot_example_dots)
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots,
                                                           assemble_dots_in_grid) 
 from pyFPM.NTNU_specific.simulate_images.simulate_setup import simulate_setup_parameters                                          
@@ -27,6 +28,7 @@ def aberrated_dot_array_setup():
     return setup_parameters
 
 def plot_abberated_dot_arrays():
+    save_results = False
     zernike_coefficients_list = []
     N = 25
     magnitude = 1
@@ -47,24 +49,29 @@ def plot_abberated_dot_arrays():
 
     for j, (simulated_data, pupil, zernike_coefficients) in enumerate(zip(simulated_datas, pupils, zernike_coefficients_list)):
         image = simulated_data.amplitude_images[0]
-        #locate_and_plot_dots()
         fig, axes = plt.subplots(nrows=2,ncols=2)
-        axes: list[plt.Axes] = axes.flatten()
-        axes[0].matshow(image)
-        plot_zernike_coefficients(ax=axes[1], zernike_coefficients=zernike_coefficients)
-        axes[2].matshow(np.angle(pupil)*CTF)
+
+        plot_zernike_coefficients(ax=axes[0,0], zernike_coefficients=zernike_coefficients)
+        axes[0,1].matshow(np.angle(pupil)*CTF, vmin=-np.pi, vmax=np.pi)
+        axes[0,1].set_axis_off()
+        axes[1,0].matshow(image)
+        axes[1,0].set_axis_off()
 
         object_pixel_size = setup_parameters.camera.camera_pixel_size / setup_parameters.lens.magnification
         
-        located_blobs = locate_dots(image, dot_array.diameter/2, object_pixel_size, sub_precision)
-
-        blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, located_blobs, dot_array.spacing, object_pixel_size)
-        print(f"The total rotation was {rotation} degrees")
-        plot_located_dots_vs_grid(image, blobs, grid_points)
-
-        plot_dot_error(ax=axes[3], blobs=blobs, grid_points=grid_points, 
+        located_blobs = locate_dots(image, dot_array, object_pixel_size, sub_precision)
+        blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image, located_blobs, dot_array, object_pixel_size)
+        print(f"The total rotation was {rotation} degrees")       
+        plot_dot_error(ax=axes[1,1], blobs=blobs, grid_points=grid_points, 
                        grid_indices=grid_indices, object_pixel_size=object_pixel_size)
+
         fig.tight_layout()
+        fig_2 = plt.figure()
+        plot_example_dots(fig_2, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size)
+
+        if save_results:
+            filename = r"\examples\saved_plots\simulated_dot_array_"+str(j)+".pdf"
+            fig.savefig(fname=filename, dpi=1000, format="pdf")
 
     plt.show()
 
@@ -73,8 +80,8 @@ def locate_and_plot_simulated_dots():
     setup_parameters = aberrated_dot_array_setup()
     dot_array = EO_DOT_ARRAY
 
-    zernike_coefficients_list = [[0,0,0,0,0,0,0]]
-    pixel_scale_factor = 4
+    zernike_coefficients_list = [[0,0,0,0,1,0,0]]
+    pixel_scale_factor = 1
 
     simulated_datas, pupils, low_res_dot_blobs, \
     high_res_complex_object, high_res_dot_blobs, CTF \
@@ -106,8 +113,8 @@ def profile_main():
     stats.dump_stats(filename=r"profiling_data\dot_locating.prof")
 
 def main():
-    locate_and_plot_simulated_dots()
-    #plot_abberated_dot_arrays()
+    #locate_and_plot_simulated_dots()
+    plot_abberated_dot_arrays()
 
 if __name__ == "__main__":
     profile_main()

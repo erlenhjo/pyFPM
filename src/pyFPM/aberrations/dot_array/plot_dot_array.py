@@ -24,8 +24,6 @@ def plot_located_dots(image, blobs_list):
     ax[1].set_axis_off()
 
 
-
-
 def plot_located_dots_vs_grid(image, detected_blobs, grid_points):
     colors = ["red", "lime"]
     markers = ["x", "+"]
@@ -79,3 +77,57 @@ def plot_dot_error(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_
     cax = ax.matshow(error, vmin=0, vmax = max(10, error.max()))
     plt.colorbar(cax, ax=ax)
     ax.set_title("Error in micrometers")
+
+
+def plot_example_dots(fig, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size):
+    dot_radius_pixels = dot_array.diameter/2 / object_pixel_size
+    fig.suptitle("Example dots")
+    
+    axes = fig.subplots(3,3)
+    center = grid_indices.max()//2
+    min = 2
+    max = grid_indices.max()-3
+    # for y in [min, center, max]:
+    #     for x in [min, center, max]:
+
+    values = zip(blobs, grid_points, grid_indices)
+    for blob, grid_point, indices in values:
+        Y = indices[0]
+        X = indices[1]
+
+        if Y == min: n=0
+        elif Y == center: n=1
+        elif Y == max: n=2
+        else: continue
+
+        if X == min: m=0
+        elif X == center: m=1
+        elif X == max: m=2
+        else: continue
+            
+        ax = axes[n,m]
+            
+        plot_dot_subimage(ax, image, blob, grid_point, dot_radius_pixels)
+    
+    fig.tight_layout()
+
+def plot_dot_subimage(ax, image, blob, grid_point, dot_radius_pixels):
+    colors = ["red", "lime"]
+    markers = ["x", "+"]
+    
+    delta = 1.3 * dot_radius_pixels
+    y, x = blob
+    x_min = int(x-delta)
+    x_max = int(x+delta)
+    y_min = int(y-delta)
+    y_max = int(y+delta)
+
+    blob_y, blob_x = blob - np.array([y_min, x_min])
+    grid_y, grid_x = grid_point - np.array([y_min, x_min])
+
+    ax.imshow(image[y_min:y_max, x_min:x_max])
+    ax.plot(blob_x, blob_y, color=colors[0], marker=markers[0])
+
+    ax.plot(grid_x, grid_y, color=colors[1], marker=markers[1])
+
+    ax.set_axis_off()
