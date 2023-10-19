@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pyFPM.aberrations.dot_array.plot_dot_array import (plot_located_dots_vs_grid,
-                                                        plot_located_dot_error,
-                                                        plot_dot_error,
+from pyFPM.aberrations.dot_array.plot_dot_array import (plot_dot_error,
                                                         plot_example_dots)
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots,
                                                           assemble_dots_in_grid) 
@@ -28,13 +26,12 @@ def aberrated_dot_array_setup():
     return setup_parameters
 
 def plot_abberated_dot_arrays():
-    save_results = False
     zernike_coefficients_list = []
-    N = 25
-    magnitude = 1
-    for j in range(4, 5):
-        zernike_coefficients = np.zeros(N+1)
-        zernike_coefficients[j] = magnitude
+    max_j = 25
+    aberration_magnitudes = [0.1, 1, 3]
+    for n in range(len(aberration_magnitudes)):
+        zernike_coefficients = (np.random.random(max_j+1)*2 - 1) * aberration_magnitudes[n]
+        zernike_coefficients[0] = 0
         zernike_coefficients_list.append(zernike_coefficients)
 
     setup_parameters = aberrated_dot_array_setup()
@@ -69,37 +66,9 @@ def plot_abberated_dot_arrays():
         fig_2 = plt.figure()
         plot_example_dots(fig_2, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size)
 
-        if save_results:
-            filename = r"\examples\saved_plots\simulated_dot_array_"+str(j)+".pdf"
-            fig.savefig(fname=filename, dpi=1000, format="pdf")
 
     plt.show()
 
-
-def locate_and_plot_simulated_dots():
-    setup_parameters = aberrated_dot_array_setup()
-    dot_array = EO_DOT_ARRAY
-
-    zernike_coefficients_list = [[0,0,0,0,1,0,0]]
-    pixel_scale_factor = 1
-
-    simulated_datas, pupils, low_res_dot_blobs, \
-    high_res_complex_object, high_res_dot_blobs, CTF \
-        = simulate_abberated_dot_arrays(zernike_coefficients_list, dot_array=dot_array, arraysize=1, 
-                                        setup_parameters=setup_parameters, pixel_scale_factor=pixel_scale_factor)
-
-    image = simulated_datas[0].amplitude_images[0]
-    pixel_size = setup_parameters.camera.camera_pixel_size
-    magnification = setup_parameters.lens.magnification
-    object_pixel_size = pixel_size / magnification
-
-    located_blobs = locate_dots(image, dot_array, object_pixel_size, sub_precision=4)
-
-    blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image.shape, located_blobs, dot_array.spacing, object_pixel_size)
-    print(f"The total rotation was {rotation} degrees")
-    plot_located_dots_vs_grid(image, blobs, grid_points)
-    plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size)
-    plt.show()
 
 
 def profile_main():
@@ -113,7 +82,6 @@ def profile_main():
     stats.dump_stats(filename=r"profiling_data\dot_locating.prof")
 
 def main():
-    #locate_and_plot_simulated_dots()
     plot_abberated_dot_arrays()
 
 if __name__ == "__main__":
