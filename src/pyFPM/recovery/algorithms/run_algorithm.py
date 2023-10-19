@@ -16,7 +16,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
-            pupil = pupil_guess,
+            pupil_guess = pupil_guess,
             loops = loops
         )
     elif method == Method.Fraunhofer_Epry:
@@ -24,7 +24,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
-            pupil = pupil_guess,
+            pupil_guess = pupil_guess,
             loops = loops,
             use_epry = True,
             use_gradient_descent = False
@@ -34,7 +34,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
-            pupil = pupil_guess,
+            pupil_guess = pupil_guess,
             loops = loops,
             use_epry = True,
             use_gradient_descent = True

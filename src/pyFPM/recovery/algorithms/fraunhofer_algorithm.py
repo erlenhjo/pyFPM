@@ -13,7 +13,7 @@ def fraunhofer_recovery_algorithm(
         data_patch: Data_patch,
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,
-        pupil,
+        pupil_guess,
         loops,
         use_epry = False,
         use_gradient_descent = False
@@ -26,9 +26,9 @@ def fraunhofer_recovery_algorithm(
     recovered_object_guess = initialize_high_res_image(low_res_images, update_order, scaling_factor)
     
 
-    recovered_object_fourier_transform, pupil, convergence_index, real_space_error_metric \
+    recovered_object_fourier_transform, recovered_pupil, convergence_index, real_space_error_metric \
         = main_algorithm_loop(recovered_object_guess, loops, use_epry, use_gradient_descent, update_order, low_res_images,  LED_indices,
-                        k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, low_res_CTF, pupil
+                        k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, low_res_CTF, pupil_guess
                         )
 
     recovered_CTF = calculate_recovered_CTF(update_order, LED_indices, k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, low_res_CTF)
@@ -37,7 +37,7 @@ def fraunhofer_recovery_algorithm(
     algorithm_result = Algorithm_result(
         recovered_object = fftshift(ifft2(ifftshift(recovered_object_fourier_transform))),
         recovered_object_fourier_transform = recovered_object_fourier_transform,
-        pupil = pupil,
+        pupil = recovered_pupil,
         convergence_index = convergence_index,
         real_space_error_metric = real_space_error_metric
     ) 
