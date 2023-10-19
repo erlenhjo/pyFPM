@@ -3,6 +3,7 @@ from pyFPM.setup.Data import Simulated_data, Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.simulation.fraunhofer_simulator import simulate_fraunhofer_imaging
 from pyFPM.aberrations.pupils.zernike_pupil import get_zernike_pupil
+from pyFPM.simulation.apply_gaussian_noise import apply_gaussian_noise
 
 import numpy as np
 
@@ -41,8 +42,14 @@ def simulate_imaging(
             LED_indices,
             full_image_imaging_system)
     
-    # will get back to this :)
-    # low_res_images = apply_gaussian_noise(low_res_images, noise_fraction)
+    illumination_pattern = Illumination_pattern(LED_indices=LED_indices,
+                                                imaging_system=full_image_imaging_system,
+                                                setup_parameters=setup_parameters) 
+
+    low_res_images = apply_gaussian_noise(low_res_images = low_res_images, 
+                                          noise_fraction = noise_fraction, 
+                                          relative_NAs = illumination_pattern.relative_NAs, 
+                                          LED_indices = LED_indices)
 
     simulated_data = Simulated_data(LED_indices=LED_indices, amplitude_images=low_res_images)
     
