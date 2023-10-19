@@ -170,8 +170,8 @@ def calculate_coherent_transfer_function(pixel_size, image_region_size, spatial_
 
 def calculate_frequency_mesh_grids(pixel_size, image_region_size):
     max_frequency = 1 / (2 * pixel_size)
-    spatial_frequencies_x = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[0], endpoint = False)   # is enpoint setting correct?
-    spatial_frequencies_y = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[1], endpoint = False)
+    spatial_frequencies_x = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[0], endpoint = True)   # is enpoint setting correct?
+    spatial_frequencies_y = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[1], endpoint = True)
 
     fx_mesh, fy_mesh = np.meshgrid(spatial_frequencies_x, spatial_frequencies_y)
     

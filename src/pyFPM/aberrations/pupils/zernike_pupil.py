@@ -38,11 +38,12 @@ def decompose_zernike_pupil(imaging_system: Imaging_system, pupil, max_j):
             max_j = max_j,
             pixel_size = imaging_system.raw_image_pixel_size,
             spatial_cutoff_frequency = imaging_system.cutoff_frequency,
-            image_region_size = imaging_system.patch_size
+            image_region_size = imaging_system.patch_size,
+            CTF=imaging_system.low_res_CTF
         )
         return pupil
 
-def calculate_decomposed_zernike_coefficients(pupil, max_j, pixel_size, spatial_cutoff_frequency, image_region_size):
+def calculate_decomposed_zernike_coefficients(pupil, max_j, pixel_size, spatial_cutoff_frequency, image_region_size, CTF):
     fx_mesh, fy_mesh = calculate_frequency_mesh_grids(pixel_size=pixel_size, image_region_size=image_region_size)
     normalized_fx_mesh = fx_mesh/(spatial_cutoff_frequency)
     normalized_fy_mesh = fy_mesh/(spatial_cutoff_frequency)
@@ -53,10 +54,10 @@ def calculate_decomposed_zernike_coefficients(pupil, max_j, pixel_size, spatial_
     wavefront_error = unwrap_phase(wavefront_error)
 
     zernike_coefficients = np.zeros(shape=max_j+1)
-    unit_disk = normalized_fx_mesh**2 + normalized_fy_mesh**2 < 1
+
     for j in range(1, max_j+1):
         zernike_mode = evaluate_zernike_polynomial(normalized_fx_mesh, normalized_fy_mesh, j)
-        integrand = wavefront_error * zernike_mode * unit_disk
+        integrand = wavefront_error * zernike_mode * CTF
         
         integral_x = simpson(y=integrand, dx=dx)
         integral_x_and_y = simpson(y=integral_x, dx=dy)
