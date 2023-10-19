@@ -6,61 +6,34 @@ from pyFPM.setup.Imaging_system import Imaging_system
 
 class Illumination_pattern(object):
     def __init__(self, LED_indices, imaging_system: Imaging_system, setup_parameters: Setup_parameters):
-        # LED_array_size = setup_parameters.LED_info.LED_array_size
+        LED_array_size = setup_parameters.LED_info.LED_array_size
         center_indices = setup_parameters.LED_info.center_indices
+        LED_frequencies_x = imaging_system.LED_frequencies_x
+        LED_frequencies_y = imaging_system.LED_frequencies_y
+        cutoff_frequency = imaging_system.cutoff_frequency
         
-        # LED_frequencies_x = imaging_system.LED_frequencies_x
-        # LED_frequencies_y = imaging_system.LED_frequencies_y
-        # cutoff_frequency = imaging_system.cutoff_frequency
 
-        # available_LEDs = determine_available_LEDs(
-        #     LED_indices = LED_indices, 
-        #     LED_array_size = LED_array_size
-        #     )
-        
-        # relative_NAs = calculate_relative_NA(
-        #     LED_frequencies_x = LED_frequencies_x,
-        #     LED_frequencies_y = LED_frequencies_y,
-        #     cutoff_frequency = cutoff_frequency
-        # )
+        self.relative_NAs = calculate_relative_NA(
+            LED_frequencies_x = LED_frequencies_x,
+            LED_frequencies_y = LED_frequencies_y,
+            cutoff_frequency = cutoff_frequency
+        )
 
-        # BF_edge = determine_BF_edge(
-        #     relative_NAs = relative_NAs
-        # )
-
-        # available_LEDs = available_LEDs
-        # BF_edge = BF_edge
-
-        self.update_order, _ = spiral_indices(LED_indices = LED_indices, center_indices=center_indices)
+        self.update_order, _ = spiral_indices(LED_indices = LED_indices, 
+                                              center_indices=center_indices,
+                                              LED_array_size=LED_array_size)
 
 
 
-
-def determine_available_LEDs(LED_indices, LED_array_size):
-    available_LEDs = np.zeros(shape = (LED_array_size[1] + 1, LED_array_size[0] + 1), dtype = bool)   # plus 1 in case array indices are one indexed
-    
-    for x, y in LED_indices:
-        available_LEDs[y,x] = True
-
-    return available_LEDs
 
 def calculate_relative_NA(LED_frequencies_x, LED_frequencies_y, cutoff_frequency):
     return np.sqrt(LED_frequencies_x**2 + LED_frequencies_y**2) / cutoff_frequency
 
-def determine_BF_edge(relative_NAs):
-    lower_NA_limit = 0.9
-    upper_NA_limit = 1.5
-    return (relative_NAs > lower_NA_limit) * (relative_NAs < upper_NA_limit)
-
-def indices_NA_first(LED_indices, center):
-    raise "Not implemented NA first ordering"
-
-
-def spiral_indices(LED_indices, center_indices):
+def spiral_indices(LED_indices, center_indices, LED_array_size):
     center_x_index = center_indices[0]
     center_y_index = center_indices[1]
 
-    order_matrix = np.zeros(shape=(33,33), dtype = int)
+    order_matrix = np.zeros(shape=(LED_array_size[1]+1, LED_array_size[0]+1), dtype = int)
     order_list = np.empty(shape=len(LED_indices), dtype = int)
 
 
