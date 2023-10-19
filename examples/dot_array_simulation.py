@@ -28,7 +28,7 @@ def aberrated_dot_array_setup():
 def plot_abberated_dot_arrays():
     zernike_coefficients_list = []
     max_j = 25
-    aberration_magnitudes = [0.1, 1, 3]
+    aberration_magnitudes = [0.1, 0.5, 1]
     for n in range(len(aberration_magnitudes)):
         zernike_coefficients = (np.random.random(max_j+1)*2 - 1) * aberration_magnitudes[n]
         zernike_coefficients[0] = 0
@@ -44,7 +44,7 @@ def plot_abberated_dot_arrays():
         = simulate_abberated_dot_arrays(zernike_coefficients_list, dot_array=dot_array, arraysize=1, 
                                         setup_parameters=setup_parameters, pixel_scale_factor=pixel_scale_factor)
 
-    for j, (simulated_data, pupil, zernike_coefficients) in enumerate(zip(simulated_datas, pupils, zernike_coefficients_list)):
+    for simulated_data, pupil, zernike_coefficients in zip(simulated_datas, pupils, zernike_coefficients_list):
         image = simulated_data.amplitude_images[0]
         fig, axes = plt.subplots(nrows=2,ncols=2)
 
