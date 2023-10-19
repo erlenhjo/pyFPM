@@ -1,16 +1,11 @@
 import matplotlib.pyplot as plt
-
 import numpy as np
-from numpy.fft import fft2, fftshift, ifftshift
 
-# setup imports
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.aberrations.zernike_polynomials.plot_zernike_coefficients import plot_zernike_coefficients
 from pyFPM.aberrations.pupils.zernike_pupil import decompose_zernike_pupil
-
-# recovery method imports
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 
 
