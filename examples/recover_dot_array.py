@@ -9,6 +9,7 @@ from pyFPM.aberrations.pupils.zernike_pupil import decompose_zernike_pupil
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots,
                                                           assemble_dots_in_grid) 
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
+from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
 from plotting.plot_experimental_results import plot_experimental_results
 
 import numpy as np
@@ -32,14 +33,16 @@ def locate_recovered_dots():
         pixel_scale_factor = pixel_scale_factor
     )
 
+    # define step description
+    step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=200)
+
     # define pupil guess
     defocus_guess = 0
     pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = defocus_guess)
 
     algorithm_result: Algorithm_result = recover(method=method, data_patch=data_patch, imaging_system=imaging_system,
-                            illumination_pattern=illumination_pattern, pupil_guess=pupil_guess,
-                            loops=loops)
-
+                                                illumination_pattern=illumination_pattern, pupil_guess=pupil_guess,
+                                                step_description=step_description)
 
     max_j = 25
     dot_array = EO_DOT_ARRAY

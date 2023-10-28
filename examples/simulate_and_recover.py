@@ -1,18 +1,20 @@
 # FPM imports
 from pyFPM.NTNU_specific.simulate_images.cameraman import simulate_cameraman_2x
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
+from pyFPM.recovery.algorithms.Step_description import get_constant_step_description, get_standard_adaptive_step_description
 
 # import plotting
 from plotting.plot_simulation_results import plot_simulation_results
+from plotting.illustrative_plots import plot_bright_field_images
 
 import numpy as np
 
 def main():
-    method = Method.Fraunhofer_Epry_Gradient_Descent
-    loops = 100
+    method = Method.Fraunhofer_Epry
 
     max_j = 25
-    #zernike_coefficients = (np.random.random(max_j+1)*2 - 1) * 0.1
+
+    #zernike_coefficients = (np.random.random(max_j+1)*2 - 1) * 0.2
     zernike_coefficients = [ 0.0490545,  -0.06489815, -0.05771678, -0.02830205, -0.03818069,  0.01629342,
                              0.03223081,  0.07773553, -0.01409983,  0.00772039, -0.05556964,  0.07741695,
                             -0.07330059, -0.01082829,  0.06798477, -0.06677369,  0.07063081,  0.06726429,
@@ -22,8 +24,9 @@ def main():
     
     zernike_coefficients[0] = 0
 
-    setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil\
-        = simulate_cameraman_2x(noise_fraction=1, zernike_coefficients=zernike_coefficients)
+    setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
+        = simulate_cameraman_2x(noise_fraction=0.1, zernike_coefficients=zernike_coefficients)
+    step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=3)
 
 
     # define pupil guess
@@ -35,7 +38,7 @@ def main():
         imaging_system=imaging_system,
         illumination_pattern=illumination_pattern,
         pupil_guess=pupil_guess,
-        loops=loops
+        step_description=step_description
     )
 
     plot_simulation_results(data_patch, illumination_pattern, imaging_system, algorithm_result, 

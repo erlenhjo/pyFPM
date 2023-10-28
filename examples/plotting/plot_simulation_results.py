@@ -83,7 +83,6 @@ def plot_simulation_results(
     axes[11].set_title(f"Real space error metric")
     axes[11].plot(algorithm_result.real_space_error_metric)
     axes[11].set_xlabel("Loop number")
-    axes[11].set_yscale("log")
 
 
     plt.show()

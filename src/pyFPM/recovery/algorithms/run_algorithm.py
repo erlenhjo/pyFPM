@@ -9,7 +9,8 @@ class Method(Enum):
     Fresnel = 4
     Fresnel_Epry = 5
 
-def recover(method, data_patch, imaging_system, illumination_pattern, pupil_guess, loops):
+
+def recover(method, data_patch, imaging_system, illumination_pattern, pupil_guess, step_description):
 
     if method == Method.Fraunhofer:
         algorithm_result = fraunhofer_recovery_algorithm(
@@ -17,7 +18,9 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
-            loops = loops
+            step_description = step_description,
+            use_epry = False, 
+            use_gradient_descent = False
         )
     elif method == Method.Fraunhofer_Epry:
         algorithm_result = fraunhofer_recovery_algorithm(
@@ -25,7 +28,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
-            loops = loops,
+            step_description = step_description,
             use_epry = True,
             use_gradient_descent = False
         )
@@ -35,7 +38,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
-            loops = loops,
+            step_description = step_description,
             use_epry = True,
             use_gradient_descent = True
         )
