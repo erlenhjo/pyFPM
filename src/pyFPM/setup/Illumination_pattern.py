@@ -12,6 +12,7 @@ class Illumination_pattern(object):
         LED_frequencies_y = imaging_system.LED_frequencies_y
         cutoff_frequency = imaging_system.cutoff_frequency
         
+        avaliable_LEDs = determine_available_LEDs(LED_indices=LED_indices, LED_array_size=LED_array_size)
 
         self.relative_NAs = calculate_relative_NA(
             LED_frequencies_x = LED_frequencies_x,
@@ -19,21 +20,27 @@ class Illumination_pattern(object):
             cutoff_frequency = cutoff_frequency
         )
 
-        self.update_order, _ = spiral_indices(LED_indices = LED_indices, 
-                                              center_indices=center_indices,
-                                              LED_array_size=LED_array_size)
-
-
+        self.update_order, self.update_order_matrix \
+            = spiral_indices(LED_indices = LED_indices, center_indices=center_indices, 
+                             LED_array_size=LED_array_size, avaliable_LEDs=avaliable_LEDs)
 
 
 def calculate_relative_NA(LED_frequencies_x, LED_frequencies_y, cutoff_frequency):
     return np.sqrt(LED_frequencies_x**2 + LED_frequencies_y**2) / cutoff_frequency
 
-def spiral_indices(LED_indices, center_indices, LED_array_size):
+def determine_available_LEDs(LED_indices, LED_array_size):
+    available_LEDs = np.zeros(shape = (LED_array_size[1] + 1, LED_array_size[0] + 1), dtype = bool)
+    
+    for x, y in LED_indices:
+        available_LEDs[y,x] = True
+
+    return available_LEDs
+
+def spiral_indices(LED_indices, center_indices, LED_array_size, avaliable_LEDs):
     center_x_index = center_indices[0]
     center_y_index = center_indices[1]
 
-    order_matrix = np.zeros(shape=(LED_array_size[1]+1, LED_array_size[0]+1), dtype = int)
+    order_matrix = np.zeros(shape=(LED_array_size[1] + 1, LED_array_size[0]+1), dtype = int)
     order_list = np.empty(shape=len(LED_indices), dtype = int)
 
 
@@ -53,10 +60,12 @@ def spiral_indices(LED_indices, center_indices, LED_array_size):
             elif direction % 4 == 3:
                 x_index += 1
 
-            order_matrix[y_index, x_index] = update_index
-            update_index += 1
+            if avaliable_LEDs[y_index, x_index]:
+                order_matrix[y_index, x_index] = update_index
+                update_index += 1
 
         direction += 1
+
 
     for n, indices in enumerate(LED_indices):
         x = indices[0]
@@ -66,6 +75,5 @@ def spiral_indices(LED_indices, center_indices, LED_array_size):
         order_list[update_index] = n
 
     return order_list, order_matrix
-    
     
     
