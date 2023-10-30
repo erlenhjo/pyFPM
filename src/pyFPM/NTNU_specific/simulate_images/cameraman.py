@@ -13,7 +13,7 @@ def simulate_cameraman_2x(zernike_coefficients, noise_fraction):
     phase_image = np.zeros(shape=amplitude_image.shape)
     high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
     pixel_scale_factor = 4
-    arraysize = 9
+    arraysize = 15
     low_res_image_size = [amplitude_image.shape[1]//pixel_scale_factor, amplitude_image.shape[0]//pixel_scale_factor]
     
     lens = INFINITYCORRECTED_2X
@@ -57,5 +57,5 @@ def simulate_cameraman_2x(zernike_coefficients, noise_fraction):
             pixel_scale_factor = pixel_scale_factor
         )
     
-    return setup_parameters, data_patch, imaging_system, illumination_pattern, pupil
+    return setup_parameters, data_patch, imaging_system, illumination_pattern, pupil, high_res_complex_object
 

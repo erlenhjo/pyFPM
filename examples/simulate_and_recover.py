@@ -5,7 +5,6 @@ from pyFPM.recovery.algorithms.Step_description import get_constant_step_descrip
 
 # import plotting
 from plotting.plot_simulation_results import plot_simulation_results
-from plotting.illustrative_plots import plot_bright_field_images
 
 import numpy as np
 
