@@ -14,6 +14,7 @@ from plotting.plot_experimental_results import plot_experimental_results
 
 #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
 datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf"
+datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark"
 
 pixel_scale_factor = 4
 patch_start = [870, 870] # [x, y]

@@ -50,6 +50,16 @@ INFINITYCORRECTED_2X = Lens(
     lens_type = Lens_type.INFINITY_CORRECTED
 )
 
+TELECENTRIC_3X = Lens(
+    NA = 0.09,
+    magnification = 3,
+    diameter = None,
+    focal_length = 58.51e-3,
+    working_distance = 77e-3,
+    depth_of_field = 34e-6,
+    lens_type = Lens_type.TELECENTRIC
+)
+
 ###### Aberration target ######
 
 EO_DOT_ARRAY = Dot_array(

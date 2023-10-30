@@ -5,17 +5,19 @@ import matplotlib.pyplot as plt
 from pyFPM.aberrations.dot_array.plot_dot_array import (plot_example_dots, plot_dot_error)
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots,
                                                           assemble_dots_in_grid)                                          
-from pyFPM.NTNU_specific.components import EO_DOT_ARRAY, HAMAMATSU_C11440_42U30, INFINITYCORRECTED_2X
+from pyFPM.NTNU_specific.components import EO_DOT_ARRAY, HAMAMATSU_C11440_42U30, INFINITYCORRECTED_2X, TELECENTRIC_3X
 
 
 
 def locate_and_plot_dots():
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf\0_10-16_16.tiff"
+    #filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark\0_34-16_16.tiff"
+    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_2x_object\0_10-16_16.tiff"
 
-    image = np.array(Image.open(filepath))
+    image = np.array(Image.open(filepath))#[1300:,1300:]
 
     dot_array = EO_DOT_ARRAY
     camera = HAMAMATSU_C11440_42U30
+    #lens = TELECENTRIC_3X
     lens = INFINITYCORRECTED_2X
 
     fig, axes = plt.subplots(nrows=1,ncols=2)

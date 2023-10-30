@@ -1,4 +1,5 @@
 from pyFPM.NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
+from pyFPM.NTNU_specific.setup_3x_telecentric_hamamatsu import setup_3x_telecentric_hamamatsu
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 from pyFPM.NTNU_specific.components import EO_DOT_ARRAY
@@ -17,16 +18,17 @@ import matplotlib.pyplot as plt
 
 def locate_recovered_dots():
 
-    datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf"
+    #datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_2x_dark_object"
+    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark"
+
 
     pixel_scale_factor = 4
     patch_start = [767,767]
-    patch_size = [512, 513] # [x, y]
+    patch_size = [512, 512] # [x, y]
 
     method = Method.Fraunhofer_Epry
-    loops = 100
 
-    setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_hamamatsu(
+    setup_parameters, data_patch, imaging_system, illumination_pattern = setup_3x_telecentric_hamamatsu(
         datadirpath = datadirpath,
         patch_start = patch_start,
         patch_size = patch_size,
@@ -35,6 +37,7 @@ def locate_recovered_dots():
 
     # define step description
     step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=200)
+    step_description.beta = 1
 
     # define pupil guess
     defocus_guess = 0
