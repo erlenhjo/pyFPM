@@ -102,10 +102,9 @@ def main_algorithm_loop(recovered_object_guess, use_epry, use_gradient_descent, 
         normalized_real_space_error_metric[loop_nr] = real_space_error_metric/real_space_error_metric_normalization_factor
 
         if use_adaptive_step_size and (loop_nr > 1):
-            alpha, beta = update_step_sizes(alpha, beta, eta,
+            alpha, beta = update_step_sizes(alpha, beta, eta, loop_nr,
                                             error=normalized_real_space_error_metric[loop_nr],
                                             prev_error=normalized_real_space_error_metric[loop_nr-1])
-            print(f"Loop nr {loop_nr}, alpha={alpha}, beta={beta}")
 
             if alpha<converged_alpha:
                 normalized_real_space_error_metric=normalized_real_space_error_metric[:loop_nr]
@@ -141,9 +140,11 @@ def caclulate_real_space_error_normalization_factor(
 
     return real_space_error_metric_normalization_factor
 
-@njit(cache=True)
-def update_step_sizes(alpha, beta, eta, error, prev_error):
+
+def update_step_sizes(alpha, beta, eta, loop_nr, error, prev_error):
     if (prev_error - error) > eta * prev_error:
         return alpha, beta
     else:
-        return alpha/2, beta/2
+        alpha, beta = alpha/2, beta/2
+        print(f"Loop nr {loop_nr}, alpha={alpha}, beta={beta}")
+        return alpha, beta
