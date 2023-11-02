@@ -3,19 +3,21 @@ import numpy as np
 
 from plotting.plot_illumination import plot_bright_field_images
 
-from pyFPM.NTNU_specific.simulate_images.cameraman import simulate_cameraman_2x
-
-# FPM imports
+from pyFPM.NTNU_specific.simulate_images.only_illumination import simulate_illumination
 from pyFPM.NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
+from pyFPM.NTNU_specific.components import INFINITYCORRECTED_2X, TELECENTRIC_3X
 
-def illustrate_simulation():
+def illustrate_illumination_from_simulation():
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
-       = simulate_cameraman_2x(noise_fraction=0, zernike_coefficients=np.array([0,0,0]))
+       = simulate_illumination(lens=INFINITYCORRECTED_2X, 
+                               correct_spherical_wave_illumination = True, 
+                               correct_non_telecentric = False,
+                               arraysize=5)
+    plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
 
-    plot_bright_field_images(data_patch=data_patch, illumination_pattern=illumination_pattern, setup_parameters=setup_parameters, array_size=5)
     plt.show()
 
-def illustrate_from_setup():
+def illustrate_illumination_from_setup():
     #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
     #datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf"
     #datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_2x_dark_no_object"
@@ -36,12 +38,12 @@ def illustrate_from_setup():
         pixel_scale_factor = pixel_scale_factor
     )
 
-    plot_bright_field_images(data_patch=data_patch, illumination_pattern=illumination_pattern, setup_parameters=setup_parameters, array_size=array_size)
+    plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=array_size)
     plt.show()
 
 if __name__ == "__main__":
-    illustrate_from_setup()
-    #illustrate_simulation()
+    #illustrate_illumination_from_setup()
+    illustrate_illumination_from_simulation()
 
     
 

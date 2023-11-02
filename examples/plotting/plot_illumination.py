@@ -1,13 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Setup_parameters import Setup_parameters
 
 
-def plot_bright_field_images(data_patch: Data_patch, illumination_pattern: Illumination_pattern, setup_parameters: Setup_parameters, array_size):
-    relative_NAs = illumination_pattern.relative_NAs
+def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_parameters, array_size):
     LED_indices = data_patch.LED_indices
 
     center_indices = setup_parameters.LED_info.center_indices
