@@ -8,7 +8,7 @@ from scipy.integrate import simpson
 def get_zernike_pupil(imaging_system: Imaging_system, zernike_coefficients):
         pupil = calculate_zernike_pupil(
             zernike_coefficients = zernike_coefficients,
-            pixel_size = imaging_system.raw_image_pixel_size,
+            pixel_size = imaging_system.raw_object_pixel_size,
             spatial_cutoff_frequency = imaging_system.cutoff_frequency,
             image_region_size = imaging_system.patch_size
         )
@@ -36,7 +36,7 @@ def decompose_zernike_pupil(imaging_system: Imaging_system, pupil, max_j):
         pupil = calculate_decomposed_zernike_coefficients(
             pupil = pupil,
             max_j = max_j,
-            pixel_size = imaging_system.raw_image_pixel_size,
+            pixel_size = imaging_system.raw_object_pixel_size,
             spatial_cutoff_frequency = imaging_system.cutoff_frequency,
             image_region_size = imaging_system.patch_size,
             CTF=imaging_system.low_res_CTF
