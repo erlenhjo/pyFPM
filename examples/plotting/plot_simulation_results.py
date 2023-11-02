@@ -32,9 +32,10 @@ def plot_simulation_results(
     axes[1].margins(x=0, y=0)
 
     axes[2].set_title(f"Recovered phase")
-    axes[2].matshow(np.angle(algorithm_result.recovered_object), vmin=-np.pi, vmax=np.pi)    
+    cax = axes[2].matshow(np.angle(algorithm_result.recovered_object), vmin=-np.pi, vmax=np.pi, cmap="twilight")    
     axes[2].axis("off")
     axes[2].margins(x=0, y=0)
+    fig.colorbar(cax)
 
     nonzero_y, nonzero_x = np.nonzero(algorithm_result.recovered_object_fourier_transform)
     min_x, max_x = np.min(nonzero_x), np.max(nonzero_x)

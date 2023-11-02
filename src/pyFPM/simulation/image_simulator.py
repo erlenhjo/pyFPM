@@ -2,13 +2,14 @@ from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.utility.k_space import calculate_k_vector_range
 
 import numpy as np
-from numpy.fft import fft2, ifft2, fftshift, ifftshift
+from numpy.fft import ifft2, fftshift, ifftshift
 
 
-def simulate_fraunhofer_imaging(high_resolution_object,
-                                pupil,
-                                LED_indices,
-                                imaging_system: Imaging_system):
+def simulate_angled_imaging(high_res_fourier_transform,
+                            pupil,
+                            LED_indices,
+                            imaging_system: Imaging_system
+                            ):
     
     size_high_res_x = imaging_system.final_image_size[0]
     size_high_res_y = imaging_system.final_image_size[1]
@@ -22,7 +23,6 @@ def simulate_fraunhofer_imaging(high_resolution_object,
     dk_y = imaging_system.differential_wavevectors_y()
     low_res_CTF = imaging_system.low_res_CTF
 
-    high_res_fourier_transform = fftshift(fft2(ifftshift(high_resolution_object)))
     low_res_images = np.zeros(shape=(len(LED_indices), size_low_res_y, size_low_res_x))
     
     for image_nr in range(len(LED_indices)):
@@ -40,3 +40,5 @@ def simulate_fraunhofer_imaging(high_resolution_object,
         
     
     return low_res_images
+
+

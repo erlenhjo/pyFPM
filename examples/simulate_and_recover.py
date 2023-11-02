@@ -1,15 +1,20 @@
 # FPM imports
-from pyFPM.NTNU_specific.simulate_images.cameraman import simulate_cameraman_2x
+from pyFPM.NTNU_specific.simulate_images.simulate_2x import simulate_2x
+from pyFPM.simulation.image_simulator import simulate_angled_imaging
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 from pyFPM.recovery.algorithms.Step_description import get_constant_step_description, get_standard_adaptive_step_description
+from pyFPM.setup.Data import Data_patch, Simulated_data
 
 # import plotting
 from plotting.plot_simulation_results import plot_simulation_results
+from plotting.plot_illumination import plot_bright_field_images
 
 import numpy as np
+import skimage
 
 def main():
     method = Method.Fraunhofer_Epry
+    simulate_spherical_illumination = True
 
     max_j = 25
 
@@ -23,10 +28,15 @@ def main():
     
     zernike_coefficients[0] = 0
 
-    setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
-        = simulate_cameraman_2x(noise_fraction=0.1, zernike_coefficients=zernike_coefficients)
-    step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=3)
+    amplitude_image = skimage.data.eagle()[:1800,:1800]
+    phase_image = np.zeros(shape=amplitude_image.shape)
+    high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
 
+    setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
+        = simulate_2x(high_res_complex_object, noise_fraction=0.1, zernike_coefficients=zernike_coefficients, spherical_illumination=simulate_spherical_illumination)
+    step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=100)
+
+    plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
 
     # define pupil guess
     pupil_guess = applied_pupil * 0 + 1
@@ -39,6 +49,21 @@ def main():
         pupil_guess=pupil_guess,
         step_description=step_description
     )
+
+
+
+    recovered_low_res_images \
+        = simulate_angled_imaging(
+            algorithm_result.recovered_object_fourier_transform,
+            algorithm_result.pupil,
+            data_patch.LED_indices,
+            imaging_system)
+    
+    recovered_low_res_data = Simulated_data(LED_indices=data_patch.LED_indices, amplitude_images=recovered_low_res_images)
+
+    recovered_data_patch = Data_patch(data = recovered_low_res_data, patch_start=[0, 0], patch_size=recovered_low_res_images[0].shape)
+    
+    plot_bright_field_images(data_patch=recovered_data_patch, setup_parameters=setup_parameters, array_size=5)
 
     plot_simulation_results(data_patch, illumination_pattern, imaging_system, algorithm_result, 
                             original_zernike_coefficients=zernike_coefficients, original_pupil=applied_pupil)

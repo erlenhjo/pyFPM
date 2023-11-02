@@ -3,27 +3,21 @@ from pyFPM.setup.Setup_parameters import Camera
 from pyFPM.simulation.simulate_imaging import simulate_imaging, finalize_simulation_setup
 from pyFPM.NTNU_specific.simulate_images.simulate_setup import simulate_setup_parameters
 
-import numpy as np
-import skimage
 
 
-def simulate_cameraman_2x(zernike_coefficients, noise_fraction):
-    
-    amplitude_image = skimage.data.camera()
-    phase_image = np.zeros(shape=amplitude_image.shape)
-    high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
+def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, spherical_illumination, arraysize=15):
+
     pixel_scale_factor = 4
-    arraysize = 15
-    low_res_image_size = [amplitude_image.shape[1]//pixel_scale_factor, amplitude_image.shape[0]//pixel_scale_factor]
-    
+    low_res_image_size = [high_res_complex_object.shape[1]//pixel_scale_factor, high_res_complex_object.shape[0]//pixel_scale_factor]
+
     lens = INFINITYCORRECTED_2X
     LED_array = MAIN_LED_ARRAY
     array_to_object_distance = 0.200 # m    
 
     dummy_camera = Camera(
-            camera_pixel_size = 6e-6,
+            camera_pixel_size = 6.5e-6,
             raw_image_size = low_res_image_size,
-            bit_depth = int(2**8-1)
+            bit_depth = int(1)
             )
      
     slide = None # for now
@@ -42,7 +36,9 @@ def simulate_cameraman_2x(zernike_coefficients, noise_fraction):
         noise_fraction = noise_fraction,
         setup_parameters = setup_parameters,
         arraysize = arraysize,
-        pixel_scale_factor = pixel_scale_factor
+        pixel_scale_factor = pixel_scale_factor,
+        non_telecentric_correction = True,
+        spherical_illumination_correction = spherical_illumination 
     )
 
     patch_start = [0, 0]

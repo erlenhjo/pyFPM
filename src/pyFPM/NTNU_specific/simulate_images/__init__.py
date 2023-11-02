@@ -1,1 +1,1 @@
-from . import cameraman, simulate_setup
+from . import simulate_2x, simulate_setup

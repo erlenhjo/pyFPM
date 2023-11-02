@@ -1,11 +1,12 @@
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.setup.Data import Simulated_data, Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.simulation.fraunhofer_simulator import simulate_fraunhofer_imaging
+from pyFPM.simulation.image_simulator import simulate_angled_imaging
 from pyFPM.aberrations.pupils.zernike_pupil import get_zernike_pupil
 from pyFPM.simulation.apply_gaussian_noise import apply_gaussian_noise
 
 import numpy as np
+from numpy.fft import fft2, ifftshift, fftshift
 
 
 def simulate_imaging(
@@ -14,7 +15,9 @@ def simulate_imaging(
     noise_fraction,
     setup_parameters,
     arraysize,
-    pixel_scale_factor
+    pixel_scale_factor,
+    non_telecentric_correction,
+    spherical_illumination_correction
 ):
       
     # Define simulated data set
@@ -35,9 +38,17 @@ def simulate_imaging(
     
     pupil = get_zernike_pupil(full_image_imaging_system, zernike_coefficients)
 
+    object_plane_phase_shift_correction = 1
+    if non_telecentric_correction:
+        object_plane_phase_shift_correction *= full_image_imaging_system.high_res_non_telecentric_correction
+    if spherical_illumination_correction: 
+        object_plane_phase_shift_correction *= full_image_imaging_system.high_res_spherical_illumination_correction
+
+    high_res_fourier_transform = fftshift(fft2(ifftshift(high_res_complex_object * object_plane_phase_shift_correction)))
+
     low_res_images \
-        = simulate_fraunhofer_imaging(
-            high_res_complex_object,
+        = simulate_angled_imaging(
+            high_res_fourier_transform,
             pupil,
             LED_indices,
             full_image_imaging_system)

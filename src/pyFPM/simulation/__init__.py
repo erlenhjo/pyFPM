@@ -1,1 +1,1 @@
-from . import fraunhofer_simulator
+from . import image_simulator
