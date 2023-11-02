@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
-from pyFPM.recovery.error_measures.sum_square_error import compute_sum_square_error
+from pyFPM.recovery.utility.real_space_error import compute_sum_square_error
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 
 

@@ -9,6 +9,7 @@ from pyFPM.recovery.algorithms.Step_description import Step_description
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 from pyFPM.recovery.utility.k_space import calculate_k_vector_range, calculate_recovered_CTF
 from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables
+from pyFPM.recovery.utility.real_space_error import caclulate_real_space_error_normalization_factor
 
 def fraunhofer_recovery_algorithm(
         data_patch: Data_patch,
@@ -127,18 +128,7 @@ def gradient_descent_step(phi, new_FT, old_FT, delta):
 
 
 
-@njit(cache=True)
-def caclulate_real_space_error_normalization_factor(
-    low_res_images,
-    update_order
-):
-    real_space_error_metric_normalization_factor = 0
-    for image_nr in range(len(update_order)):
-        index = update_order[image_nr]
-        raw_low_res_image = low_res_images[index]
-        real_space_error_metric_normalization_factor += np.linalg.norm(raw_low_res_image)**2
 
-    return real_space_error_metric_normalization_factor
 
 
 def update_step_sizes(alpha, beta, eta, loop_nr, error, prev_error):
