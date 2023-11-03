@@ -115,7 +115,7 @@ def plot_dot_subimage(ax, image, blob, grid_point, dot_radius_pixels):
     colors = ["red", "lime"]
     markers = ["x", "+"]
     
-    delta = 1.3 * dot_radius_pixels
+    delta = 1.6 * dot_radius_pixels
     y, x = blob
     x_min = int(x-delta)
     x_max = int(x+delta)
