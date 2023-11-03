@@ -1,10 +1,10 @@
-from pyFPM.setup.Setup_parameters import Lens, Slide, Camera, LED_infos, Setup_parameters
+from pyFPM.setup.Setup_parameters import Lens, Camera, LED_infos, Setup_parameters
 from pyFPM.NTNU_specific.components import LED_array
 
 import numpy as np
 
 def simulate_setup_parameters(lens: Lens, camera: Camera, 
-                               slide: Slide, LED_array: LED_array, array_to_object_distance):
+                              LED_array: LED_array, array_to_object_distance):
 
     x_size = LED_array.array_size[0]
     y_size = LED_array.array_size[1]
@@ -29,7 +29,6 @@ def simulate_setup_parameters(lens: Lens, camera: Camera,
     setup_parameters: Setup_parameters = Setup_parameters(
         lens = lens,
         camera = camera,
-        slide = slide,
         LED_info = LED_info
     )
 

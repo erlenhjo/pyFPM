@@ -14,7 +14,6 @@ def setup_2x_hamamatsu(
 ):
     camera = HAMAMATSU_C11440_42U30
     lens = INFINITYCORRECTED_2X
-    slide = None
     LED_array = MAIN_LED_ARRAY
     array_to_object_distance = 0.192  
 
@@ -27,7 +26,6 @@ def setup_2x_hamamatsu(
         datadirpath = datadirpath,
         lens = lens,
         camera = camera,
-        slide = slide,
         LED_array = LED_array,
         array_to_object_distance = array_to_object_distance
         )

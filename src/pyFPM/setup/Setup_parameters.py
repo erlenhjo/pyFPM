@@ -40,17 +40,12 @@ class Lens(object):
         self.depth_of_field = depth_of_field # m
         self.lens_type: Lens_type = lens_type
 
-class Slide(object):
-    def __init__(self, thickness, refractive_index):
-        self.thickness = thickness # m
-        self.refractive_index = refractive_index
-
 class Setup_parameters(object):
-    def __init__(self, lens: Lens, camera: Camera, LED_info: LED_infos, slide: Slide = None):
+    def __init__(self, lens: Lens, camera: Camera, LED_info: LED_infos):
         self.lens: Lens = lens
         self.camera: Camera = camera
         self.LED_info: LED_infos = LED_info
-        self.slide: Slide = slide
+
         
 
 

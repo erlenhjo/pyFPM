@@ -25,13 +25,10 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_non
             raw_image_size = low_res_image_size,
             bit_depth = int(2**8-1)
             )
-     
-    slide = None # for now
     
     setup_parameters = simulate_setup_parameters(
         lens = lens,
         camera = dummy_camera,
-        slide = slide,
         LED_array = LED_array,
         array_to_object_distance = array_to_object_distance
         )  

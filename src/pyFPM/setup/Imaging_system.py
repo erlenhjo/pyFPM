@@ -18,8 +18,7 @@ class Imaging_system(object):
             raise "Too low pixel scale factor"
 
         # calculate offsets
-        x_offset, y_offset = calculate_offset(
-            LED_offset = setup_parameters.LED_info.LED_offset,
+        patch_offset_x, patch_offset_y = calculate_patch_offset(
             image_size = setup_parameters.camera.raw_image_size,
             patch_start = patch_start,
             patch_size = patch_size,
@@ -27,30 +26,31 @@ class Imaging_system(object):
         )
 
         # calculate LED positions
-        LED_x_locations, LED_y_locations = calculate_LED_locations(
+        LED_locations_x, LED_locations_y = calculate_LED_locations(
             LED_array_size = setup_parameters.LED_info.LED_array_size,
             center_indices = setup_parameters.LED_info.center_indices,
             LED_pitch = setup_parameters.LED_info.LED_pitch,
-            x_offset = x_offset,
-            y_offset = y_offset
+            LED_offset = setup_parameters.LED_info.LED_offset
         )
         
-        # calculate frequency components for thin or thick sample/glass slide
-        if setup_parameters.slide is None:
-            spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components_thin_sample(
-                LED_x_locations = LED_x_locations, 
-                LED_y_locations = LED_y_locations, 
-                z_LED = setup_parameters.LED_info.array_to_object_distance, 
-                spatial_frequency = spatial_frequency
-            )
-        else:
-            spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components_thick_sample(
-                LED_x_locations = LED_x_locations, 
-                LED_y_locations = LED_y_locations, 
-                z_LED = setup_parameters.LED_info.array_to_object_distance,
-                spatial_frequency = spatial_frequency,
-                slide = setup_parameters.slide
-            )
+        # calculate frequency components for normal frequency shift model
+        spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components(
+            LED_locations_x = LED_locations_x, 
+            LED_locations_y = LED_locations_y,
+            patch_offset_x = patch_offset_x,
+            patch_offset_y = patch_offset_y,
+            z_LED = setup_parameters.LED_info.array_to_object_distance, 
+            spatial_frequency = spatial_frequency
+        )
+        # calculate frequency components for alternative frequency shift model (Fresnel propagation based?)
+        spatial_LED_frequencies_x_alternative, spatial_LED_frequencies_y_alternative = calculate_spatial_LED_frequency_components_alternative(
+            LED_locations_x = LED_locations_x, 
+            LED_locations_y = LED_locations_y,
+            patch_offset_x = patch_offset_x,
+            patch_offset_y = patch_offset_y,
+            z_LED = setup_parameters.LED_info.array_to_object_distance, 
+            spatial_frequency = spatial_frequency
+        )
  
         low_res_CTF = calculate_coherent_transfer_function(
             pixel_size = raw_object_pixel_size,
@@ -115,11 +115,7 @@ def calculate_required_pixel_size(spatial_cutoff_frequency):
     return 1 / (2.1 * spatial_cutoff_frequency)    #technically should be 2 for Nyquist criterion, but 2.1 gives some leeway
 
 
-def calculate_patch_offset(LED_offset, image_size, patch_start, patch_size, raw_object_pixel_size):
-    # misalignment of LEDs with respect to optical axis
-    LED_offset_x = LED_offset[0]
-    LED_offset_y = LED_offset[1]
-
+def calculate_patch_offset(image_size, patch_start, patch_size, raw_object_pixel_size):
     # find center of image and patch
     image_center_pixel_x = image_size[0] / 2
     image_center_pixel_y = image_size[1] / 2
@@ -129,19 +125,19 @@ def calculate_patch_offset(LED_offset, image_size, patch_start, patch_size, raw_
     # calculate offset of selected patch with respect to image centre
     patch_offset_x = (image_center_pixel_x - patch_center_pixel_x) * raw_object_pixel_size
     patch_offset_y = (image_center_pixel_y - patch_center_pixel_y) * raw_object_pixel_size
-
-    # total offset
-    x_offset = LED_offset_x + patch_offset_x
-    y_offset = LED_offset_y + patch_offset_y
     
-    return x_offset, y_offset
+    return patch_offset_x, patch_offset_y
 
 
-def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, x_offset, y_offset):
+def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, LED_offset):
     # note [y, x] indexing due to how matrix indexing works (row, col) -> (y, x)
     # arraysize + 1 in case LED array is one indexed
     x_size = LED_array_size[0] + 1 
     y_size = LED_array_size[1] + 1
+
+    # misalignment of LEDs with respect to optical axis
+    x_offset = LED_offset[0]
+    y_offset = LED_offset[1]
 
     x_locations = np.zeros(shape = (y_size , x_size))
     y_locations = np.zeros(shape = (y_size , x_size))
@@ -159,10 +155,14 @@ def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, x_offset,
     return x_locations, y_locations
 
 
-def calculate_spatial_LED_frequency_components_thin_sample(LED_x_locations, LED_y_locations, z_LED, spatial_frequency):
-    # find relative values
-    freqs_x_relative = -LED_x_locations / np.sqrt(LED_x_locations**2 + LED_y_locations**2 + z_LED**2)
-    freqs_y_relative = -LED_y_locations / np.sqrt(LED_x_locations**2 + LED_y_locations**2 + z_LED**2)
+def calculate_spatial_LED_frequency_components(LED_locations_x, LED_locations_y, patch_offset_x, patch_offset_y, z_LED, spatial_frequency):
+    # find x_locations relative patch center
+    locations_x = patch_offset_x - LED_locations_x
+    locations_y = patch_offset_y - LED_locations_y
+    
+    # find relative frequency values
+    freqs_x_relative = locations_x / np.sqrt(locations_x**2 + locations_y**2 + z_LED**2)
+    freqs_y_relative = locations_y / np.sqrt(locations_x**2 + locations_y**2 + z_LED**2)
 
     # multiply by frequency magnitude
     spatial_frequencies_x = spatial_frequency * freqs_x_relative
@@ -171,8 +171,8 @@ def calculate_spatial_LED_frequency_components_thin_sample(LED_x_locations, LED_
     return spatial_frequencies_x, spatial_frequencies_y
 
 
-def calculate_spatial_LED_frequency_components_thick_sample(LED_x_locations, LED_y_locations, z_LED, f0, slide):
-    raise "Thick sample compensation by Zheng not implemented yet."
+def calculate_spatial_LED_frequency_components_alternative(LED_locations_x, LED_locations_y, patch_offset_x, patch_offset_y, z_LED, spatial_frequency):
+    return "Not implemented yet :)", None
 
 
 def calculate_coherent_transfer_function(pixel_size, image_region_size, spatial_cutoff_frequency):

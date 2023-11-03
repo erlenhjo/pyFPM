@@ -1,12 +1,12 @@
 import os
 import numpy as np
 
-from pyFPM.setup.Setup_parameters import Setup_parameters, Lens, Camera, LED_infos, Slide
+from pyFPM.setup.Setup_parameters import Setup_parameters, Lens, Camera, LED_infos
 from .components import LED_array
 
 
 def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera, 
-                               slide: Slide, LED_array: LED_array, array_to_object_distance):
+                                LED_array: LED_array, array_to_object_distance):
 
     BF_exposure_time, DF_exposure_time, \
         BF_exposure_radius, wavelength, \
@@ -27,7 +27,6 @@ def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera,
     setup_parameters: Setup_parameters = Setup_parameters(
         lens = lens,
         camera = camera,
-        slide = slide,
         LED_info = LED_info
     )
 
