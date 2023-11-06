@@ -16,7 +16,7 @@ def simulate_imaging(
     setup_parameters,
     arraysize,
     pixel_scale_factor,
-    non_telecentric_correction,
+    Fresnel_correction,
     spherical_illumination_correction
 ):
       
@@ -39,8 +39,8 @@ def simulate_imaging(
     pupil = get_zernike_pupil(full_image_imaging_system, zernike_coefficients)
 
     object_plane_phase_shift_correction = 1
-    if non_telecentric_correction:
-        object_plane_phase_shift_correction *= full_image_imaging_system.high_res_non_telecentric_correction
+    if Fresnel_correction:
+        object_plane_phase_shift_correction *= full_image_imaging_system.high_res_Fresnel_correction
     if spherical_illumination_correction: 
         object_plane_phase_shift_correction *= full_image_imaging_system.high_res_spherical_illumination_correction
 

@@ -7,7 +7,7 @@ import numpy as np
 import skimage
 
 
-def simulate_illumination(lens, correct_spherical_wave_illumination, correct_non_telecentric, arraysize):
+def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fresnel_propagation, arraysize):
     noise_fraction = 0 
     zernike_coefficients = np.array([0,0,0])
 
@@ -40,7 +40,7 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_non
         setup_parameters = setup_parameters,
         arraysize = arraysize,
         pixel_scale_factor = pixel_scale_factor,
-        non_telecentric_correction = correct_non_telecentric,
+        Fresnel_correction = correct_Fresnel_propagation,
         spherical_illumination_correction = correct_spherical_wave_illumination
     )
 

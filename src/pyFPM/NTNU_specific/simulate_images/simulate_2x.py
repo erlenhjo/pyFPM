@@ -25,7 +25,6 @@ def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, s
     setup_parameters = simulate_setup_parameters(
         lens = lens,
         camera = dummy_camera,
-        slide = slide,
         LED_array = LED_array,
         array_to_object_distance = array_to_object_distance
         )  
@@ -37,7 +36,7 @@ def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, s
         setup_parameters = setup_parameters,
         arraysize = arraysize,
         pixel_scale_factor = pixel_scale_factor,
-        non_telecentric_correction = True,
+        Fresnel_correction = False,
         spherical_illumination_correction = spherical_illumination 
     )
 

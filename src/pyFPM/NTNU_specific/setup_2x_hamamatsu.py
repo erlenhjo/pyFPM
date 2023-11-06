@@ -15,7 +15,7 @@ def setup_2x_hamamatsu(
     camera = HAMAMATSU_C11440_42U30
     lens = INFINITYCORRECTED_2X
     LED_array = MAIN_LED_ARRAY
-    array_to_object_distance = 0.192  
+    array_to_object_distance = 0.195  
 
     background_filename = "dark_image"
     image_format = "tiff"

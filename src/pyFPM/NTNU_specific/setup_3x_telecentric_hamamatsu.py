@@ -14,7 +14,6 @@ def setup_3x_telecentric_hamamatsu(
 ):
     camera = HAMAMATSU_C11440_42U30
     lens = TELECENTRIC_3X
-    slide = None
     LED_array = MAIN_LED_ARRAY
     array_to_object_distance = 0.192  
 
@@ -27,7 +26,6 @@ def setup_3x_telecentric_hamamatsu(
         datadirpath = datadirpath,
         lens = lens,
         camera = camera,
-        slide = slide,
         LED_array = LED_array,
         array_to_object_distance = array_to_object_distance
         )

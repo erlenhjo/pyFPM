@@ -10,17 +10,22 @@ from scipy.ndimage import zoom
 def extract_variables(data_patch: Data_patch, 
                       imaging_system: Imaging_system, 
                       illumination_pattern: Illumination_pattern,
-                      step_description: Step_description):
+                      step_description: Step_description,
+                      correct_aperture_shift: bool):
     low_res_images = data_patch.amplitude_images
     update_order = illumination_pattern.update_order
     size_low_res_x = imaging_system.patch_size[0]
     size_low_res_y = imaging_system.patch_size[1]
     size_high_res_x = imaging_system.final_image_size[0]
     size_high_res_y = imaging_system.final_image_size[1]
-    k_x = imaging_system.wavevectors_x()
-    k_y = imaging_system.wavevectors_y()
-    dk_x = imaging_system.differential_wavevectors_x()
-    dk_y = imaging_system.differential_wavevectors_y()
+
+    if not correct_aperture_shift:
+        shifts_x = imaging_system.LED_shifts_x
+        shifts_y = imaging_system.LED_shifts_y
+    else: 
+        shifts_x = imaging_system.LED_shifts_x_aperture
+        shifts_y = imaging_system.LED_shifts_y_aperture
+
     low_res_CTF = imaging_system.low_res_CTF
     scaling_factor_squared = (imaging_system.pixel_scale_factor)**2
     scaling_factor = imaging_system.pixel_scale_factor
@@ -32,15 +37,16 @@ def extract_variables(data_patch: Data_patch,
     converged_alpha = step_description.converged_alpha
     max_iterations = step_description.max_iterations
 
-    return low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, k_x, k_y, dk_y, dk_x,\
+
+
+    return low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, shifts_x, shifts_y,\
             low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, alpha, beta, eta, use_adaptive_step_size, \
             converged_alpha, max_iterations
 
 
-def initialize_high_res_image(low_res_images, update_order, scaling_factor):
+def initialize_high_res_image(low_res_images, update_order, scaling_factor, object_phase_correction):
     first_image = low_res_images[update_order[0]]
     
-    recovered_object_guess = zoom(input=first_image, zoom=scaling_factor)
-    #recovered_object_guess = np.ones(shape = [size*scaling_factor for size in first_image.shape])   
-    
+    recovered_object_guess = zoom(input=first_image, zoom=scaling_factor) * object_phase_correction
+
     return recovered_object_guess

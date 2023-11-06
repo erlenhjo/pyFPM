@@ -5,9 +5,10 @@ from pyFPM.recovery.algorithms.fraunhofer_algorithm import fraunhofer_recovery_a
 class Method(Enum):
     Fraunhofer = 1
     Fraunhofer_Epry = 2
-    Fraunhofer_Epry_Gradient_Descent = 3
-    Fresnel = 4
-    Fresnel_Epry = 5
+    Pseudo_Fresnel = 3
+    Pseudo_Fresnel_4f = 4
+    Fresnel = 5
+    Fresnel_4f = 6
 
 
 def recover(method, data_patch, imaging_system, illumination_pattern, pupil_guess, step_description):
@@ -19,8 +20,10 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = False, 
-            use_gradient_descent = False
+            use_epry = False,
+            correct_spherical_wave_phase = False,
+            correct_Fresnel_phase = False,
+            correct_aperture_shift = False 
         )
     elif method == Method.Fraunhofer_Epry:
         algorithm_result = fraunhofer_recovery_algorithm(
@@ -30,9 +33,11 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             pupil_guess = pupil_guess,
             step_description = step_description,
             use_epry = True,
-            use_gradient_descent = False
+            correct_spherical_wave_phase = False,
+            correct_Fresnel_phase = False,
+            correct_aperture_shift = False 
         )
-    elif method == Method.Fraunhofer_Epry_Gradient_Descent:
+    elif method == Method.Pseudo_Fresnel:
         algorithm_result = fraunhofer_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
@@ -40,7 +45,45 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             pupil_guess = pupil_guess,
             step_description = step_description,
             use_epry = True,
-            use_gradient_descent = True
+            correct_spherical_wave_phase = True,
+            correct_Fresnel_phase = True,
+            correct_aperture_shift = False 
+        )
+    elif method == Method.Pseudo_Fresnel_4f:
+        algorithm_result = fraunhofer_recovery_algorithm(
+            data_patch = data_patch,
+            imaging_system = imaging_system,
+            illumination_pattern = illumination_pattern,
+            pupil_guess = pupil_guess,
+            step_description = step_description,
+            use_epry = True,
+            correct_spherical_wave_phase = True,
+            correct_Fresnel_phase = False,
+            correct_aperture_shift = False 
+        )
+    elif method == Method.Fresnel:
+        algorithm_result = fraunhofer_recovery_algorithm(
+            data_patch = data_patch,
+            imaging_system = imaging_system,
+            illumination_pattern = illumination_pattern,
+            pupil_guess = pupil_guess,
+            step_description = step_description,
+            use_epry = True,
+            correct_spherical_wave_phase = True,
+            correct_Fresnel_phase = True,
+            correct_aperture_shift = True 
+        )
+    elif method == Method.Fresnel_4f:
+        algorithm_result = fraunhofer_recovery_algorithm(
+            data_patch = data_patch,
+            imaging_system = imaging_system,
+            illumination_pattern = illumination_pattern,
+            pupil_guess = pupil_guess,
+            step_description = step_description,
+            use_epry = True,
+            correct_spherical_wave_phase = True,
+            correct_Fresnel_phase = False,
+            correct_aperture_shift = True 
         )
     else:
         raise "Recovery with specified method not implemented"

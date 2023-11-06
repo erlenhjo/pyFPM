@@ -32,7 +32,7 @@ def plot_simulation_results(
     axes[1].margins(x=0, y=0)
 
     axes[2].set_title(f"Recovered phase")
-    cax = axes[2].matshow(np.angle(algorithm_result.recovered_object), vmin=-np.pi, vmax=np.pi, cmap="twilight")    
+    cax = axes[2].matshow(np.angle(algorithm_result.recovered_object), vmin=-np.pi, vmax=np.pi)    
     axes[2].axis("off")
     axes[2].margins(x=0, y=0)
     fig.colorbar(cax)

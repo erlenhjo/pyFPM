@@ -7,7 +7,7 @@ from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Step_description import Step_description
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
-from pyFPM.recovery.utility.k_space import calculate_k_vector_range, calculate_recovered_CTF
+from pyFPM.recovery.utility.k_space import calculate_low_res_index_range, calculate_recovered_CTF
 from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables
 from pyFPM.recovery.utility.real_space_error import caclulate_real_space_error_normalization_factor
 
@@ -18,28 +18,34 @@ def fraunhofer_recovery_algorithm(
         pupil_guess,
         step_description: Step_description,
         use_epry: bool,
-        use_gradient_descent: bool
-    ) -> Algorithm_result :
+        correct_spherical_wave_phase: bool,
+        correct_Fresnel_phase: bool,
+        correct_aperture_shift: bool
+        ) -> Algorithm_result :
 
     low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
-        k_x, k_y, dk_y, dk_x, low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, \
+        shifts_x, shifts_y, low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, \
         alpha, beta, eta, use_adaptive_step_size, converged_alpha, max_iterations \
-                = extract_variables(data_patch, imaging_system, illumination_pattern, step_description)
+                = extract_variables(data_patch, imaging_system, illumination_pattern, step_description, correct_aperture_shift)
     
-    recovered_object_guess = initialize_high_res_image(low_res_images, update_order, scaling_factor)
+    object_phase_correction = get_object_phase_correction(imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase)
+    
+    recovered_object_guess = initialize_high_res_image(low_res_images, update_order, scaling_factor, object_phase_correction)
     
 
     recovered_object_fourier_transform, recovered_pupil, convergence_index, real_space_error_metric \
-        = main_algorithm_loop(recovered_object_guess, use_epry, use_gradient_descent, update_order, low_res_images,  LED_indices,
-                        k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
+        = main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_images,  LED_indices,
+                        shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
                         low_res_CTF, pupil_guess, alpha, beta, eta, use_adaptive_step_size, converged_alpha, max_iterations
                         )
 
-    recovered_CTF = calculate_recovered_CTF(update_order, LED_indices, k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, low_res_CTF)
+    recovered_CTF = calculate_recovered_CTF(update_order, LED_indices, shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, low_res_CTF)
     recovered_object_fourier_transform = recovered_object_fourier_transform * recovered_CTF
 
+    recovered_object = fftshift(ifft2(ifftshift(recovered_object_fourier_transform))) * np.conj(object_phase_correction)
+
     algorithm_result = Algorithm_result(
-        recovered_object = fftshift(ifft2(ifftshift(recovered_object_fourier_transform))),
+        recovered_object = recovered_object,
         recovered_object_fourier_transform = recovered_object_fourier_transform,
         pupil = recovered_pupil,
         convergence_index = convergence_index,
@@ -49,8 +55,8 @@ def fraunhofer_recovery_algorithm(
 
 
 
-def main_algorithm_loop(recovered_object_guess, use_epry, use_gradient_descent, update_order, low_res_images,  LED_indices,
-                        k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
+def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_images,  LED_indices,
+                        shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
                         low_res_CTF, pupil, alpha, beta, eta, use_adaptive_step_size, converged_alpha, max_iterations
                         ):
     recovered_object_fourier_transform = fftshift(fft2(ifftshift(recovered_object_guess)))  
@@ -67,10 +73,10 @@ def main_algorithm_loop(recovered_object_guess, use_epry, use_gradient_descent, 
             
             raw_low_res_image = low_res_images[index]
 
-            k_min_x, k_max_x, k_min_y, k_max_y = calculate_k_vector_range(k_x, k_y, dk_x, dk_y, size_low_res_x, size_low_res_y,
+            min_x, max_x, min_y, max_y = calculate_low_res_index_range(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
                                                                           size_high_res_x, size_high_res_y, LED_indices, index)
-
-            recovered_low_res_fourier_transform = pupil * recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1]
+            print(min_x, max_x, min_y, max_y)
+            recovered_low_res_fourier_transform = pupil * recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1]
                                                 
             recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))            
 
@@ -87,17 +93,12 @@ def main_algorithm_loop(recovered_object_guess, use_epry, use_gradient_descent, 
                 object_update_term = standard_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
                 pupil_update_term = 0
 
-            elif not use_gradient_descent:
+            else:
                 object_update_term = standard_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
-                pupil_update_term = standard_step(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1],
+                pupil_update_term = standard_step(recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1],
                                                   new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
                 
-            elif use_gradient_descent:
-                object_update_term = gradient_descent_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1.0)
-                pupil_update_term = gradient_descent_step(recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1],
-                                                          new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1.0)
-
-            recovered_object_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] += alpha * object_update_term * low_res_CTF
+            recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1] += alpha * object_update_term * low_res_CTF
             pupil += beta * pupil_update_term * low_res_CTF
         
         normalized_real_space_error_metric[loop_nr] = real_space_error_metric/real_space_error_metric_normalization_factor
@@ -126,6 +127,14 @@ def gradient_descent_step(phi, new_FT, old_FT, delta):
     denominator = np.max(np.abs(phi)) * (np.abs(phi)**2 + delta)
     return numerator/denominator * (new_FT - old_FT)
 
+
+def get_object_phase_correction(imaging_system: Imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase):
+    object_plane_phase_shift_correction = 1
+    if correct_Fresnel_phase:
+        object_plane_phase_shift_correction *= imaging_system.high_res_Fresnel_correction
+    if correct_spherical_wave_phase: 
+        object_plane_phase_shift_correction *= imaging_system.high_res_spherical_illumination_correction
+    return object_plane_phase_shift_correction
 
 
 

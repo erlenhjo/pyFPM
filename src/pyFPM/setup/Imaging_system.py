@@ -13,6 +13,9 @@ class Imaging_system(object):
         final_object_pixel_size = raw_object_pixel_size / pixel_scale_factor
         final_image_size = [pixel_scale_factor * size for size in patch_size]
 
+        object_to_lens_distance = (1+1/setup_parameters.lens.magnification)*setup_parameters.lens.focal_length
+        print(object_to_lens_distance)
+
         
         if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency):
             raise "Too low pixel scale factor"
@@ -34,22 +37,27 @@ class Imaging_system(object):
         )
         
         # calculate frequency components for normal frequency shift model
-        spatial_LED_frequencies_x, spatial_LED_frequencies_y = calculate_spatial_LED_frequency_components(
+        LED_shifts_x, LED_shifts_y = calculate_LED_shifts_from_in_plane_frequency_components(
             LED_locations_x = LED_locations_x, 
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
             patch_offset_y = patch_offset_y,
             z_LED = setup_parameters.LED_info.array_to_object_distance, 
-            spatial_frequency = spatial_frequency
+            spatial_frequency = spatial_frequency,
+            pixel_size = final_object_pixel_size,
+            image_size = final_image_size
         )
         # calculate frequency components for alternative frequency shift model (Fresnel propagation based?)
-        spatial_LED_frequencies_x_alternative, spatial_LED_frequencies_y_alternative = calculate_spatial_LED_frequency_components_alternative(
+        LED_shifts_x_aperture, LED_shifts_y_aperture = calculate_LED_shifts_from_aperture_shift(
             LED_locations_x = LED_locations_x, 
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
             patch_offset_y = patch_offset_y,
-            z_LED = setup_parameters.LED_info.array_to_object_distance, 
-            spatial_frequency = spatial_frequency
+            z_LED = setup_parameters.LED_info.array_to_object_distance,
+            z_1 = object_to_lens_distance, 
+            wavelength = setup_parameters.LED_info.wavelength,
+            pixel_size = final_object_pixel_size,
+            image_size = final_image_size
         )
  
         low_res_CTF = calculate_coherent_transfer_function(
@@ -57,28 +65,42 @@ class Imaging_system(object):
             image_region_size = patch_size, 
             spatial_cutoff_frequency = spatial_cutoff_frequency
         )
+        import matplotlib.pyplot as plt
+        plt.matshow(LED_shifts_x)
+        plt.matshow(LED_shifts_y)
+        plt.matshow(LED_shifts_x_aperture)
+        plt.matshow(LED_shifts_y_aperture)
+        plt.show()
 
 
-        high_res_object_x_positions, high_res_object_y_positions = calculate_position_mesh_grids(final_object_pixel_size, 
-                                                                                                 image_region_size=final_image_size)
-        high_res_non_telecentric_object_plane_phase_correction = calculate_object_plane_phase_shift(
-                                                                     x_mesh = high_res_object_x_positions, 
-                                                                     y_mesh = high_res_object_y_positions, 
-                                                                     wavevector = 2*np.pi*spatial_frequency, 
-                                                                     distance = setup_parameters.lens.working_distance
-                                                                 )
-        high_res_spherical_illumination_object_plane_phase_correction = calculate_object_plane_phase_shift(
-                                                                            x_mesh = high_res_object_x_positions, 
-                                                                            y_mesh = high_res_object_y_positions, 
-                                                                            wavevector = 2*np.pi*spatial_frequency, 
-                                                                            distance = setup_parameters.LED_info.array_to_object_distance
-                                                                        )
+        high_res_object_x_positions, high_res_object_y_positions = calculate_position_mesh_grids(pixel_size = final_object_pixel_size, 
+                                                                                                 image_region_size = final_image_size,
+                                                                                                 offset_x = patch_offset_x, 
+                                                                                                 offset_y = patch_offset_y
+                                                                                                 ) 
+        high_res_Fresnel_object_phase_correction = calculate_object_plane_phase_shift(
+                                                    x_mesh = high_res_object_x_positions, 
+                                                    y_mesh = high_res_object_y_positions, 
+                                                    wavevector = 2*np.pi*spatial_frequency, 
+                                                    distance = setup_parameters.lens.working_distance
+                                                )
+        high_res_spherical_illumination_object_phase_correction = calculate_object_plane_phase_shift(
+                                                                    x_mesh = high_res_object_x_positions, 
+                                                                    y_mesh = high_res_object_y_positions, 
+                                                                    wavevector = 2*np.pi*spatial_frequency, 
+                                                                    distance = setup_parameters.LED_info.array_to_object_distance
+                                                                )
                     
         # assign public variables
         self.frequency = spatial_frequency
         self.cutoff_frequency = spatial_cutoff_frequency
-        self.LED_frequencies_x = spatial_LED_frequencies_x
-        self.LED_frequencies_y = spatial_LED_frequencies_y
+        self.LED_shifts_x = LED_shifts_x
+        self.LED_shifts_y = LED_shifts_y
+        self.LED_shifts_x_aperture = LED_shifts_x_aperture
+        self.LED_shifts_y_aperture = LED_shifts_y_aperture
+        self.df_x = 1/(final_object_pixel_size * final_image_size[0])
+        self.df_y = 1/(final_object_pixel_size * final_image_size[1])
+
 
         self.patch_start = patch_start
         self.patch_size = patch_size
@@ -88,19 +110,11 @@ class Imaging_system(object):
         self.pixel_scale_factor = pixel_scale_factor
         
         self.low_res_CTF = low_res_CTF
-        self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_plane_phase_correction
-        self.high_res_non_telecentric_correction =high_res_non_telecentric_object_plane_phase_correction
+        self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_phase_correction
+        self.high_res_Fresnel_correction =high_res_Fresnel_object_phase_correction
 
 
-    def wavevectors_x(self):
-        return 2*np.pi*self.LED_frequencies_x
-    def wavevectors_y(self):
-        return 2*np.pi*self.LED_frequencies_y
-    def differential_wavevectors_x(self):
-        return 2*np.pi / (self.final_object_pixel_size * self.final_image_size[0])
-    def differential_wavevectors_y(self):
-        return 2*np.pi / (self.final_object_pixel_size * self.final_image_size[1])
-    
+
 
 
 
@@ -155,24 +169,44 @@ def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, LED_offse
     return x_locations, y_locations
 
 
-def calculate_spatial_LED_frequency_components(LED_locations_x, LED_locations_y, patch_offset_x, patch_offset_y, z_LED, spatial_frequency):
+def calculate_LED_shifts_from_in_plane_frequency_components(LED_locations_x, LED_locations_y, 
+                                                            patch_offset_x, patch_offset_y, 
+                                                            z_LED, spatial_frequency,
+                                                            pixel_size, image_size):
+    df_x = 1/(pixel_size * image_size[0])
+    df_y = 1/(pixel_size * image_size[1])
+    
     # find x_locations relative patch center
-    locations_x = patch_offset_x - LED_locations_x
-    locations_y = patch_offset_y - LED_locations_y
+    locations_x = LED_locations_x - patch_offset_x
+    locations_y = LED_locations_y - patch_offset_y
     
     # find relative frequency values
     freqs_x_relative = locations_x / np.sqrt(locations_x**2 + locations_y**2 + z_LED**2)
     freqs_y_relative = locations_y / np.sqrt(locations_x**2 + locations_y**2 + z_LED**2)
 
-    # multiply by frequency magnitude
-    spatial_frequencies_x = spatial_frequency * freqs_x_relative
-    spatial_frequencies_y = spatial_frequency * freqs_y_relative
+    # multiply by frequency magnitude and divide by discreteization to get value in pixels
+    shifts_x = spatial_frequency/df_x * freqs_x_relative
+    shifts_y = spatial_frequency/df_y * freqs_y_relative
 
-    return spatial_frequencies_x, spatial_frequencies_y
+    return shifts_x, shifts_y
 
 
-def calculate_spatial_LED_frequency_components_alternative(LED_locations_x, LED_locations_y, patch_offset_x, patch_offset_y, z_LED, spatial_frequency):
-    return "Not implemented yet :)", None
+def calculate_LED_shifts_from_aperture_shift(LED_locations_x, LED_locations_y, 
+                                                      patch_offset_x, patch_offset_y, 
+                                                      z_LED, z_1, wavelength,
+                                                      pixel_size, image_size):
+    dx = wavelength*z_1/(pixel_size * image_size[0])
+    dy = wavelength*z_1/(pixel_size * image_size[1])
+
+    #calculate spatial shift
+    spatial_shifts_x = LED_locations_x/z_LED
+    spatial_shifts_y = LED_locations_y/z_LED
+
+    #calculate pixel shift
+    pixel_shifts_x = spatial_shifts_x/dx
+    pixel_shifts_y = spatial_shifts_y/dy
+    
+    return pixel_shifts_x, pixel_shifts_y
 
 
 def calculate_coherent_transfer_function(pixel_size, image_region_size, spatial_cutoff_frequency):
@@ -191,13 +225,11 @@ def calculate_frequency_mesh_grids(pixel_size, image_region_size):
     
     return fx_mesh, fy_mesh
 
-def calculate_position_mesh_grids(pixel_size, image_region_size):
-
-    max_position_x = image_region_size[0] * pixel_size / 2
-    max_position_y = image_region_size[1] * pixel_size / 2
-
-    positions_x = np.linspace(start = -max_position_x, stop = max_position_x, num = image_region_size[0], endpoint = True)
-    positions_y = np.linspace(start = -max_position_y, stop = max_position_y, num = image_region_size[1], endpoint = True)
+def calculate_position_mesh_grids(pixel_size, image_region_size, offset_x, offset_y):
+    FOV_x = image_region_size[0] * pixel_size
+    FOV_y = image_region_size[1] * pixel_size
+    positions_x = np.linspace(start = -FOV_x/2, stop = FOV_x/2, num = image_region_size[0], endpoint = True) - offset_x
+    positions_y = np.linspace(start = -FOV_y/2, stop = FOV_y/2, num = image_region_size[1], endpoint = True) - offset_y
 
     x_mesh, y_mesh = np.meshgrid(positions_x, positions_y)
     

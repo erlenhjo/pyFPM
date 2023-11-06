@@ -13,7 +13,7 @@ import numpy as np
 import skimage
 
 def main():
-    method = Method.Fraunhofer_Epry
+    method = Method.Pseudo_Fresnel_4f
     simulate_spherical_illumination = True
 
     max_j = 25
@@ -28,12 +28,12 @@ def main():
     
     zernike_coefficients[0] = 0
 
-    amplitude_image = skimage.data.eagle()[:1800,:1800]
+    amplitude_image = skimage.data.eagle()[512:1024,512:1024]
     phase_image = np.zeros(shape=amplitude_image.shape)
     high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
 
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
-        = simulate_2x(high_res_complex_object, noise_fraction=0.1, zernike_coefficients=zernike_coefficients, spherical_illumination=simulate_spherical_illumination)
+        = simulate_2x(high_res_complex_object, noise_fraction=0, zernike_coefficients=zernike_coefficients, spherical_illumination=simulate_spherical_illumination)
     step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=100)
 
     plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)

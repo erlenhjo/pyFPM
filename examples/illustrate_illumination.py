@@ -9,9 +9,9 @@ from pyFPM.NTNU_specific.components import INFINITYCORRECTED_2X, TELECENTRIC_3X
 
 def illustrate_illumination_from_simulation():
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
-       = simulate_illumination(lens=INFINITYCORRECTED_2X, 
+       = simulate_illumination(lens = INFINITYCORRECTED_2X, 
                                correct_spherical_wave_illumination = True, 
-                               correct_non_telecentric = False,
+                               correct_Fresnel_propagation = False,
                                arraysize=5)
     plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
 

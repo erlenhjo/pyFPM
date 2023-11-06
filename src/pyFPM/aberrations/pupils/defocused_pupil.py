@@ -5,7 +5,7 @@ import numpy as np
 def get_defocused_pupil(imaging_system: Imaging_system, defocus):
         pupil = calculate_defocused_pupil(
             defocus = defocus,
-            pixel_size = imaging_system.raw_image_pixel_size,
+            pixel_size = imaging_system.raw_object_pixel_size,
             frequency = imaging_system.frequency,
             image_region_size = imaging_system.patch_size
         )
