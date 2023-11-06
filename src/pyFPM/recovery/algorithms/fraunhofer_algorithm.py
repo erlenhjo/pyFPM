@@ -75,7 +75,7 @@ def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_
 
             min_x, max_x, min_y, max_y = calculate_low_res_index_range(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
                                                                           size_high_res_x, size_high_res_y, LED_indices, index)
-            print(min_x, max_x, min_y, max_y)
+            
             recovered_low_res_fourier_transform = pupil * recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1]
                                                 
             recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))            

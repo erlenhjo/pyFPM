@@ -42,7 +42,7 @@ def illustrate_illumination_from_setup():
     plt.show()
 
 if __name__ == "__main__":
-    #illustrate_illumination_from_setup()
+    illustrate_illumination_from_setup()
     illustrate_illumination_from_simulation()
 
     

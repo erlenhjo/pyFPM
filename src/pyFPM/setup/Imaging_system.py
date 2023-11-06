@@ -14,8 +14,6 @@ class Imaging_system(object):
         final_image_size = [pixel_scale_factor * size for size in patch_size]
 
         object_to_lens_distance = (1+1/setup_parameters.lens.magnification)*setup_parameters.lens.focal_length
-        print(object_to_lens_distance)
-
         
         if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency):
             raise "Too low pixel scale factor"
@@ -65,12 +63,6 @@ class Imaging_system(object):
             image_region_size = patch_size, 
             spatial_cutoff_frequency = spatial_cutoff_frequency
         )
-        import matplotlib.pyplot as plt
-        plt.matshow(LED_shifts_x)
-        plt.matshow(LED_shifts_y)
-        plt.matshow(LED_shifts_x_aperture)
-        plt.matshow(LED_shifts_y_aperture)
-        plt.show()
 
 
         high_res_object_x_positions, high_res_object_y_positions = calculate_position_mesh_grids(pixel_size = final_object_pixel_size, 

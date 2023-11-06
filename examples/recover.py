@@ -17,21 +17,21 @@ from plotting.plot_experimental_results import plot_experimental_results
 from plotting.plot_illumination import plot_bright_field_images
 
 
-# datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
+datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
 # datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\EHJ20230915_dotarray_2x_inf"
 # datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark"
 # datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF1951_centered_2x_infcorr"
 # datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF1951_centered_defocused_2x_infcorr"
-datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF1951_corner_2x_infcorr"
+# datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF1951_corner_2x_infcorr"
 # datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF1951_corner_defocused_2x_infcorr"
 # datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF1951_plastic_2x_infcorr"
 #datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_2x_dark_no_object"
 
-pixel_scale_factor = 8
+pixel_scale_factor = 4
 patch_start = [0, 0] # [x, y]
-patch_size = [64, 64] # [x, y]
+patch_size = [128, 128] # [x, y]
 
-method = Method.Fraunhofer
+method = Method.Fresnel
 
 setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_hamamatsu(
     datadirpath = datadirpath,
@@ -55,8 +55,6 @@ algorithm_result = recover(method=method, data_patch=data_patch, imaging_system=
 plt.matshow(np.angle(algorithm_result.recovered_object))
 
 
-
-
 recovered_low_res_images \
         = simulate_angled_imaging(
             algorithm_result.recovered_object_fourier_transform,
@@ -73,3 +71,5 @@ plot_bright_field_images(data_patch=recovered_data_patch, setup_parameters=setup
 plot_experimental_results(data_patch, illumination_pattern, imaging_system, algorithm_result)
 
 plt.show()
+
+
