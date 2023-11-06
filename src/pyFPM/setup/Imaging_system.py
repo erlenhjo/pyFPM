@@ -185,10 +185,10 @@ def calculate_LED_shifts_from_in_plane_frequency_components(LED_locations_x, LED
     freqs_y_relative = locations_y / np.sqrt(locations_x**2 + locations_y**2 + z_LED**2)
 
     # multiply by frequency magnitude and divide by discreteization to get value in pixels
-    shifts_x = spatial_frequency/df_x * freqs_x_relative
-    shifts_y = spatial_frequency/df_y * freqs_y_relative
+    pixel_shifts_x = spatial_frequency/df_x * freqs_x_relative
+    pixel_shifts_y = spatial_frequency/df_y * freqs_y_relative
 
-    return shifts_x, shifts_y
+    return pixel_shifts_x, pixel_shifts_y
 
 
 def calculate_LED_shifts_from_aperture_shift(LED_locations_x, LED_locations_y, 
@@ -199,8 +199,8 @@ def calculate_LED_shifts_from_aperture_shift(LED_locations_x, LED_locations_y,
     dy = wavelength*z_1/(pixel_size * image_size[1])
 
     #calculate spatial shift
-    spatial_shifts_x = LED_locations_x/z_LED
-    spatial_shifts_y = LED_locations_y/z_LED
+    spatial_shifts_x = (LED_locations_x-patch_offset_x)*z_1/z_LED - patch_offset_x
+    spatial_shifts_y = (LED_locations_y-patch_offset_y)*z_1/z_LED - patch_offset_y
 
     #calculate pixel shift
     pixel_shifts_x = spatial_shifts_x/dx
