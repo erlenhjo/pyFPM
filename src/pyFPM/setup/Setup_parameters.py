@@ -40,6 +40,13 @@ class Lens(object):
         self.depth_of_field = depth_of_field # m
         self.lens_type: Lens_type = lens_type
 
+def get_object_to_lens_distance(lens: Lens):
+    if lens.lens_type == Lens_type.INFINITY_CORRECTED:
+        return lens.focal_length
+    if lens.lens_type == Lens_type.TELECENTRIC:
+        return (1+1/lens.magnification)*lens.focal_length
+
+
 class Setup_parameters(object):
     def __init__(self, lens: Lens, camera: Camera, LED_info: LED_infos):
         self.lens: Lens = lens

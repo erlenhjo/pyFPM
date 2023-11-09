@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyFPM.setup.Setup_parameters import Setup_parameters
+from pyFPM.setup.Setup_parameters import Setup_parameters, Lens, get_object_to_lens_distance
 
 class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
@@ -13,7 +13,7 @@ class Imaging_system(object):
         final_object_pixel_size = raw_object_pixel_size / pixel_scale_factor
         final_image_size = [pixel_scale_factor * size for size in patch_size]
 
-        object_to_lens_distance = (1+1/setup_parameters.lens.magnification)*setup_parameters.lens.focal_length
+        object_to_lens_distance = get_object_to_lens_distance(setup_parameters.lens)
         
         if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency):
             raise "Too low pixel scale factor"
@@ -74,7 +74,7 @@ class Imaging_system(object):
                                                     x_mesh = high_res_object_x_positions, 
                                                     y_mesh = high_res_object_y_positions, 
                                                     wavevector = 2*np.pi*spatial_frequency, 
-                                                    distance = setup_parameters.lens.working_distance
+                                                    distance = object_to_lens_distance
                                                 )
         high_res_spherical_illumination_object_phase_correction = calculate_object_plane_phase_shift(
                                                                     x_mesh = high_res_object_x_positions, 
@@ -103,8 +103,7 @@ class Imaging_system(object):
         
         self.low_res_CTF = low_res_CTF
         self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_phase_correction
-        self.high_res_Fresnel_correction =high_res_Fresnel_object_phase_correction
-
+        self.high_res_Fresnel_correction = high_res_Fresnel_object_phase_correction
 
 
 
