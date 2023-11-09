@@ -10,22 +10,27 @@ class Step_description:
     eta: float|None
     converged_alpha: float
     max_iterations: int
-    use_adaptive_step_size: bool
+    start_EPRY_at_iteration: int
+    start_adaptive_at_iteration: int
 
 
 def get_standard_adaptive_step_description(illumination_pattern: Illumination_pattern,
-                                           max_iterations: int):
+                                           max_iterations: int,
+                                           start_EPRY_at_iteration: int,
+                                           start_adaptive_at_iteration: int):
     return Step_description(alpha=1,
-                            beta=1/np.sqrt(np.sqrt(len(illumination_pattern.update_order))),
+                            beta=1/np.sqrt(len(illumination_pattern.update_order)),
                             eta=0.01,
                             converged_alpha=1e-3,
                             max_iterations=max_iterations,
-                            use_adaptive_step_size=True)
+                            start_EPRY_at_iteration = start_EPRY_at_iteration,
+                            start_adaptive_at_iteration = start_adaptive_at_iteration)
 
-def get_constant_step_description(max_iterations):
+def get_constant_step_description(max_iterations, start_EPRY_at_iteration):
     return Step_description(alpha=1,
                             beta=1,
                             eta=None,
                             converged_alpha=0,
                             max_iterations=max_iterations,
-                            use_adaptive_step_size=False)
+                            start_EPRY_at_iteration = start_EPRY_at_iteration,
+                            start_adaptive_at_iteration=2*max_iterations)

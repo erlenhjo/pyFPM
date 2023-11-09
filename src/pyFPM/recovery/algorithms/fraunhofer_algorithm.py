@@ -25,7 +25,7 @@ def fraunhofer_recovery_algorithm(
 
     low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
         shifts_x, shifts_y, low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, \
-        alpha, beta, eta, use_adaptive_step_size, converged_alpha, max_iterations \
+        alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, max_iterations \
                 = extract_variables(data_patch, imaging_system, illumination_pattern, step_description, correct_aperture_shift)
     
     object_phase_correction = get_object_phase_correction(imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase)
@@ -36,7 +36,7 @@ def fraunhofer_recovery_algorithm(
     recovered_object_fourier_transform, recovered_pupil, convergence_index, real_space_error_metric \
         = main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_images,  LED_indices,
                         shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
-                        low_res_CTF, pupil_guess, alpha, beta, eta, use_adaptive_step_size, converged_alpha, max_iterations
+                        low_res_CTF, pupil_guess, alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, max_iterations
                         )
 
     recovered_CTF = calculate_recovered_CTF(update_order, LED_indices, shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, low_res_CTF)
@@ -57,7 +57,7 @@ def fraunhofer_recovery_algorithm(
 
 def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_images,  LED_indices,
                         shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
-                        low_res_CTF, pupil, alpha, beta, eta, use_adaptive_step_size, converged_alpha, max_iterations
+                        low_res_CTF, pupil, alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, max_iterations
                         ):
     recovered_object_fourier_transform = fftshift(fft2(ifftshift(recovered_object_guess)))  
     convergence_index = np.zeros(max_iterations)
@@ -89,7 +89,14 @@ def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_
             
             new_recovered_low_res_fourier_transform = fftshift(fft2(ifftshift(new_recovered_low_res_image)))
 
-            if not use_epry:
+            # import matplotlib.pyplot as plt
+            # plt.matshow(np.abs(recovered_low_res_image))
+            # plt.matshow(np.abs(new_recovered_low_res_image))
+            # plt.matshow(np.log(np.abs(new_recovered_low_res_fourier_transform)))
+            # plt.matshow(np.log(np.abs(recovered_low_res_fourier_transform)))
+            # plt.show()
+
+            if not use_epry or loop_nr<start_EPRY_at_iteration:
                 object_update_term = standard_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
                 pupil_update_term = 0
 
@@ -103,7 +110,7 @@ def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_
         
         normalized_real_space_error_metric[loop_nr] = real_space_error_metric/real_space_error_metric_normalization_factor
 
-        if use_adaptive_step_size and (loop_nr > 1):
+        if loop_nr > start_adaptive_steps_at_iteration:
             alpha, beta = update_step_sizes(alpha, beta, eta, loop_nr,
                                             error=normalized_real_space_error_metric[loop_nr],
                                             prev_error=normalized_real_space_error_metric[loop_nr-1])

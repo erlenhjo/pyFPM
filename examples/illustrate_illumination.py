@@ -35,14 +35,16 @@ def illustrate_illumination_from_setup():
         datadirpath = datadirpath,
         patch_start = patch_start,
         patch_size = patch_size,
-        pixel_scale_factor = pixel_scale_factor
+        pixel_scale_factor = pixel_scale_factor,
+        remove_background=0,
+        threshold_value=0
     )
 
     plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=array_size)
     plt.show()
 
 if __name__ == "__main__":
-    illustrate_illumination_from_setup()
+    #illustrate_illumination_from_setup()
     illustrate_illumination_from_simulation()
 
     
