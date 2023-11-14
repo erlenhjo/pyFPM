@@ -1,9 +1,8 @@
 from enum import Enum
 
 class LED_infos(object):
-    def __init__(self, array_to_object_distance, LED_pitch, wavelength, LED_array_size,
+    def __init__(self, LED_pitch, wavelength, LED_array_size,
                  LED_offset, center_indices, exposure_times):
-        self.array_to_object_distance = array_to_object_distance # m
         self.LED_pitch = LED_pitch # m
         self.wavelength = wavelength # m
         self.LED_array_size = LED_array_size # [x, y]

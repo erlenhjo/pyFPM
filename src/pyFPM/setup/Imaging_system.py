@@ -1,10 +1,19 @@
 import numpy as np
+from dataclasses import dataclass
 
-from pyFPM.setup.Setup_parameters import Setup_parameters, Lens, get_object_to_lens_distance
+from pyFPM.setup.Setup_parameters import Setup_parameters, get_object_to_lens_distance
+
+@dataclass
+class LED_calibration_parameters:
+    LED_distance: float
+    LED_x_offset: float
+    LED_y_offset: float
+    LED_rotation: float
+
 
 class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
-                  patch_start, patch_size):
+                  patch_start, patch_size, LED_calibration_parameters):
         
         spatial_frequency = 1 / setup_parameters.LED_info.wavelength
         spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
@@ -15,7 +24,7 @@ class Imaging_system(object):
 
         object_to_lens_distance = get_object_to_lens_distance(setup_parameters.lens)
         
-        if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency):
+        if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency): #raw?
             raise "Too low pixel scale factor"
 
         # calculate offsets
@@ -31,7 +40,9 @@ class Imaging_system(object):
             LED_array_size = setup_parameters.LED_info.LED_array_size,
             center_indices = setup_parameters.LED_info.center_indices,
             LED_pitch = setup_parameters.LED_info.LED_pitch,
-            LED_offset = setup_parameters.LED_info.LED_offset
+            LED_rotation = LED_calibration_parameters.LED_rotation,
+            LED_offset = np.array(setup_parameters.LED_info.LED_offset) \
+                + np.array([LED_calibration_parameters.LED_x_offset,LED_calibration_parameters.LED_y_offset])
         )
         
         # calculate frequency components for normal frequency shift model
@@ -40,7 +51,7 @@ class Imaging_system(object):
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
             patch_offset_y = patch_offset_y,
-            z_LED = setup_parameters.LED_info.array_to_object_distance, 
+            z_LED = LED_calibration_parameters.LED_distance, 
             spatial_frequency = spatial_frequency,
             pixel_size = final_object_pixel_size,
             image_size = final_image_size
@@ -51,7 +62,7 @@ class Imaging_system(object):
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
             patch_offset_y = patch_offset_y,
-            z_LED = setup_parameters.LED_info.array_to_object_distance,
+            z_LED = LED_calibration_parameters.LED_distance,
             z_1 = object_to_lens_distance, 
             wavelength = setup_parameters.LED_info.wavelength,
             pixel_size = final_object_pixel_size,
@@ -80,7 +91,7 @@ class Imaging_system(object):
                                                                     x_mesh = high_res_object_x_positions, 
                                                                     y_mesh = high_res_object_y_positions, 
                                                                     wavevector = 2*np.pi*spatial_frequency, 
-                                                                    distance = setup_parameters.LED_info.array_to_object_distance
+                                                                    distance = LED_calibration_parameters.LED_distance
                                                                 )
                     
         # assign public variables
@@ -100,6 +111,8 @@ class Imaging_system(object):
         self.raw_object_pixel_size = raw_object_pixel_size
         self.final_object_pixel_size = final_object_pixel_size
         self.pixel_scale_factor = pixel_scale_factor
+        self.patch_offset_x = patch_offset_x
+        self.patch_offset_y = patch_offset_y
         
         self.low_res_CTF = low_res_CTF
         self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_phase_correction
@@ -134,7 +147,7 @@ def calculate_patch_offset(image_size, patch_start, patch_size, raw_object_pixel
     return patch_offset_x, patch_offset_y
 
 
-def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, LED_offset):
+def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, LED_rotation, LED_offset):
     # note [y, x] indexing due to how matrix indexing works (row, col) -> (y, x)
     # arraysize + 1 in case LED array is one indexed
     x_size = LED_array_size[0] + 1 
@@ -148,10 +161,16 @@ def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, LED_offse
     y_locations = np.zeros(shape = (y_size , x_size))
 
     # calculate locations relative center LED
+    rotation_radians = 3.14/180 * LED_rotation
     for x_index in range(x_size):
         for y_index in range(y_size):
-            x_locations[y_index, x_index] = (x_index - center_indices[0]) * LED_pitch
-            y_locations[y_index, x_index] = (y_index - center_indices[1]) * LED_pitch    
+            m = x_index - center_indices[0]
+            n = y_index - center_indices[1]
+            sin = np.sin(rotation_radians)
+            cos = np.cos(rotation_radians)
+            x_locations[y_index, x_index] = (cos*m + sin*n) * LED_pitch
+            y_locations[y_index, x_index] = (-sin*m + cos*n) * LED_pitch 
+    
 
     # apply offset
     x_locations = x_locations + x_offset

@@ -6,7 +6,7 @@ from .components import LED_array
 
 
 def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera, 
-                                LED_array: LED_array, array_to_object_distance):
+                                LED_array: LED_array):
 
     BF_exposure_time, DF_exposure_time, \
         BF_exposure_radius, wavelength, \
@@ -14,8 +14,7 @@ def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera,
     
     exposure_times = calculate_exposure_times(center_indices, BF_exposure_radius, BF_exposure_time, DF_exposure_time, LED_array.array_size)
 
-    LED_info: LED_infos = LED_infos(
-            array_to_object_distance = array_to_object_distance, 
+    LED_info: LED_infos = LED_infos( 
             LED_pitch = LED_array.LED_pitch, 
             wavelength = wavelength, 
             LED_array_size = LED_array.array_size,

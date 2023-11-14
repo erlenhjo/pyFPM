@@ -12,26 +12,25 @@ def setup_2x_hamamatsu(
     patch_size,
     pixel_scale_factor,
     remove_background,
-    threshold_value
+    threshold_value,
+    calibration_parameters
 ):
     camera = HAMAMATSU_C11440_42U30
     lens = INFINITYCORRECTED_2X
-    LED_array = MAIN_LED_ARRAY
-    array_to_object_distance = 0.195  
+    LED_array = MAIN_LED_ARRAY 
     
 
     setup_parameters: Setup_parameters = setup_parameters_from_file(
         datadirpath = datadirpath,
         lens = lens,
         camera = camera,
-        LED_array = LED_array,
-        array_to_object_distance = array_to_object_distance
+        LED_array = LED_array
         )
 
     rawdata: Rawdata = get_rawdata_from_files(
         datadirpath = datadirpath
         )
-
+    
     preprocessed_data = Preprocessed_data(
         rawdata = rawdata,
         setup_parameters = setup_parameters,
@@ -49,7 +48,8 @@ def setup_2x_hamamatsu(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
         patch_start = patch_start,
-        patch_size = patch_size
+        patch_size = patch_size,
+        LED_calibration_parameters=calibration_parameters
         )
 
     illumination_pattern = Illumination_pattern(
