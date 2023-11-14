@@ -10,6 +10,17 @@ def calculate_low_res_index_range(shifts_x, shifts_y, size_low_res_x, size_low_r
     shift_x = shifts_x[LED_index_y, LED_index_x]
     shift_y = shifts_y[LED_index_y, LED_index_x]
 
+    min_x, max_x, min_y, max_y =\
+          calculate_low_res_index_range_core(shift_x, shift_y,
+                                             size_low_res_x, size_low_res_y, 
+                                             size_high_res_x, size_high_res_y)
+    
+
+    return min_x, max_x, min_y, max_y
+
+def calculate_low_res_index_range_core(shift_x, shift_y, size_low_res_x, size_low_res_y, 
+                                  size_high_res_x, size_high_res_y
+                                ):
     # calculate which wavevector-values are present in the current low res image
     center_x = (size_high_res_x - 1)/2 + shift_x
     center_y = (size_high_res_y - 1)/2 + shift_y
