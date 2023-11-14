@@ -21,9 +21,7 @@ def compute_sum_square_error(data_patch: Data_patch, imaging_system: Imaging_sys
             high_res_fourier_transform = recovered_object_fourier_transform,
             pupil = pupil,
             LED_indices = LED_indices,
-            imaging_system = imaging_system,
-            non_telecentric_correction = False,
-            spherical_illumination_correction = False
+            imaging_system = imaging_system
         )
 
     numerator = caclulate_real_space_error_numerator(low_res_images=low_res_images,
@@ -43,13 +41,14 @@ def caclulate_real_space_error_numerator(
     recovered_low_res_images,
     update_order
 ):
-    real_space_error_metric_normalization_factor = 0
+    real_space_error_metric_numerator = 0
     for image_nr in range(len(update_order)):
         index = update_order[image_nr]
         raw_low_res_image = low_res_images[index]
-        real_space_error_metric_normalization_factor += np.linalg.norm(low_res_images - recovered_low_res_images)**2
+        recovered_low_res_image = recovered_low_res_images[index]
+        real_space_error_metric_numerator += np.linalg.norm(raw_low_res_image - recovered_low_res_image)**2
 
-    return real_space_error_metric_normalization_factor
+    return real_space_error_metric_numerator
 
 
 
