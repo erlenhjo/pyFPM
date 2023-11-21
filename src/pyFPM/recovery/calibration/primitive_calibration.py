@@ -38,7 +38,7 @@ def primitive_calibration(
     max_iterations = 20
     step_description = get_constant_step_description(max_iterations=max_iterations, 
                                                      start_EPRY_at_iteration=max_iterations+1)
-    method = Method.Fraunhofer
+    method = Method.Fraunhofer_aperture
 
     best_image = None
     best_image_defocus = None
@@ -118,7 +118,7 @@ def get_calibration_parameters(
         ):
 
     if parameter_to_calibrate == Parameter.Defocus:
-        defocus_range = np.linspace(-1,1,number_of_steps) * 200e-6 + defocus_guess
+        defocus_range = np.linspace(-1,1,number_of_steps) * 50e-6 + defocus_guess
         calibration_parameters =  [LED_calibration_parameters(LED_distance_offset_guess,
                                                               LED_x_offset_guess,
                                                               LED_y_offset_guess,
@@ -137,7 +137,7 @@ def get_calibration_parameters(
     elif parameter_to_calibrate == Parameter.LED_x:
         defocus_range = [defocus_guess] * number_of_steps
         calibration_parameters = [] 
-        x_range = np.linspace(-1,1,number_of_steps) * 1e-3 + LED_x_offset_guess
+        x_range = np.linspace(-1,1,number_of_steps) * 50e-6 + LED_x_offset_guess
         for current_guess in x_range:
             calibration_parameters.append(LED_calibration_parameters(LED_distance_offset_guess,
                                                               current_guess,
@@ -147,7 +147,7 @@ def get_calibration_parameters(
     elif parameter_to_calibrate == Parameter.LED_y:
         defocus_range = [defocus_guess] * number_of_steps
         calibration_parameters = [] 
-        y_range = np.linspace(-1,1,number_of_steps) * 1e-3 + LED_y_offset_guess
+        y_range = np.linspace(-1,1,number_of_steps) * 50e-6 + LED_y_offset_guess
         for current_guess in y_range:
             calibration_parameters.append(LED_calibration_parameters(LED_distance_offset_guess,
                                                               LED_x_offset_guess,
@@ -157,7 +157,7 @@ def get_calibration_parameters(
     elif parameter_to_calibrate == Parameter.LED_z:
         defocus_range = [defocus_guess] * number_of_steps
         calibration_parameters = [] 
-        z_range = np.linspace(-1,1,number_of_steps) * 3e-3 + LED_distance_offset_guess
+        z_range = np.linspace(-1,1,number_of_steps) * 1e-3 + LED_distance_offset_guess
         for current_guess in z_range:
             calibration_parameters.append(LED_calibration_parameters(current_guess,
                                                               LED_x_offset_guess,

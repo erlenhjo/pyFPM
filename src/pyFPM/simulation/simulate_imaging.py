@@ -55,6 +55,9 @@ def simulate_imaging(
             LED_indices,
             full_image_imaging_system)
     
+    # for n in range(low_res_images.shape[0]):
+    #     low_res_images[n] *= np.random.normal(1,0.3)
+
     illumination_pattern = Illumination_pattern(LED_indices=LED_indices,
                                                 imaging_system=full_image_imaging_system,
                                                 setup_parameters=setup_parameters) 

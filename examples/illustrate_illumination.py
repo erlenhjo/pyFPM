@@ -13,7 +13,8 @@ def illustrate_illumination_from_simulation():
        = simulate_illumination(lens = INFINITYCORRECTED_2X, 
                                correct_spherical_wave_illumination = True, 
                                correct_Fresnel_propagation = False,
-                               arraysize=5)
+                               arraysize=5,
+                               calibration_parameters=LED_calibration_parameters(201e-3,0,0,0))
     plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
 
     plt.show()
@@ -25,8 +26,8 @@ def illustrate_illumination_from_setup():
     #datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_2x_dark_object"
     #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark"
     #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark_no_object"
-    #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_light_infcor2x"
-    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_centered_infcor2x"
+    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_light_infcor2x"
+    #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_centered_infcor2x"
 
     array_size = 5
 
@@ -48,8 +49,8 @@ def illustrate_illumination_from_setup():
     plt.show()
 
 if __name__ == "__main__":
-    illustrate_illumination_from_setup()
-    #illustrate_illumination_from_simulation()
+    #illustrate_illumination_from_setup()
+    illustrate_illumination_from_simulation()
 
     
 

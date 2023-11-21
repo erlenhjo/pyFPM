@@ -7,7 +7,8 @@ import numpy as np
 import skimage
 
 
-def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fresnel_propagation, arraysize):
+def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fresnel_propagation, 
+                          arraysize, calibration_parameters):
     noise_fraction = 0 
     zernike_coefficients = np.array([0,0,0])
 
@@ -18,7 +19,6 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
     low_res_image_size = [amplitude_image.shape[1]//pixel_scale_factor, amplitude_image.shape[0]//pixel_scale_factor]
     
     LED_array = MAIN_LED_ARRAY
-    array_to_object_distance = 0.200 # m    
 
     dummy_camera = Camera(
             camera_pixel_size = 6.5e-6,
@@ -29,8 +29,7 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
     setup_parameters = simulate_setup_parameters(
         lens = lens,
         camera = dummy_camera,
-        LED_array = LED_array,
-        array_to_object_distance = array_to_object_distance
+        LED_array = LED_array
         )  
 
     simulated_data, pupil, _ = simulate_imaging(
@@ -41,7 +40,8 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
         arraysize = arraysize,
         pixel_scale_factor = pixel_scale_factor,
         Fresnel_correction = correct_Fresnel_propagation,
-        spherical_illumination_correction = correct_spherical_wave_illumination
+        spherical_illumination_correction = correct_spherical_wave_illumination,
+        calibration_parameters=calibration_parameters
     )
 
     patch_start = [0, 0]
@@ -53,7 +53,8 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
             simulated_data = simulated_data,
             patch_start = patch_start,
             patch_size = patch_size,
-            pixel_scale_factor = pixel_scale_factor
+            pixel_scale_factor = pixel_scale_factor,
+            calibration_parameters=calibration_parameters
         )
     
     return setup_parameters, data_patch, imaging_system, illumination_pattern, pupil, high_res_complex_object

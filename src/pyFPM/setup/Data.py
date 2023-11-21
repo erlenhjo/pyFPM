@@ -11,7 +11,8 @@ class Rawdata:
              
 
 class Preprocessed_data:
-    def __init__(self, rawdata: Rawdata, setup_parameters: Setup_parameters, remove_background: bool, threshold_value):
+    def __init__(self, rawdata: Rawdata, setup_parameters: Setup_parameters, remove_background: bool,
+                noise_reduction_regions, threshold_value):
         center_indices = setup_parameters.LED_info.center_indices
         LED_indices = rawdata.LED_indices
         images = rawdata.images
@@ -25,8 +26,6 @@ class Preprocessed_data:
             bit_depth = bit_depth
             )
 
-
-
         if exposure_times is not None:
             images, background_image = _compensate_for_exposure_times(
                 images = images,
@@ -36,14 +35,15 @@ class Preprocessed_data:
                 exposure_times = exposure_times
                 )
             
-        import matplotlib.pyplot as plt
-
         if remove_background:
-            images = _subtract_background_image(images=images, background_image=background_image)
+            images = _subtract_background_image(images=images, background_image=background_image, 
+                                                background_removal_regions = noise_reduction_regions)
 
-
-        if threshold_value > 0:
+        if threshold_value > 0 and remove_background:
             images = _threshold(images=images, threshold_value=threshold_value)
+        elif threshold_value > 0:
+            images = _alternative_threshold(images=images, threshold_value=threshold_value)
+        
 
 
         self.amplitude_images = np.sqrt(images)   # take amplitude
@@ -80,14 +80,33 @@ def _compensate_for_exposure_times(images, background_image, center_indices, LED
     
     return images, background_image
 
-def _subtract_background_image(images, background_image):
-    images = images-background_image
+def _subtract_background_image(images, background_image, background_removal_regions):
+    region_size = 200
+    if background_removal_regions is None:
+        images = images-background_image
+    else:
+        for n in range(images.shape[0]):
+            image=images[n]
+            numerator = 0
+            denominator = 0
+            for region_x, region_y in background_removal_regions:
+                image_region = image[region_y:region_y+region_size, region_x:region_x+region_size]
+                background_region = background_image[region_y:region_y+region_size, region_x:region_x+region_size]
+                numerator += np.sum(image_region*background_region)
+                denominator += np.sum(image_region*image_region)
+            alpha = numerator/denominator
+            images[n] -= alpha*background_image
+
     images[images<0] = 0
     return images
 
 
 def _threshold(images: np.ndarray, threshold_value):
     images[images<threshold_value]=0
+    #images = images - threshold_value
+    #images[images<0] = 0
     return images
 
+def _alternative_threshold(images: np.ndarray, threshold_value, noise_removal_regions):
+    return
 

@@ -28,16 +28,17 @@ from plotting.plot_illumination import plot_bright_field_images
 # datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF1951_plastic_2x_infcorr"
 # datadirpath = r"c:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_2x_dark_no_object"
 
-datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_centered_infcor2x"
+#datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_centered_infcor2x"
+datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_corner_infcor2x"
 
-
-pixel_scale_factor = 4
-patch_start = [964, 964] # [x, y]
-patch_size = [128, 128] # [x, y]
+pixel_scale_factor = 8
+patch_start = [0, 0] # [x, y]
+patch_size = [256, 256] # [x, y]
 remove_background = 1
-threshold_value = 0
+threshold_value = 0.005
+noise_reduction_regions = None# [[0,0], [1000,0]]
 
-method = Method.Fraunhofer_Epry_aperture
+method = Method.Fresnel_aperture
 
 setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_hamamatsu(
     datadirpath = datadirpath,
@@ -46,6 +47,7 @@ setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_ha
     pixel_scale_factor = pixel_scale_factor,
     remove_background = remove_background,
     threshold_value = threshold_value,
+    noise_reduction_regions = noise_reduction_regions,
     calibration_parameters=LED_calibration_parameters(
         LED_distance=201e-3,
         LED_x_offset=0,
@@ -54,15 +56,18 @@ setup_parameters, data_patch, imaging_system, illumination_pattern = setup_2x_ha
     )
 )
 
+
 # define step size method
 step_description = get_standard_adaptive_step_description(illumination_pattern=illumination_pattern,
                                                           max_iterations=200,
-                                                          start_EPRY_at_iteration = 0,
-                                                          start_adaptive_at_iteration = 0)
+                                                          start_EPRY_at_iteration = 200,
+                                                          start_adaptive_at_iteration = 2)
 # step_description = get_constant_step_description(max_iterations=20, start_EPRY_at_iteration=21)
 # define pupil
+
 defocus_guess = 0
 pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = defocus_guess)
+
 
 #plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=7)
 

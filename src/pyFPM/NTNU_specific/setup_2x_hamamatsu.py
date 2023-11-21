@@ -13,6 +13,7 @@ def setup_2x_hamamatsu(
     pixel_scale_factor,
     remove_background,
     threshold_value,
+    noise_reduction_regions,
     calibration_parameters
 ):
     camera = HAMAMATSU_C11440_42U30
@@ -30,11 +31,12 @@ def setup_2x_hamamatsu(
     rawdata: Rawdata = get_rawdata_from_files(
         datadirpath = datadirpath
         )
-    
+
     preprocessed_data = Preprocessed_data(
         rawdata = rawdata,
         setup_parameters = setup_parameters,
-        remove_background = remove_background, 
+        remove_background = remove_background,
+        noise_reduction_regions = noise_reduction_regions, 
         threshold_value = threshold_value
         )
     

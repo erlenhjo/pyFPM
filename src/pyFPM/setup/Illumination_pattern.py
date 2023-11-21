@@ -10,6 +10,8 @@ class Illumination_pattern(object):
         center_indices = setup_parameters.LED_info.center_indices
         LED_frequencies_x = imaging_system.LED_shifts_x * imaging_system.df_x
         LED_frequencies_y = imaging_system.LED_shifts_y * imaging_system.df_y
+        LED_aperture_shifts_x = imaging_system.LED_shifts_x_aperture 
+        LED_aperture_shifts_y = imaging_system.LED_shifts_y_aperture
         cutoff_frequency = imaging_system.cutoff_frequency
         
         avaliable_LEDs = determine_available_LEDs(LED_indices=LED_indices, LED_array_size=LED_array_size)
@@ -19,6 +21,16 @@ class Illumination_pattern(object):
              LED_frequencies_y = LED_frequencies_y,
              cutoff_frequency = cutoff_frequency
         )
+
+        self.relative_aperture_shifts = calculate_relative_NA(   # don't worry about this, it is the same
+             LED_frequencies_x = LED_aperture_shifts_x * imaging_system.df_x,
+             LED_frequencies_y = LED_aperture_shifts_y * imaging_system.df_y,
+             cutoff_frequency = cutoff_frequency
+        )
+        # plt.matshow(self.relative_NAs[11:22,11:22])
+        # plt.matshow(self.relative_aperture_shifts[11:22,11:22])
+        # plt.show()
+
 
         self.update_order, self.update_order_matrix \
             = spiral_indices(LED_indices = LED_indices, center_indices=center_indices, 
