@@ -33,20 +33,29 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
     
     fig.subplots_adjust(wspace=0.05, hspace=0.05)
 
-    fig_3, ax = plt.subplots(1,1)
-    cax = ax.matshow(mean_values,vmin=0, vmax=max_intensity)
-    fig_3.colorbar(cax)
+    fig_2, axes_2 = plt.subplots(nrows=array_size, ncols=array_size, figsize=(5,5))
 
 
-    # fig_2, axes_2 = plt.subplots(nrows=array_size, ncols=array_size, figsize=(5,5))
-
-
-    # for image_nr, indices in enumerate(LED_indices):
-    #     x,y = indices
-    #     if x >= x_min and x<x_max and y>=y_min and y<y_max:
-    #         m=y_max-y-1
-    #         n=x_max-x-1
-    #         axes_2[m,n].matshow(np.log(np.abs(np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(data_patch.amplitude_images[image_nr]**2))))))
-    #         axes_2[m,n].axis("off")
+    for image_nr, indices in enumerate(LED_indices):
+        x,y = indices
+        if x >= x_min and x<x_max and y>=y_min and y<y_max:
+            m=y_max-y-1
+            n=x_max-x-1
+            axes_2[m,n].matshow(np.log(np.abs(np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(data_patch.amplitude_images[image_nr]**2))))))
+            axes_2[m,n].axis("off")
     
-    # fig_2.subplots_adjust(wspace=0.05, hspace=0.05)
+    fig_2.subplots_adjust(wspace=0.05, hspace=0.05)
+
+
+    fig_3, axes_3 = plt.subplots(nrows=array_size, ncols=array_size, figsize=(5,5))
+    start, stop = int(2048/2-10), int(2048/2+256)
+
+    for image_nr, indices in enumerate(LED_indices):
+        x,y = indices
+        if x >= x_min and x<x_max and y>=y_min and y<y_max:
+            m=y_max-y-1
+            n=x_max-x-1
+            axes_3[m,n].matshow(np.log(np.abs(np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(data_patch.amplitude_images[image_nr]**2)))))[start:stop,start:stop] )
+            axes_3[m,n].axis("off")
+    
+    fig_3.subplots_adjust(wspace=0.05, hspace=0.05)

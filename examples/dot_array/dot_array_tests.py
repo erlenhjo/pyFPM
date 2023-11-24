@@ -17,8 +17,8 @@ def locate_and_plot_dots():
 
     dot_array = EO_DOT_ARRAY
     camera = HAMAMATSU_C11440_42U30
-    #lens = TELECENTRIC_3X
-    lens = INFINITYCORRECTED_2X
+    lens = TELECENTRIC_3X
+    #lens = INFINITYCORRECTED_2X
 
     fig, axes = plt.subplots(nrows=1,ncols=2)
     axes[0].matshow(image)

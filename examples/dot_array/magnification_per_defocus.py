@@ -11,13 +11,12 @@ from pyFPM.NTNU_specific.components import EO_DOT_ARRAY, HAMAMATSU_C11440_42U30,
 
 
 def locate_and_plot_dots():
-    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification_per_defocus"
+    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification_per_defocus_telecentric"
     outputdirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\generated_plots\magnification"
     for filename in os.listdir(datadirpath):
         filepath = os.path.join(datadirpath,filename)
         fig_1, fig_2 = locate_and_plot(filepath)
-        fig_1.savefig(os.path.join(outputdirpath,filename.split(".")[0]+"_overview.png"))
-        fig_2.savefig(os.path.join(outputdirpath,filename.split(".")[0]+"_example_dots.png"))
+    plt.show()
 
 
 
@@ -26,8 +25,8 @@ def locate_and_plot(filepath):
 
     dot_array = EO_DOT_ARRAY
     camera = HAMAMATSU_C11440_42U30
-    #lens = TELECENTRIC_3X
-    lens = INFINITYCORRECTED_2X
+    lens = TELECENTRIC_3X
+    #lens = INFINITYCORRECTED_2X
 
     fig_1, axes = plt.subplots(nrows=1,ncols=2)
     axes[0].matshow(image)
@@ -35,7 +34,7 @@ def locate_and_plot(filepath):
     
     object_pixel_size = camera.camera_pixel_size / lens.magnification
     
-    located_blobs = locate_dots(image, dot_array, object_pixel_size, sub_precision=4)
+    located_blobs = locate_dots(image, dot_array, object_pixel_size, sub_precision=8)
     blobs, grid_points, grid_indices, rotation = assemble_dots_in_grid(image, located_blobs, dot_array, object_pixel_size)
     print(f"The total rotation was {rotation} degrees")       
     plot_dot_error(ax=axes[1], blobs=blobs, grid_points=grid_points, 
