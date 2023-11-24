@@ -4,7 +4,7 @@ import numpy as np
 from skimage.feature import blob_log
 from scipy.spatial.transform import Rotation
 
-def locate_dots(image, dot_array: Dot_array, pixel_size, sub_precision):
+def  locate_dots(image, dot_array: Dot_array, pixel_size, sub_precision):
     inverted_image = np.max(image) - image
     
     dot_radius = dot_array.diameter/2
@@ -137,6 +137,13 @@ def assemble_dots_in_grid(image: np.ndarray, blobs, dot_array: Dot_array, pixel_
     # strip z coordinates
     blobs = blobs[:,:2]
     grid_points = grid_points[:,:2]
+    
+    # remove shift grid indices to start at (0,0) if possible (remove leading empty rows)
+    shift = np.min(grid_indices, axis=0)
+    grid_indices[:,0] -= shift[0]
+    grid_indices[:,1] -= shift[1]
+    
+
 
     return blobs, grid_points, grid_indices, total_rotation
 
