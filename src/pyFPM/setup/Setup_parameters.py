@@ -19,6 +19,8 @@ class Camera(object):
 class Lens_type(Enum):
     INFINITY_CORRECTED = 1
     TELECENTRIC = 2
+    SINGLE_LENS = 3
+    COMPACT = 4
 
 class Lens(object):
     def __init__(
@@ -42,7 +44,7 @@ class Lens(object):
 def get_object_to_lens_distance(lens: Lens):
     if lens.lens_type == Lens_type.INFINITY_CORRECTED:
         return lens.focal_length
-    if lens.lens_type == Lens_type.TELECENTRIC:
+    if lens.lens_type == Lens_type.TELECENTRIC or lens.lens_type == Lens_type.COMPACT or lens.lens_type == Lens_type.SINGLE_LENS:
         return (1+1/lens.magnification)*lens.focal_length
 
 
