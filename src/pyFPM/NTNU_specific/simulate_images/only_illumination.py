@@ -1,4 +1,4 @@
-from pyFPM.NTNU_specific.components import INFINITYCORRECTED_2X, MAIN_LED_ARRAY
+from pyFPM.NTNU_specific.components import MAIN_LED_ARRAY, HAMAMATSU_C11440_42U30
 from pyFPM.setup.Setup_parameters import Camera
 from pyFPM.simulation.simulate_imaging import simulate_imaging, finalize_simulation_setup
 from pyFPM.NTNU_specific.simulate_images.simulate_setup import simulate_setup_parameters
@@ -12,19 +12,15 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
     noise_fraction = 0 
     zernike_coefficients = np.array([0,0,0])
 
-    amplitude_image = np.ones(shape=(8192, 8192))
-    phase_image = np.zeros(shape=amplitude_image.shape)
-    high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
-    pixel_scale_factor = 4
-    low_res_image_size = [amplitude_image.shape[1]//pixel_scale_factor, amplitude_image.shape[0]//pixel_scale_factor]
-    
+    dummy_camera = HAMAMATSU_C11440_42U30
     LED_array = MAIN_LED_ARRAY
 
-    dummy_camera = Camera(
-            camera_pixel_size = 6.5e-6,
-            raw_image_size = low_res_image_size,
-            bit_depth = int(2**8-1)
-            )
+    pixel_scale_factor = 4
+
+    amplitude_image = np.ones(shape=(dummy_camera.raw_image_size[1]*pixel_scale_factor, dummy_camera.raw_image_size[0]*pixel_scale_factor))
+    phase_image = np.zeros(shape=amplitude_image.shape)
+    high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
+    
     
     setup_parameters = simulate_setup_parameters(
         lens = lens,
