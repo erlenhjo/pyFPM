@@ -12,11 +12,11 @@ class Dot_array(object):
     diameter_tolerance: float
      
 
-def get_dot_array_image(dot_radius, dot_spacing, image_size, object_pixel_size):
+def get_dot_array_image(dot_radius, dot_spacing, image_size, object_pixel_size, rotation=0):
     # create a mask corresponding to a single dot
     single_dot_mask = create_single_dot_mask(dot_radius, object_pixel_size)
     # place "delta functions" at desired positions
-    dot_centers, dot_blobs = determine_dot_centers(dot_radius, dot_spacing, object_pixel_size, image_size)
+    dot_centers, dot_blobs = determine_dot_centers(dot_radius, dot_spacing, object_pixel_size, image_size, rotation)
     # create complete image with correct Center of Mass through convolution
     dot_image = fftconvolve(dot_centers, single_dot_mask, mode="same")
     # invert as the dot array is an absorbtion target
@@ -24,7 +24,7 @@ def get_dot_array_image(dot_radius, dot_spacing, image_size, object_pixel_size):
 
     return dot_image, dot_blobs       
 
-def determine_dot_centers(dot_radius, dot_spacing, object_pixel_size, image_size):
+def determine_dot_centers(dot_radius, dot_spacing, object_pixel_size, image_size, rotation):
     image_size_x = image_size[0]
     image_size_y = image_size[1]
 
@@ -34,6 +34,9 @@ def determine_dot_centers(dot_radius, dot_spacing, object_pixel_size, image_size
     nr_of_dots_y = int(area_size_y // dot_spacing)
     dot_buffer_x = area_size_x % dot_spacing / 2
     dot_buffer_y = area_size_y % dot_spacing / 2
+    rotation = np.pi/180 * rotation
+    rotation_center_x = (nr_of_dots_x/2 * dot_spacing + dot_buffer_x)/ object_pixel_size - 1
+    rotation_center_y = (nr_of_dots_y/2 * dot_spacing + dot_buffer_y) / object_pixel_size - 1
 
     dot_centers = np.zeros(shape = (image_size_y, image_size_x))
     dot_blobs = []
@@ -41,8 +44,13 @@ def determine_dot_centers(dot_radius, dot_spacing, object_pixel_size, image_size
     for y_dot in range(nr_of_dots_y):
         for x_dot in range(nr_of_dots_x):
             # center of dot in fractional pixels
-            dot_center_x = ((x_dot + 1/2) * dot_spacing + dot_buffer_x) / object_pixel_size - 1
-            dot_center_y = ((y_dot + 1/2) * dot_spacing + dot_buffer_y) / object_pixel_size - 1
+            ideal_dot_center_x = ((x_dot + 1/2) * dot_spacing + dot_buffer_x) / object_pixel_size - 1
+            ideal_dot_center_y = ((y_dot + 1/2) * dot_spacing + dot_buffer_y) / object_pixel_size - 1
+
+            relative_x = ideal_dot_center_x - rotation_center_x
+            relative_y = ideal_dot_center_y - rotation_center_y
+            dot_center_x = relative_x * np.cos(rotation) - relative_y * np.sin(rotation) + rotation_center_x
+            dot_center_y = relative_x * np.sin(rotation) + relative_y * np.cos(rotation) + rotation_center_y
             
             # assign a total value of 1 distributed between the four nearest pixels
             x_minus = np.floor(dot_center_x).astype(int)

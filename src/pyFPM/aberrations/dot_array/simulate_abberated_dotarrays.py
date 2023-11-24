@@ -1,22 +1,12 @@
 from pyFPM.simulation.simulate_imaging import simulate_imaging
-from pyFPM.aberrations.dot_array.Dot_array import get_dot_array_image, Dot_array
+from pyFPM.aberrations.dot_array.Dot_array import Dot_array
+from pyFPM.aberrations.dot_array.simulate_dot_array import simulate_dot_array
 from pyFPM.setup.Setup_parameters import Setup_parameters
 
 import numpy as np
 
 
-def simulate_dot_array(dot_array: Dot_array, image_size, pixel_size, magnification):
-    dot_radius = dot_array.diameter / 2 # m
-    dot_spacing = dot_array.spacing # m
 
-    dot_array_image, dot_blobs = get_dot_array_image(
-                                        dot_radius=dot_radius, 
-                                        dot_spacing=dot_spacing, 
-                                        image_size=image_size,
-                                        object_pixel_size=pixel_size/magnification
-                                        )
-
-    return dot_array_image, dot_blobs
 
 def simulate_abberated_dot_arrays(zernike_coefficients_list, dot_array: Dot_array, arraysize, 
                                   setup_parameters: Setup_parameters, pixel_scale_factor):
