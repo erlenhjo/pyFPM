@@ -60,6 +60,26 @@ TELECENTRIC_3X = Lens(
     lens_type = Lens_type.TELECENTRIC
 )
 
+COMPACT_2X = Lens(
+    NA = 0.06,
+    magnification = 2,
+    diameter = None,
+    focal_length = 60.33e-3,
+    working_distance = 92e-3,
+    depth_of_field = 76e-6,
+    lens_type = Lens_type.COMPACT
+)
+
+DOUBLE_CONVEX = Lens(
+    NA = 0.049,
+    magnification = 2.13,
+    diameter = None,
+    focal_length = 36e-3,
+    working_distance = None,
+    depth_of_field = None,
+    lens_type = Lens_type.SINGLE_LENS
+)
+
 ###### Aberration target ######
 
 EO_DOT_ARRAY = Dot_array(
