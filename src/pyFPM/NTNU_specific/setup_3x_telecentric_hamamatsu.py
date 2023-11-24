@@ -12,20 +12,19 @@ def setup_3x_telecentric_hamamatsu(
     patch_size,
     pixel_scale_factor,
     remove_background,
-    threshold_value
+    threshold_value,
+    noise_reduction_regions,
+    calibration_parameters
 ):
     camera = HAMAMATSU_C11440_42U30
     lens = TELECENTRIC_3X
     LED_array = MAIN_LED_ARRAY
-    array_to_object_distance = 0.195  
-
 
     setup_parameters: Setup_parameters = setup_parameters_from_file(
         datadirpath = datadirpath,
         lens = lens,
         camera = camera,
-        LED_array = LED_array,
-        array_to_object_distance = array_to_object_distance
+        LED_array = LED_array
         )
 
     rawdata: Rawdata = get_rawdata_from_files(
@@ -35,7 +34,8 @@ def setup_3x_telecentric_hamamatsu(
     preprocessed_data = Preprocessed_data(
         rawdata = rawdata,
         setup_parameters = setup_parameters,
-        remove_background = remove_background, 
+        remove_background = remove_background,
+        noise_reduction_regions=noise_reduction_regions, 
         threshold_value = threshold_value, 
         )
     
@@ -49,7 +49,8 @@ def setup_3x_telecentric_hamamatsu(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
         patch_start = patch_start,
-        patch_size = patch_size
+        patch_size = patch_size,
+        LED_calibration_parameters=calibration_parameters
         )
 
     illumination_pattern = Illumination_pattern(
