@@ -6,7 +6,8 @@ from pyFPM.setup.Imaging_system import LED_calibration_parameters
 
 
 
-def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, spherical_illumination, arraysize=15):
+def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, spherical_illumination, 
+                arraysize=15, patch_offset=[0,0], use_aperture_shift = False):
 
     pixel_scale_factor = 4
     low_res_image_size = [high_res_complex_object.shape[1]//pixel_scale_factor, high_res_complex_object.shape[0]//pixel_scale_factor]
@@ -40,17 +41,18 @@ def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, s
         pixel_scale_factor = pixel_scale_factor,
         Fresnel_correction = False,
         spherical_illumination_correction = spherical_illumination,
+        patch_offset=patch_offset,
+        use_aperture_shift=use_aperture_shift,
         calibration_parameters = true_calibration_parameters
     )
 
-    patch_start = [0, 0]
     patch_size = dummy_camera.raw_image_size
 
     data_patch, imaging_system, illumination_pattern \
         = finalize_simulation_setup(
             setup_parameters = setup_parameters,
             simulated_data = simulated_data,
-            patch_start = patch_start,
+            patch_offset = patch_offset,
             patch_size = patch_size,
             pixel_scale_factor = pixel_scale_factor,
             calibration_parameters = guessed_calibration_parameters

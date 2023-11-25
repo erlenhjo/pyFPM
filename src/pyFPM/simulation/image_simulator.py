@@ -9,7 +9,7 @@ def simulate_angled_imaging(high_res_fourier_transform,
                             pupil,
                             LED_indices,
                             imaging_system: Imaging_system,
-                            correct_aperture_shift = False
+                            use_aperture_shift = False
                             ):
     
     size_high_res_x = imaging_system.final_image_size[0]
@@ -18,12 +18,12 @@ def simulate_angled_imaging(high_res_fourier_transform,
     size_low_res_y = imaging_system.patch_size[1]
     inverse_scaling_factor_squared = (1/imaging_system.pixel_scale_factor)**2
 
-    if not correct_aperture_shift:
+    if not use_aperture_shift:
         shifts_x = imaging_system.LED_shifts_x
         shifts_y = imaging_system.LED_shifts_y
     else: 
-        shifts_x = imaging_system.LED_shifts_x_aperture()
-        shifts_y = imaging_system.LED_shifts_y_aperture()
+        shifts_x = imaging_system.LED_shifts_x_aperture
+        shifts_y = imaging_system.LED_shifts_y_aperture
     
     
     low_res_CTF = imaging_system.low_res_CTF

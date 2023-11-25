@@ -18,7 +18,9 @@ def simulate_imaging(
     pixel_scale_factor,
     Fresnel_correction,
     spherical_illumination_correction,
-    calibration_parameters: LED_calibration_parameters
+    patch_offset,
+    use_aperture_shift,
+    calibration_parameters: LED_calibration_parameters,
 ):
       
     # Define simulated data set
@@ -33,7 +35,7 @@ def simulate_imaging(
     full_image_imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
-        patch_start = [0,0],
+        patch_start = patch_offset,
         patch_size = setup_parameters.camera.raw_image_size,
         LED_calibration_parameters=calibration_parameters
         )
@@ -53,7 +55,8 @@ def simulate_imaging(
             high_res_fourier_transform,
             pupil,
             LED_indices,
-            full_image_imaging_system)
+            full_image_imaging_system,
+            use_aperture_shift=use_aperture_shift)
     
     # for n in range(low_res_images.shape[0]):
     #     low_res_images[n] *= np.random.normal(1,0.3)
@@ -74,7 +77,7 @@ def simulate_imaging(
 def finalize_simulation_setup(
     setup_parameters,
     simulated_data,
-    patch_start,
+    patch_offset,
     patch_size,
     pixel_scale_factor,
     calibration_parameters
@@ -84,13 +87,13 @@ def finalize_simulation_setup(
     imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
-        patch_start = patch_start,
+        patch_start = patch_offset,
         patch_size = patch_size,
         LED_calibration_parameters = calibration_parameters
         )
 
     data_patch = Data_patch(data = simulated_data,
-                            patch_start = patch_start,
+                            patch_start = [0,0],
                             patch_size = patch_size)
 
     illumination_pattern = Illumination_pattern(

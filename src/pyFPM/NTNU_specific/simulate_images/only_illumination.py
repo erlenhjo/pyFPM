@@ -8,7 +8,7 @@ import skimage
 
 
 def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fresnel_propagation, 
-                          arraysize, calibration_parameters):
+                          arraysize, calibration_parameters, patch_offset=[0,0]):
     noise_fraction = 0 
     zernike_coefficients = np.array([0,0,0])
 
@@ -37,17 +37,17 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
         pixel_scale_factor = pixel_scale_factor,
         Fresnel_correction = correct_Fresnel_propagation,
         spherical_illumination_correction = correct_spherical_wave_illumination,
+        patch_offset=patch_offset,
         calibration_parameters=calibration_parameters
     )
 
-    patch_start = [0, 0]
     patch_size = dummy_camera.raw_image_size
 
     data_patch, imaging_system, illumination_pattern \
         = finalize_simulation_setup(
             setup_parameters = setup_parameters,
             simulated_data = simulated_data,
-            patch_start = patch_start,
+            patch_offset = patch_offset,
             patch_size = patch_size,
             pixel_scale_factor = pixel_scale_factor,
             calibration_parameters=calibration_parameters
