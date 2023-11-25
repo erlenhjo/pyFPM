@@ -19,6 +19,6 @@ def experimental():
 
 if __name__ == "__main__": 
     simulate_illumination()
-    simulate_both()
-    experimental()
+    #simulate_both()
+    #experimental()
     plt.show()

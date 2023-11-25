@@ -80,5 +80,5 @@ def simulate_blob_detection():
 
 if __name__ == "__main__":
     simulate_blob_detection_small()
-    simulate_blob_detection()
+    #simulate_blob_detection()
     plt.show()
