@@ -66,40 +66,35 @@ def plot_located_dot_error(blobs, grid_points, grid_indices, object_pixel_size):
 
 
 def plot_dot_error(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_size):
-    max_index = grid_indices.max()
-    error = np.zeros(shape = (max_index+1, max_index+1))
+    max_index_x, max_index_y = grid_indices.max(axis=0)
+    error_value_grid = np.zeros(shape = (max_index_y+1, max_index_x+1))
     values = zip(blobs, grid_points, grid_indices)
     for blob, grid_point, indices in values:
         Y = indices[0]
         X = indices[1]
         distance_error = np.linalg.norm(blob-grid_point) * object_pixel_size *1e6
-        error[Y, X] = distance_error
+        error_value_grid[Y, X] = distance_error
 
+    error_vectors_x = (blobs[:,1]-grid_points[:,1]) / (np.linalg.norm(blobs-grid_points, axis=1) + 1e-10)
+    error_vectors_y = (blobs[:,0]-grid_points[:,0]) / (np.linalg.norm(blobs-grid_points, axis=1) + 1e-10)
+    error_values = np.linalg.norm(blobs-grid_points, axis=1) * object_pixel_size *1e6
+    print(error_vectors_y)
     
-    error_vectors = (blobs-grid_points) * object_pixel_size * 1e6 + 10e-16
-    arrow_starts = grid_points * object_pixel_size * 1e6
-    error_values = np.linalg.norm(error_vectors, axis=1)
+    scale = 2
+    width = 1
+    headwidth = 3 * width
+    headlength = 5 * width
+    headaxislength = 5 * width
+    minshaft = 1
+    minlength = 0.9 / scale
 
-    visual_scaling = 130
-    # error_vectors = error_vectors * visual_scaling / np.max(error_values)
-    error_vectors[:,0] *= visual_scaling / (error_values)
-    error_vectors[:,1] *= visual_scaling / (error_values)
-    
-    width = visual_scaling
-    headwidth = 40 * width
-    headlength = 1.6 * headwidth
-    headaxislength = headlength #* 0.8
-    minshaft = 0.8
-    minlength = 0.0
-    colormap = cmasher.get_sub_cmap("viridis", 0, 0.8)
-    #cax = ax.matshow(error, vmin=0, vmax = error.max())
-    cax = ax.quiver(arrow_starts[:,1], arrow_starts[:,0], error_vectors[:,1], error_vectors[:,0], error_values,
-                    pivot="mid", scale_units = "xy", units = "xy", cmap=colormap, edgecolor = "k", 
-                    width=width, headwidth=headwidth, headlength=headlength, headaxislength=headaxislength,
-                    minshaft=minshaft, minlength=minlength, scale = 1)
+    cax = ax.imshow(error_value_grid, vmin=0, vmax = error_values.max())
+    ax.quiver(grid_indices[:,1], grid_indices[:,0].max()-grid_indices[:,0], error_vectors_x, error_vectors_y,
+              pivot="mid", scale_units = "xy", units = "xy", color = "black",
+              width=width, headwidth=headwidth, headlength=headlength, headaxislength=headaxislength,
+              minshaft=minshaft, minlength=minlength, scale = scale)
     cbar = plt.colorbar(cax, ax=ax)
     cbar.set_label("Positional mismatch [µm]")
-    #ax.set_title("Error in micrometers")
     ax.set_axis_off()
 
 
