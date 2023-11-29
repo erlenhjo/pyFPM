@@ -38,6 +38,7 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
         Fresnel_correction = correct_Fresnel_propagation,
         spherical_illumination_correction = correct_spherical_wave_illumination,
         patch_offset=patch_offset,
+        use_aperture_shift=False,
         calibration_parameters=calibration_parameters
     )
 
