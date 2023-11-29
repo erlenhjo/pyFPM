@@ -31,7 +31,6 @@ def plot_located_dots_vs_grid(image, detected_blobs, grid_points):
 
     fig, ax = plt.subplots()
     ax.imshow(image)
-    ax.set_title("Dots vs. grid")
 
     blob_color = colors[0]
     blob_marker = markers[0]
@@ -87,8 +86,10 @@ def plot_dot_error(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_
     headaxislength = 5 * width
     minshaft = 1
     minlength = 0.9 / scale
+    
+    cmap = cmasher.get_sub_cmap("viridis", 0, 0.85)
 
-    cax = ax.imshow(error_value_grid, vmin=0, vmax = error_values.max())
+    cax = ax.imshow(error_value_grid, vmin=0, vmax = error_values.max(), cmap=cmap)
     ax.quiver(grid_indices[:,1], grid_indices[:,0].max()-grid_indices[:,0], error_vectors_x, error_vectors_y,
               pivot="mid", scale_units = "xy", units = "xy", color = "black",
               width=width, headwidth=headwidth, headlength=headlength, headaxislength=headaxislength,
@@ -132,10 +133,13 @@ def plot_dot_subimage(ax, image, blob, grid_point, dot_radius_pixels):
     
     delta = 1.6 * dot_radius_pixels
     y, x = blob
-    x_min = int(np.floor(x-delta))
-    x_max = int(np.floor(x+delta))
-    y_min = int(np.floor(y-delta))
-    y_max = int(np.floor(y+delta))
+    x_min = int(x)-int(np.floor(delta))
+    x_max = int(x)+int(np.ceil(delta))
+    y_min = int(y)-int(np.floor(delta))
+    y_max = int(y)+int(np.ceil(delta))
+
+    print(x_max-x_min)
+    print(y_max-y_min)
 
     blob_y, blob_x = blob - np.array([y_min, x_min])
     grid_y, grid_x = grid_point - np.array([y_min, x_min])
