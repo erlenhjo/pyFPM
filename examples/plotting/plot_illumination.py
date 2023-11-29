@@ -58,4 +58,4 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
     #         axes_3[m,n].matshow(np.log(np.abs(np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(data_patch.amplitude_images[image_nr]**2)))))[start:stop,start:stop] )
     #         axes_3[m,n].axis("off")
     
-    fig_3.subplots_adjust(wspace=0.05, hspace=0.05)
+    # fig_3.subplots_adjust(wspace=0.05, hspace=0.05)

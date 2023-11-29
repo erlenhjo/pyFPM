@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 from pyFPM.aberrations.dot_array.plot_dot_array import (plot_dot_error,
                                                         plot_example_dots,
-                                                        plot_located_dots)
+                                                        plot_located_dots,
+                                                        plot_located_dots_vs_grid)
 from pyFPM.aberrations.dot_array.locate_dot_array import (locate_dots,
                                                           assemble_dots_in_grid)                                        
 from pyFPM.NTNU_specific.components import (HAMAMATSU_C11440_42U30,
@@ -13,7 +14,7 @@ from pyFPM.aberrations.dot_array.simulate_dot_array import simulate_dot_array
 
 def simulate_blob_detection_small():
     dot_array = EO_DOT_ARRAY
-    image_size = [210, 210]
+    image_size = [512, 512]
     pixel_size = HAMAMATSU_C11440_42U30.camera_pixel_size
     magnification = 2
 
@@ -21,11 +22,7 @@ def simulate_blob_detection_small():
 
     image, _ = simulate_dot_array(dot_array= dot_array, image_size=image_size, 
                                 pixel_size=pixel_size, magnification=magnification,
-                                rotation = 3)    
-
-    #fig_1, axes_1 = plt.subplots(nrows=1,ncols=1)
-    #axes_1.matshow(image)
-    #axes_1.set_axis_off()
+                                rotation = 2)    
     
     object_pixel_size = pixel_size / magnification
     
@@ -36,13 +33,14 @@ def simulate_blob_detection_small():
     print(f"The total rotation was {rotation} degrees")       
     plot_dot_error(ax=axes_2, blobs=blobs, grid_points=grid_points, 
                     grid_indices=grid_indices, object_pixel_size=object_pixel_size)
-    
-    #fig_3 = plt.figure(figsize=(5,5))
-    #plot_example_dots(fig_3, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size)
 
-    #fig_1.tight_layout()
+    plot_located_dots_vs_grid(image=image, detected_blobs=blobs, grid_points=grid_points)
+    
+    fig_3 = plt.figure(figsize=(5,5))
+    plot_example_dots(fig_3, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size)
+
     fig_2.tight_layout()
-    #fig_3.tight_layout()
+    fig_3.tight_layout()
 
 def simulate_blob_detection():
 

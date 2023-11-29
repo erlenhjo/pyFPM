@@ -47,7 +47,7 @@ def get_fast_image_of_zernike_polynomial(j):
     return zernike_mode
 
 def plot_zernike_pyramid():
-    j_range = np.arange(1, 22)
+    j_range = np.arange(1, 11)
     n_vals, m_vals = zip(*[get_Noll_indices(j) for j in j_range])
     n_min, n_max, m_max = min(n_vals), max(n_vals), max(m_vals) 
 
@@ -77,7 +77,7 @@ def plot_zernike_pyramid():
 
         zernike_mode_image = get_fast_image_of_zernike_polynomial(j)
         im_size = zernike_mode_image.shape[0]
-        image = ax.imshow(zernike_mode_image)
+        image = ax.pcolor(zernike_mode_image)
         clip_circle = patches.Circle(xy=(im_size//2, im_size//2), radius = im_size//2-im_size//100, transform=ax.transData)
         image.set_clip_path(clip_circle)
         ax.axis("off")

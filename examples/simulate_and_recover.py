@@ -30,14 +30,14 @@ def main():
     
     zernike_coefficients[0] = 0
 
-    #amplitude_image = skimage.data.camera()
-    amplitude_image = np.ones(shape=(1024*4, 1024*4))
+    amplitude_image = skimage.data.eagle()[0:1024,512:1536]
+
     phase_image = np.zeros(shape=amplitude_image.shape)
     high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
 
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
         = simulate_2x(high_res_complex_object, noise_fraction=0.1, zernike_coefficients=zernike_coefficients, 
-                      spherical_illumination=simulate_spherical_illumination, patch_offset=[-512, 0], use_aperture_shift=True)
+                      spherical_illumination=simulate_spherical_illumination, patch_offset=[0, 0], use_aperture_shift=False)
     step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=100, start_EPRY_at_iteration=10, start_adaptive_at_iteration=30)
 
     plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)

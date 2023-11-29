@@ -12,9 +12,6 @@ def simulate_both():
 def simulate_illumination():
     illustrate_illumination_from_simulation(lens, spherical=True, Fresnel=False, z_LED=201e-3, arraysize=array_size)
 
-def simulate_illumintion_offcenter():
-    illustrate_illumination_from_simulation(lens, spherical=True, Fresnel=False, z_LED=201e-3, arraysize=array_size, patch_offset=[-512,0])
-
 def experimental_reflections():
     datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark_no_object"
     illustrate_illumination_from_setup(datadirpath, lens, array_size)
@@ -25,8 +22,7 @@ def experimental_proper():
 
 if __name__ == "__main__": 
     simulate_illumination()
-    simulate_illumintion_offcenter()
     # simulate_both
     # experimental_reflections()
-    # experimental_proper()
+    #experimental_proper()
     plt.show()
