@@ -43,7 +43,6 @@ UI3580CP_REV2 = Camera(
 INFINITYCORRECTED_2X = Lens(
     NA = 0.055,
     magnification = 2,
-    diameter = None,
     focal_length = 100e-3,
     working_distance = 34e-3,
     depth_of_field = 91e-6,
@@ -53,7 +52,6 @@ INFINITYCORRECTED_2X = Lens(
 TELECENTRIC_3X = Lens(
     NA = 0.09,
     magnification = 3,
-    diameter = None,
     focal_length = 58.51e-3,
     working_distance = 77e-3,
     depth_of_field = 34e-6,
@@ -63,19 +61,30 @@ TELECENTRIC_3X = Lens(
 COMPACT_2X = Lens(
     NA = 0.06,
     magnification = 2,
-    diameter = None,
     focal_length = 60.33e-3,
     working_distance = 92e-3,
     depth_of_field = 76e-6,
     lens_type = Lens_type.COMPACT
 )
 
+
+double_convex_focal_length = 36e-3
+double_convex_extension_length = (100 - 1 + 17.526) * 1e-3 
+double_convex_clear_aperture = 5.2e-3
+double_convex_working_distance = 1/(1/double_convex_focal_length - 1/double_convex_extension_length)
+double_convex_numerical_aperture = (double_convex_clear_aperture/2)/double_convex_working_distance
+double_convex_magnification = double_convex_extension_length/double_convex_working_distance
+
+# print(double_convex_magnification)
+# print(double_convex_working_distance)
+# print(double_convex_extension_length)
+# print(double_convex_numerical_aperture)
+
 DOUBLE_CONVEX = Lens(
-    NA = 0.049,
-    magnification = 2.13,
-    diameter = None,
-    focal_length = 36e-3,
-    working_distance = None,
+    NA = double_convex_numerical_aperture,
+    magnification = double_convex_magnification,
+    focal_length = double_convex_focal_length,
+    working_distance = double_convex_working_distance,
     depth_of_field = None,
     lens_type = Lens_type.SINGLE_LENS
 )

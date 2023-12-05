@@ -40,7 +40,7 @@ def test_zernike_decomposition():
 
     pupil = get_zernike_pupil(imaging_system=imaging_system, zernike_coefficients=zernike_coefficients)
     
-    fig = plt.figure(figsize=(8,4))
+    fig = plt.figure(figsize=(8,4), constrained_layout=True)
     gs = fig.add_gridspec(4, 8)
 
     axes_0 = plt.subplot(gs[0:2, 0:3])
@@ -71,7 +71,6 @@ def test_zernike_decomposition():
 
     plot_zernike_coefficients(ax=axes_2, zernike_coefficients=decomposed_zernike_coefficients, title="Recovered Zernike coefficients")
     
-    fig.tight_layout()
     
     plt.show()
 

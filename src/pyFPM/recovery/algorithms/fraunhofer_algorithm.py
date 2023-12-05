@@ -88,7 +88,12 @@ def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_
 
             min_x, max_x, min_y, max_y = calculate_low_res_index_range(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
                                                                           size_high_res_x, size_high_res_y, LED_indices, index)
+
+            # plt.matshow(raw_low_res_image)
+            # plt.title(f"{image_nr}, {min_x}, {min_y}")
             
+            # plt.show()
+
             recovered_low_res_fourier_transform = pupil * recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1]
                                                 
             recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))            
@@ -159,9 +164,6 @@ def get_object_phase_correction(imaging_system: Imaging_system, correct_spherica
     if correct_spherical_wave_phase: 
         object_plane_phase_shift_correction *= imaging_system.high_res_spherical_illumination_correction
     return object_plane_phase_shift_correction
-
-
-
 
 
 def update_step_sizes(alpha, beta, eta, loop_nr, error, prev_error):

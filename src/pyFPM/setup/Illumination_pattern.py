@@ -5,7 +5,8 @@ from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import Imaging_system
 
 class Illumination_pattern(object):
-    def __init__(self, LED_indices, imaging_system: Imaging_system, setup_parameters: Setup_parameters):
+    def __init__(self, LED_indices, max_array_size,
+                 imaging_system: Imaging_system, setup_parameters: Setup_parameters):
         LED_array_size = setup_parameters.LED_info.LED_array_size
         center_indices = setup_parameters.LED_info.center_indices
         LED_frequencies_x = imaging_system.LED_shifts_x * imaging_system.df_x
@@ -14,7 +15,8 @@ class Illumination_pattern(object):
         LED_aperture_shifts_y = imaging_system.LED_shifts_y_aperture
         cutoff_frequency = imaging_system.cutoff_frequency
         
-        avaliable_LEDs = determine_available_LEDs(LED_indices=LED_indices, LED_array_size=LED_array_size)
+        avaliable_LEDs = determine_available_LEDs(LED_indices=LED_indices, LED_array_size=LED_array_size, 
+                                                  center_indices = center_indices, max_array_size = max_array_size)
 
         self.relative_NAs = calculate_relative_NA(
              LED_frequencies_x = LED_frequencies_x,
@@ -31,7 +33,6 @@ class Illumination_pattern(object):
         # plt.matshow(self.relative_aperture_shifts[11:22,11:22])
         # plt.show()
 
-
         self.update_order, self.update_order_matrix \
             = spiral_indices(LED_indices = LED_indices, center_indices=center_indices, 
                              LED_array_size=LED_array_size, avaliable_LEDs=avaliable_LEDs)
@@ -40,11 +41,23 @@ class Illumination_pattern(object):
 def calculate_relative_NA(LED_frequencies_x, LED_frequencies_y, cutoff_frequency):
     return np.sqrt(LED_frequencies_x**2 + LED_frequencies_y**2) / cutoff_frequency
 
-def determine_available_LEDs(LED_indices, LED_array_size):
+def determine_available_LEDs(LED_indices, LED_array_size, center_indices, 
+                             max_array_size):
     available_LEDs = np.zeros(shape = (LED_array_size[1] + 1, LED_array_size[0] + 1), dtype = bool)
-    
+    if max_array_size is None:
+        max_index_x = LED_array_size[0]
+        max_index_y = LED_array_size[1]
+        min_index_x = 0
+        min_index_y = 0
+    else:
+        max_index_x = center_indices[0]+max_array_size//2
+        max_index_y = center_indices[1]+max_array_size//2
+        min_index_x = center_indices[0]-max_array_size//2
+        min_index_y = center_indices[1]-max_array_size//2
+
     for x, y in LED_indices:
-        available_LEDs[y,x] = True
+        if (min_index_x <= x) and (max_index_x >= x) and (min_index_y <= y) and (max_index_y >= y):
+            available_LEDs[y,x] = True
 
     return available_LEDs
 

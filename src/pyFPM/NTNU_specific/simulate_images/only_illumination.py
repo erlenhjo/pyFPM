@@ -51,7 +51,8 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
             patch_offset = patch_offset,
             patch_size = patch_size,
             pixel_scale_factor = pixel_scale_factor,
-            calibration_parameters=calibration_parameters
+            calibration_parameters=calibration_parameters,
+            arraysize=arraysize
         )
     
     return setup_parameters, data_patch, imaging_system, illumination_pattern, pupil, high_res_complex_object

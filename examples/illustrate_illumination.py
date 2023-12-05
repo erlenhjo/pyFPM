@@ -28,10 +28,11 @@ def illustrate_illumination_from_setup():
     #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark"
     #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\dotarray_telecentric3x_dark_no_object"
     #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_light_infcor2x"
-    #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_centered_infcor2x"
-    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\telecentric_3x_dotarray"
+    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\USAF_centered_infcor2x"
+    #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\telecentric_3x_dotarray"
+    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Fourier_Ptychography\telecentric_3x_usaf"
 
-    array_size = 5
+    array_size = 7
 
     pixel_scale_factor = 4
     patch_start = [0, 0] # [x, y]
@@ -48,7 +49,13 @@ def illustrate_illumination_from_setup():
         calibration_parameters=LED_calibration_parameters(201e-3,0,0,0)
     )
 
-    plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=array_size)
+    #plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=array_size)
+    fig, ax = plt.subplots(1,1)
+    ax.matshow(data_patch.amplitude_images[100])
+    ax.set_axis_off()
+
+    
+    
     plt.show()
 
 if __name__ == "__main__":

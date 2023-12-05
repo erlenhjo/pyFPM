@@ -138,14 +138,14 @@ def assemble_dots_in_grid(image: np.ndarray, blobs, dot_array: Dot_array, pixel_
     blobs = blobs[:,:2]
     grid_points = grid_points[:,:2]
     
-    # remove shift grid indices to start at (0,0) if possible (remove leading empty rows)
+    # shift grid indices so that the first start at (0,0) if possible (remove leading empty rows)
     shift = np.min(grid_indices, axis=0)
     grid_indices[:,0] -= shift[0]
     grid_indices[:,1] -= shift[1]
     
-
-
-    return blobs, grid_points, grid_indices, total_rotation
+    center_dot_indices = np.array([center_dot_index_Y - shift[0], center_dot_index_X-shift[1]])
+    
+    return blobs, grid_points, grid_indices, total_rotation, center_dot_indices
 
 
 

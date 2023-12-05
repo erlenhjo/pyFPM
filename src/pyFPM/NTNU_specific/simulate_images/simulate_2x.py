@@ -55,7 +55,8 @@ def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, s
             patch_offset = patch_offset,
             patch_size = patch_size,
             pixel_scale_factor = pixel_scale_factor,
-            calibration_parameters = guessed_calibration_parameters
+            calibration_parameters = guessed_calibration_parameters,
+            arraysize = arraysize
         )
     
     return setup_parameters, data_patch, imaging_system, illumination_pattern, pupil, high_res_complex_object

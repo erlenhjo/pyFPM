@@ -42,7 +42,7 @@ class Preprocessed_data:
         if threshold_value > 0 and remove_background:
             images = _threshold(images=images, threshold_value=threshold_value)
         elif threshold_value > 0:
-            images = _alternative_threshold(images=images, threshold_value=threshold_value)
+            images = _alternative_threshold(images=images, threshold_value=threshold_value, noise_reduction_regions=noise_reduction_regions)
         
 
 
@@ -103,10 +103,9 @@ def _subtract_background_image(images, background_image, background_removal_regi
 
 def _threshold(images: np.ndarray, threshold_value):
     images[images<threshold_value]=0
-    #images = images - threshold_value
-    #images[images<0] = 0
     return images
 
-def _alternative_threshold(images: np.ndarray, threshold_value, noise_removal_regions):
-    return
+def _alternative_threshold(images: np.ndarray, threshold_value, noise_reduction_regions):
+
+    return images
 

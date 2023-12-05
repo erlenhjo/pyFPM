@@ -18,7 +18,7 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
 
     max_intensity = np.max(data_patch.amplitude_images)**2
 
-    fig, axes = plt.subplots(nrows=array_size, ncols=array_size, figsize=(5,5))
+    fig, axes = plt.subplots(nrows=array_size, ncols=array_size, figsize=(7,7), constrained_layout = True)
 
     mean_values = np.empty(shape=(array_size,array_size))
 
@@ -31,8 +31,4 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
             axes[m,n].axis("off")
             mean_values[m,n] = np.mean(data_patch.amplitude_images[image_nr]**2)
     
-    fig.subplots_adjust(wspace=0.05, hspace=0.05)
-
-    # fig_3, ax = plt.subplots(1,1)
-    # cax = ax.matshow(mean_values,vmin=0, vmax=max_intensity)
-    # fig_3.colorbar(cax)
+    return fig

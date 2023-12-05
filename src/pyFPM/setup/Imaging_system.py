@@ -24,7 +24,7 @@ class Imaging_system(object):
 
         object_to_lens_distance = get_object_to_lens_distance(setup_parameters.lens)
         
-        if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency): #raw?
+        if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency): 
             raise "Too low pixel scale factor"
 
         # calculate offsets
@@ -118,6 +118,12 @@ class Imaging_system(object):
         self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_phase_correction
         self.high_res_Fresnel_correction = high_res_Fresnel_object_phase_correction
 
+        # import matplotlib.pyplot as plt
+        # plt.matshow(LED_shifts_x[9:24,9:24])
+        # plt.matshow(LED_shifts_x_aperture[14:19,14:19])
+        # plt.matshow(LED_shifts_y[9:24,9:24])
+        # plt.matshow(LED_shifts_y_aperture[14:19,14:19])
+        # plt.show()
 
 
 
@@ -141,8 +147,8 @@ def calculate_patch_offset(image_size, patch_start, patch_size, raw_object_pixel
     patch_center_pixel_y = patch_start[1] + patch_size[1]/2
 
     # calculate offset of selected patch with respect to image centre
-    patch_offset_x = (image_center_pixel_x - patch_center_pixel_x) * raw_object_pixel_size
-    patch_offset_y = (image_center_pixel_y - patch_center_pixel_y) * raw_object_pixel_size
+    patch_offset_x = (patch_center_pixel_x - image_center_pixel_x) * raw_object_pixel_size
+    patch_offset_y = (patch_center_pixel_y - image_center_pixel_y) * raw_object_pixel_size
     
     return patch_offset_x, patch_offset_y
 
@@ -238,8 +244,8 @@ def calculate_frequency_mesh_grids(pixel_size, image_region_size):
 def calculate_position_mesh_grids(pixel_size, image_region_size, offset_x, offset_y):
     FOV_x = image_region_size[0] * pixel_size
     FOV_y = image_region_size[1] * pixel_size
-    positions_x = np.linspace(start = -FOV_x/2, stop = FOV_x/2, num = image_region_size[0], endpoint = True) - offset_x
-    positions_y = np.linspace(start = -FOV_y/2, stop = FOV_y/2, num = image_region_size[1], endpoint = True) - offset_y
+    positions_x = np.linspace(start = -FOV_x/2, stop = FOV_x/2, num = image_region_size[0], endpoint = True)# - offset_x
+    positions_y = np.linspace(start = -FOV_y/2, stop = FOV_y/2, num = image_region_size[1], endpoint = True)# - offset_y
 
     x_mesh, y_mesh = np.meshgrid(positions_x, positions_y)
     

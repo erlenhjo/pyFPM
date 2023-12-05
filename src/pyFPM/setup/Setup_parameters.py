@@ -26,8 +26,7 @@ class Lens(object):
     def __init__(
             self, 
             NA, 
-            magnification, 
-            diameter,
+            magnification,
             focal_length,
             working_distance,
             depth_of_field, 
@@ -35,7 +34,6 @@ class Lens(object):
         ):
         self.NA = NA
         self.magnification = magnification
-        self.diameter = diameter # m
         self.focal_length = focal_length # m
         self.working_distance = working_distance # m
         self.depth_of_field = depth_of_field # m

@@ -26,11 +26,11 @@ def epry_adaptive_aperture():
 
 
 if __name__ == "__main__":
-    noisy_original()
-    original()
-    original_adaptive()
-    original_adaptive_aperture()
-    epry()
+    #noisy_original()
+    #original()
+    #original_adaptive()
+    #original_adaptive_aperture()
+    #epry()
     epry_adaptive()
     epry_adaptive_aperture()
     plt.show()

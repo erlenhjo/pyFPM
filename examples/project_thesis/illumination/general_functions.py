@@ -19,8 +19,9 @@ def illustrate_illumination_from_simulation(lens, spherical, Fresnel, z_LED, arr
                                arraysize=arraysize,
                                calibration_parameters=LED_calibration_parameters(z_LED,0,0,0),
                                patch_offset=patch_offset)
-    plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=arraysize)
+    fig = plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=arraysize)
 
+    return fig
 
 def illustrate_illumination_from_setup(datadirpath, lens, array_size):
     patch_start = [0, 0] # [x, y]
@@ -54,8 +55,8 @@ def illustrate_illumination_from_setup(datadirpath, lens, array_size):
         patch_size = patch_size
         )
 
-    plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=array_size)
-
+    fig = plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=array_size)
+    return fig
 
     
 

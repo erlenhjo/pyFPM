@@ -155,4 +155,7 @@ cython_debug/
 data/
 profiling_data/
 *.prof
-examples/test.py
+examples/tests/
+examples/results/
+examples/dot_array/results/
+examples/project_thesis/results

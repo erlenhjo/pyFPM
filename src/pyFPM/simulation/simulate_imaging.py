@@ -63,7 +63,8 @@ def simulate_imaging(
 
     illumination_pattern = Illumination_pattern(LED_indices=LED_indices,
                                                 imaging_system=full_image_imaging_system,
-                                                setup_parameters=setup_parameters) 
+                                                setup_parameters=setup_parameters,
+                                                max_array_size=arraysize) 
 
     low_res_images = apply_gaussian_noise(low_res_images = low_res_images, 
                                           noise_fraction = noise_fraction, 
@@ -80,7 +81,8 @@ def finalize_simulation_setup(
     patch_offset,
     patch_size,
     pixel_scale_factor,
-    calibration_parameters
+    calibration_parameters,
+    arraysize
 ):
     # Adapt simulated dataset for further use
 
@@ -99,7 +101,8 @@ def finalize_simulation_setup(
     illumination_pattern = Illumination_pattern(
         LED_indices = simulated_data.LED_indices,
         imaging_system = imaging_system,
-        setup_parameters = setup_parameters
+        setup_parameters = setup_parameters,
+        max_array_size=arraysize
     )
 
     return data_patch, imaging_system, illumination_pattern
