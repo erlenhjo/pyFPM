@@ -29,6 +29,7 @@ def simulate_angled_imaging(high_res_fourier_transform,
     low_res_CTF = imaging_system.low_res_CTF
 
     low_res_images = np.zeros(shape=(len(LED_indices), size_low_res_y, size_low_res_x))
+
     
     for image_nr in range(len(LED_indices)):
         # calculate which wavevector-values should be present in the low res image for LED_indices[image_nr]
@@ -40,10 +41,10 @@ def simulate_angled_imaging(high_res_fourier_transform,
                      * low_res_CTF * pupil
         
         low_res_image =  np.abs(fftshift(ifft2(ifftshift(low_res_ft))))
-        
+
         low_res_images[image_nr] = low_res_image
         
-    
+        
     return low_res_images
 
 

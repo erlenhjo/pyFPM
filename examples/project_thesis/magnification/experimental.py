@@ -6,64 +6,55 @@ from pyFPM.NTNU_specific.components import  TELECENTRIC_3X, INFINITYCORRECTED_2X
 
 subprecision = 8
 result_folder = r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\project_thesis\results\magnification"
+dpi = 1000
 
-def telecentric():
+def telecentric(save):
     lens = TELECENTRIC_3X
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\-0,05.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
+    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_all\telecentric_0.tif"
+    
+    fig_0, fig_1, fig_2, fig_3 = locate_and_plot_dots(lens=lens, filepath=filepath, subprecision=subprecision)
+    if save:
+        fig_0.savefig(result_folder+"\magnification_telecentric_image.pdf", dpi = dpi)
+        fig_1.savefig(result_folder+"\magnification_telecentric_error_matrix.pdf", dpi = dpi)
+        fig_2.savefig(result_folder+"\magnification_telecentric_example_dots.pdf", dpi = dpi)
+        fig_3.savefig(result_folder+"\magnification_telecentric_error_plots.pdf", dpi = dpi)
 
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\-0,04.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\-0,03.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\-0,02.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\-0,01.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\0.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\0,01.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\0,02.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\0,03.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\0,04.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-    filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_telecentric\0,05.tif"
-    locate_and_scatter_plot(lens=lens, filepath=filepath, subprecision=subprecision)
-
-
-def infinity_corrected():
+def infinity_corrected(save):
     lens = INFINITYCORRECTED_2X
     filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_all\infinity_0.tif"
-    
-    locate_and_plot_dots(lens=lens, filepath=filepath, subprecision=subprecision)
+    enforced_grid_shift = [0.1,1.4]
+
+    fig_0, fig_1, fig_2, fig_3 = locate_and_plot_dots(lens=lens, filepath=filepath, subprecision=subprecision, enforced_grid_shift=enforced_grid_shift)
+    if save:
+        fig_0.savefig(result_folder+"\magnification_infinity_image.pdf", dpi = dpi)
+        fig_1.savefig(result_folder+"\magnification_infinity_error_matrix.pdf", dpi = dpi)
+        fig_2.savefig(result_folder+"\magnification_infinity_example_dots.pdf", dpi = dpi)
+        fig_3.savefig(result_folder+"\magnification_infinity_error_plots.pdf", dpi = dpi)
 
 
-def compact():
+
+
+def compact(save):
     lens = COMPACT_2X
     filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_all\compact_0.tif"
     
-    locate_and_plot_dots(lens=lens, filepath=filepath, subprecision=subprecision)
+    fig_0, fig_1, fig_2, fig_3 = locate_and_plot_dots(lens=lens, filepath=filepath, subprecision=subprecision)
+    if save:
+        fig_0.savefig(result_folder+"\magnification_compact_image.pdf", dpi = dpi)
+        fig_1.savefig(result_folder+"\magnification_compact_error_matrix.pdf", dpi = dpi)
+        fig_2.savefig(result_folder+"\magnification_compact_example_dots.pdf", dpi = dpi)
+        fig_3.savefig(result_folder+"\magnification_compact_error_plots.pdf", dpi = dpi)
 
 
 def double_convex(save):
     lens = DOUBLE_CONVEX
     filepath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Magnification\Magnification_per_defocus_all\Single_lens_in_focus.tif"
-    fig_0, fig_1, fig_2 = locate_and_plot_dots(lens=lens, filepath=filepath, subprecision=subprecision)
+    fig_0, fig_1, fig_2, fig_3 = locate_and_plot_dots(lens=lens, filepath=filepath, subprecision=subprecision)
     if save:
-        fig_0.savefig(result_folder+"\magnification_double_convex_image.pdf", dpi = 4000)
-        fig_1.savefig(result_folder+"\magnification_double_convex_error.pdf", dpi = 4000)
+        fig_0.savefig(result_folder+"\magnification_double_convex_image.pdf", dpi = dpi)
+        fig_1.savefig(result_folder+"\magnification_double_convex_error_matrix.pdf", dpi = dpi)
+        fig_2.savefig(result_folder+"\magnification_double_convex_example_dots.pdf", dpi = dpi)
+        fig_3.savefig(result_folder+"\magnification_double_convex_error_plots.pdf", dpi = dpi)
 
 
     
@@ -73,8 +64,9 @@ def double_convex(save):
 
 
 if __name__ == "__main__":
-    telecentric()
-    #infinity_corrected()
-    #compact()
-    #double_convex(save=False)
+    save=False
+    telecentric(save)
+    infinity_corrected(save)
+    compact(save)
+    double_convex(save)
     plt.show()

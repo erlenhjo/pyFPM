@@ -34,18 +34,20 @@ def simulate_blob_detection_small():
     located_blobs = locate_dots(image, dot_array, object_pixel_size, sub_precision=subprecision)
 
     fig_2, axes_2 = plt.subplots(nrows=1, ncols=1, figsize=(3,2.5), constrained_layout=True)
-    blobs, grid_points, grid_indices, rotation, center_indices = assemble_dots_in_grid(image, located_blobs, dot_array, object_pixel_size)
+    blobs, grid_points, grid_indices, rotation, center_indices = assemble_dots_in_grid(image, located_blobs, dot_array, 
+                                                                                       object_pixel_size)
+    
     print(f"The total rotation was {rotation} degrees")       
     plot_dot_error(ax=axes_2, blobs=blobs, grid_points=grid_points, 
                     grid_indices=grid_indices, object_pixel_size=object_pixel_size)
 
     fig_1 = plot_located_dots_vs_grid(image=image, detected_blobs=blobs, grid_points=grid_points)
     
-    fig_3 = plt.figure(figsize=(5,5), constrained_layout = True)
+    fig_3, axes_3 = plt.subplots(nrows=3, ncols=3, figsize=(5,5), constrained_layout=True)
     plot_example_dots(fig_3, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size)
 
-    fig_4, axes_4 = plt.subplots(nrows=1, ncols=1, figsize=(3,3), constrained_layout = True)
-    plot_dot_error_scatter(ax=axes_4, blobs=blobs, grid_points=grid_points, 
+    fig_4, axes_4 = plt.subplots(nrows=1, ncols=2, figsize=(6,3), constrained_layout = True)
+    plot_dot_error_scatter(axes=axes_4, blobs=blobs, grid_points=grid_points, 
                             grid_indices=grid_indices, object_pixel_size=object_pixel_size,
                             center_indices=center_indices)
 

@@ -71,8 +71,10 @@ def plot_results_short(
         data_patch: Data_patch, 
         illumination_pattern: Illumination_pattern,
         algorithm_result: Algorithm_result,
+        title
     ):
     fig, axes = plt.subplots(nrows=1, ncols=3, layout='constrained')
+    fig.suptitle(title)
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Low resolution image")
@@ -106,3 +108,17 @@ def plot_results_short(
     axes[2].matshow(np.angle(algorithm_result.recovered_object), vmin=-np.pi, vmax=np.pi)    
     axes[2].axis("off")
     axes[2].margins(x=0, y=0)
+
+
+def plot_phase(
+        data_patch: Data_patch, 
+        illumination_pattern: Illumination_pattern,
+        algorithm_result: Algorithm_result,
+        title
+    ):
+    fig, axes = plt.subplots(nrows=1, ncols=1, constrained_layout=True, figsize=(4,4))
+
+    axes.matshow(np.angle(algorithm_result.recovered_object), vmin=-np.pi, vmax=np.pi)    
+    axes.axis("off")
+
+    return fig

@@ -9,8 +9,8 @@ def plot_located_dots(image, blobs_list):
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 6), sharex=True, sharey=True)
     ax=axes.ravel()
-    ax[0].imshow(image)
-    ax[1].imshow(image)
+    ax[0].matshow(image)
+    ax[1].matshow(image)
     ax[0].set_title("Centers")
     ax[1].set_title("Bounding circles")
 
@@ -30,7 +30,7 @@ def plot_located_dots_vs_grid(image, detected_blobs, grid_points):
     markers = ["x", "+"]
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(2.5,2.5), constrained_layout=True)
-    ax.imshow(image)
+    ax.matshow(image)
 
     blob_color = colors[0]
     blob_marker = markers[0]
@@ -90,7 +90,7 @@ def plot_dot_error(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_
     
     cmap = cmasher.get_sub_cmap("viridis", 0, 0.85)
 
-    cax = ax.imshow(error_value_grid, vmin=0, vmax = error_values.max(), cmap=cmap)
+    cax = ax.matshow(error_value_grid, vmin=0, vmax = error_values.max(), cmap=cmap)
     ax.quiver(grid_indices[:,1], grid_indices[:,0], error_vectors_x, -error_vectors_y,
               pivot="mid", scale_units = "xy", units = "xy", color = "black",
               width=width, headwidth=headwidth, headlength=headlength, headaxislength=headaxislength,
@@ -99,68 +99,47 @@ def plot_dot_error(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_
     cbar.set_label("Positional mismatch [µm]")
     ax.set_axis_off()
 
-def plot_dot_error_scatter(ax: plt.Axes, blobs, grid_points, grid_indices, object_pixel_size, center_indices):
-    center_index_y = center_indices[0]
-    center_index_x = center_indices[1]
+def plot_dot_error_scatter(axes: list[plt.Axes], blobs, grid_points, 
+                           object_pixel_size,image_center_coords, max_FoV, ignore_center_dot):
+    
+    errors = np.linalg.norm(blobs-grid_points, axis=1) * object_pixel_size * 1e6
+    positions = np.linalg.norm(grid_points-image_center_coords, axis=1) * object_pixel_size * 1e6
 
-    max_index_y, max_index_x = grid_indices.max(axis=0)
-    error_value_grid = np.zeros(shape = (max_index_y+1, max_index_x+1))
-    position_grid_x = np.zeros(shape = (max_index_y+1, max_index_x+1))
-    position_grid_y = np.zeros(shape = (max_index_y+1, max_index_x+1))
+    if ignore_center_dot:
+        center_dot_position = np.min(positions)
+        errors = errors[np.argwhere(positions != center_dot_position)]
+        positions = positions[np.argwhere(positions != center_dot_position)]
 
-    values = zip(blobs, grid_points, grid_indices)
-    for blob, grid_point, indices in values:
-        Y = indices[0]
-        X = indices[1]
-        distance_error = np.linalg.norm(blob-grid_point) * object_pixel_size *1e6
-        error_value_grid[Y, X] = distance_error
-        position_grid_y[Y,X] = grid_point[0] * object_pixel_size * 1e6
-        position_grid_x[Y,X] = grid_point[1] * object_pixel_size * 1e6
+    normalized_error = errors/(positions+1e-60)
+    
+    axes[0].scatter(positions, errors)
+    axes[0].set_ylabel("Positional mismatch [µm]")
+    axes[0].set_xlabel("Distance from center [µm]")
 
-    position_grid_y -= position_grid_y[center_index_y, center_index_x]
-    position_grid_x -= position_grid_x[center_index_y, center_index_x]
+    axes[1].scatter(positions, normalized_error*100)
+    axes[1].set_ylabel("Normalized positional mismatch [%]")
+    axes[1].set_xlabel("Distance from center [µm]")
 
-    position_grid = np.sqrt(position_grid_x**2 + position_grid_y**2) 
+    if max_FoV is not None:
+        axes[0].axvline(x=max_FoV*1e6/2, color="r", linestyle=":")
+        axes[1].axvline(x=max_FoV*1e6/2, color="r", linestyle=":")
+        
 
-    positions = position_grid.flatten()
-    errors = error_value_grid.flatten()
-
-    non_zero_indices = np.argwhere(errors!=0)
-    positions = np.append(positions[non_zero_indices], [0])
-    errors = np.append(errors[non_zero_indices], [0])
-
-    #positions = (np.arange(max_index_x+1)-center_index_x)*0.125
-
-    ax.scatter(positions, errors)
-    ax.set_ylabel("Positional mismatch [µm]")
-    ax.set_xlabel("Distance from center [µm]")
-
-def plot_example_dots(fig, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size):
+def plot_example_dots(axes, image, blobs, grid_points, grid_indices, dot_array, object_pixel_size, center_indices):
     dot_radius_pixels = dot_array.diameter/2 / object_pixel_size
     
-    axes = fig.subplots(3,3)
-    center = grid_indices.max()//2
+    center_x = center_indices[1]
+    center_y = center_indices[0]
     min = 0
     max = grid_indices.max()
 
-    values = zip(blobs, grid_points, grid_indices)
-    for blob, grid_point, indices in values:
-        Y = indices[0]
-        X = indices[1]
-
-        if Y == min: n=0
-        elif Y == center: n=1
-        elif Y == max: n=2
-        else: continue
-
-        if X == min: m=0
-        elif X == center: m=1
-        elif X == max: m=2
-        else: continue
-            
-        ax = axes[n,m]
-            
-        plot_dot_subimage(ax, image, blob, grid_point, dot_radius_pixels)
+    for n, Y in enumerate([min, center_y, max]):
+        for m, X in enumerate([min, center_x, max]):
+            distances_from_YX = np.linalg.norm(grid_indices - [Y,X], axis=1)
+            closest_index = np.argmin(distances_from_YX)
+            blob = blobs[closest_index]
+            grid_point = grid_points[closest_index]
+            plot_dot_subimage(axes[n,m], image, blob, grid_point, dot_radius_pixels)        
     
 
 def plot_dot_subimage(ax, image, blob, grid_point, dot_radius_pixels):
@@ -177,7 +156,7 @@ def plot_dot_subimage(ax, image, blob, grid_point, dot_radius_pixels):
     blob_y, blob_x = blob - np.array([y_min, x_min])
     grid_y, grid_x = grid_point - np.array([y_min, x_min])
 
-    ax.imshow(image[y_min:y_max, x_min:x_max])
+    ax.matshow(image[y_min:y_max, x_min:x_max])
     ax.plot(blob_x, blob_y, color=colors[0], marker=markers[0])
 
     ax.plot(grid_x, grid_y, color=colors[1], marker=markers[1])

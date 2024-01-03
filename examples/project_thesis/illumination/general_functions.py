@@ -11,7 +11,7 @@ from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Data import Data_patch, Rawdata, Preprocessed_data
 
-def illustrate_illumination_from_simulation(lens, spherical, Fresnel, z_LED, arraysize, patch_offset=[0,0]):
+def illustrate_illumination_from_simulation(lens, spherical, Fresnel, z_LED, arraysize, patch_offset=[0,0], use_working_distance=False):
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, high_res_complex_object\
        = simulate_illumination(lens = lens, 
                                correct_spherical_wave_illumination = spherical, 

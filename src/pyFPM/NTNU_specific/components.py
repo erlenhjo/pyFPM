@@ -46,6 +46,7 @@ INFINITYCORRECTED_2X = Lens(
     focal_length = 100e-3,
     working_distance = 34e-3,
     depth_of_field = 91e-6,
+    max_FoV_sensor = 11e-3,
     lens_type = Lens_type.INFINITY_CORRECTED
 )
 
@@ -55,6 +56,7 @@ TELECENTRIC_3X = Lens(
     focal_length = 58.51e-3,
     working_distance = 77e-3,
     depth_of_field = 34e-6,
+    max_FoV_sensor = 11e-3,
     lens_type = Lens_type.TELECENTRIC
 )
 
@@ -64,8 +66,10 @@ COMPACT_2X = Lens(
     focal_length = 60.33e-3,
     working_distance = 92e-3,
     depth_of_field = 76e-6,
+    max_FoV_sensor = 11e-3,
     lens_type = Lens_type.COMPACT
 )
+
 
 
 double_convex_focal_length = 36e-3
@@ -86,6 +90,7 @@ DOUBLE_CONVEX = Lens(
     focal_length = double_convex_focal_length,
     working_distance = double_convex_working_distance,
     depth_of_field = None,
+    max_FoV_sensor = None,
     lens_type = Lens_type.SINGLE_LENS
 )
 

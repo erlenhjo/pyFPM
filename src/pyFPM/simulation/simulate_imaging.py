@@ -20,7 +20,7 @@ def simulate_imaging(
     spherical_illumination_correction,
     patch_offset,
     use_aperture_shift,
-    calibration_parameters: LED_calibration_parameters,
+    calibration_parameters: LED_calibration_parameters
 ):
       
     # Define simulated data set
@@ -50,6 +50,7 @@ def simulate_imaging(
 
     high_res_fourier_transform = fftshift(fft2(ifftshift(high_res_complex_object * object_plane_phase_shift_correction)))
 
+
     low_res_images \
         = simulate_angled_imaging(
             high_res_fourier_transform,
@@ -58,18 +59,20 @@ def simulate_imaging(
             full_image_imaging_system,
             use_aperture_shift=use_aperture_shift)
     
-    # for n in range(low_res_images.shape[0]):
+    
+    # for n in range(low_res_images.shape[0]):   # may be used to simulate LED intensity fluctuations temporarily
     #     low_res_images[n] *= np.random.normal(1,0.3)
 
     illumination_pattern = Illumination_pattern(LED_indices=LED_indices,
                                                 imaging_system=full_image_imaging_system,
                                                 setup_parameters=setup_parameters,
                                                 max_array_size=arraysize) 
+    if noise_fraction:
+        low_res_images = apply_gaussian_noise(low_res_images = low_res_images, #might not work for arraysize = 1 ? or something?
+                                            noise_fraction = noise_fraction, 
+                                            relative_NAs = illumination_pattern.relative_NAs, 
+                                            LED_indices = LED_indices)
 
-    low_res_images = apply_gaussian_noise(low_res_images = low_res_images, 
-                                          noise_fraction = noise_fraction, 
-                                          relative_NAs = illumination_pattern.relative_NAs, 
-                                          LED_indices = LED_indices)
 
     simulated_data = Simulated_data(LED_indices=LED_indices, amplitude_images=low_res_images)
     

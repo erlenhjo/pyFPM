@@ -67,11 +67,15 @@ def get_precise_location(image, blobs, low_res_sigma, scaling_factor):
         sub_image = image[y_min:y_max, x_min:x_max]
         high_pixel_count_sub_image = increase_pixel_count(image=sub_image, scaling_factor=scaling_factor)
         
-        precise_blob_sub_location = blob_log(image=high_pixel_count_sub_image, 
-                                     min_sigma=high_pixel_count_sigma, 
-                                     max_sigma=high_pixel_count_sigma,
-                                     num_sigma=1, 
-                                     threshold_rel=.1)[0]
+        import matplotlib.pyplot as plt
+        try:
+            precise_blob_sub_location = blob_log(image=high_pixel_count_sub_image, 
+                                        min_sigma=high_pixel_count_sigma, 
+                                        max_sigma=high_pixel_count_sigma,
+                                        num_sigma=1, 
+                                        threshold_rel=.1)[0]
+        except:
+            continue
         
         # downscale to low res pixel values, where the subvalues within a pixel goes from -0.5 to 0.5
         precise_blob = precise_blob_sub_location / scaling_factor + np.array([y_min-0.5, x_min-0.5, 0])
@@ -143,9 +147,9 @@ def assemble_dots_in_grid(image: np.ndarray, blobs, dot_array: Dot_array, pixel_
     grid_indices[:,0] -= shift[0]
     grid_indices[:,1] -= shift[1]
     
-    center_dot_indices = np.array([center_dot_index_Y - shift[0], center_dot_index_X-shift[1]])
+    center_dot_indices = np.array([center_dot_index_Y-shift[0], center_dot_index_X-shift[1]])
     
-    return blobs, grid_points, grid_indices, total_rotation, center_dot_indices
+    return blobs, grid_points, grid_indices, total_rotation, center_dot_indices, image_center_coords
 
 
 

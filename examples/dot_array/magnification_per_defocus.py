@@ -29,8 +29,8 @@ def locate_and_plot_dots():
             lens = DOUBLE_CONVEX
         print(f"{filename} is being processed")
         fig_1, fig_2 = locate_and_plot(filepath, lens, filename)
-        fig_1.savefig(os.path.join(r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\project_thesis\results\mag_per_defocus",filename.split(".")[0]+".png"))
-        fig_2.savefig(os.path.join(r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\project_thesis\results\mag_per_defocus",filename.split(".")[0]+"_dots.png"))
+        fig_1.savefig(os.path.join(r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\dot_array\results\mag_per_defocus",filename.split(".")[0]+".png"))
+        fig_2.savefig(os.path.join(r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\dot_array\results\mag_per_defocus",filename.split(".")[0]+"_dots.png"))
     plt.show()
 
 
