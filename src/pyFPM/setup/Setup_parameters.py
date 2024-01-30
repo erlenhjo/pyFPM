@@ -1,4 +1,5 @@
 from enum import Enum
+import numpy as np
 
 class LED_infos(object):
     def __init__(self, LED_pitch, wavelength, LED_array_size,
@@ -11,10 +12,11 @@ class LED_infos(object):
         self.exposure_times = exposure_times # 2D array of exposure times of size (LED_array_size + 1)^2 where indexation correspondes to LED_indices
 
 class Camera(object):
-    def __init__(self, camera_pixel_size, raw_image_size, bit_depth):
+    def __init__(self, camera_pixel_size, raw_image_size, bit_depth, float_type):
         self.camera_pixel_size = camera_pixel_size # m
         self.raw_image_size = raw_image_size # number of pixels in [x, y]
         self.bit_depth = bit_depth
+        self.float_type = float_type
 
 class Lens_type(Enum):
     INFINITY_CORRECTED = 1
@@ -54,10 +56,11 @@ def get_object_to_lens_distance(lens: Lens):
 
 
 class Setup_parameters(object):
-    def __init__(self, lens: Lens, camera: Camera, LED_info: LED_infos):
+    def __init__(self, lens: Lens, camera: Camera, LED_info: LED_infos, image_format: str = ""):
         self.lens: Lens = lens
         self.camera: Camera = camera
         self.LED_info: LED_infos = LED_info
+        self.image_format:str = image_format
 
         
 

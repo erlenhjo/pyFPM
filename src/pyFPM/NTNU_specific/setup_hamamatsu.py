@@ -29,7 +29,8 @@ def setup_hamamatsu(
         )
 
     rawdata: Rawdata = get_rawdata_from_files(
-        datadirpath = datadirpath
+        datadirpath = datadirpath,
+        image_format = setup_parameters.image_format
         )
 
     preprocessed_data = Preprocessed_data(

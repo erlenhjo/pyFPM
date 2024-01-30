@@ -5,9 +5,8 @@ from PIL import Image
 from pyFPM.setup.Data import Rawdata
 
 
-def get_rawdata_from_files(datadirpath):
+def get_rawdata_from_files(datadirpath, image_format):
         background_filename = "dark_image"
-        image_format = "tiff"
 
         image_files, background_file = get_image_filenames(
             datadirpath = datadirpath,

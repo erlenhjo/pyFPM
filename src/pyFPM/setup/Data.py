@@ -19,11 +19,13 @@ class Preprocessed_data:
         background_image = rawdata.background_image
         exposure_times = setup_parameters.LED_info.exposure_times
         bit_depth = setup_parameters.camera.bit_depth
+        float_type = setup_parameters.camera.float_type
 
         images, background_image = _normalize_images(
             images = images, 
             background_image = background_image,
-            bit_depth = bit_depth
+            bit_depth = bit_depth,
+            float_type = float_type
             )
 
         if exposure_times is not None:
@@ -68,8 +70,8 @@ class Data_patch:
 
 
 
-def _normalize_images(images:np.ndarray, background_image:np.ndarray, bit_depth):
-    return images.astype(np.float64)/bit_depth, background_image.astype(np.float64)/bit_depth
+def _normalize_images(images:np.ndarray, background_image:np.ndarray, bit_depth, float_type):
+    return images.astype(float_type)/bit_depth, background_image.astype(float_type)/bit_depth
 
 
 def _compensate_for_exposure_times(images, background_image, center_indices, LED_indices, exposure_times):

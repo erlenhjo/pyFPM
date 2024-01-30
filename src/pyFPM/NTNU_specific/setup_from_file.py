@@ -10,7 +10,7 @@ def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera,
 
     BF_exposure_time, DF_exposure_time, \
         BF_exposure_radius, wavelength, \
-            LED_offset, center_indices = read_parameters_from_file(datadirpath, LED_array)
+            LED_offset, center_indices, image_format = read_parameters_from_file(datadirpath, LED_array)
     
     exposure_times = calculate_exposure_times(center_indices, BF_exposure_radius, BF_exposure_time, DF_exposure_time, LED_array.array_size)
 
@@ -26,7 +26,8 @@ def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera,
     setup_parameters: Setup_parameters = Setup_parameters(
         lens = lens,
         camera = camera,
-        LED_info = LED_info
+        LED_info = LED_info,
+        image_format = image_format
     )
 
     return setup_parameters
@@ -45,7 +46,7 @@ def find_and_interpret(data: list[str], parameter) -> str:
 
 
 def read_parameters_from_file(datadirpath, LED_array: LED_array):
-    with open(os.path.join(datadirpath,"setup.txt")) as file:
+    with open(os.path.join(datadirpath, "setup.txt")) as file:
         data = file.read()
         data = data.split("\n")
 
@@ -74,10 +75,13 @@ def read_parameters_from_file(datadirpath, LED_array: LED_array):
     # Center LED
     center: str = find_and_interpret(data,"Centre")
     center_indices = [int(n) for n in center.split(",")]
+
+    # Image format
+    image_format = find_and_interpret(data, "Image format")
     
 
     return BF_exposure_time, DF_exposure_time, BF_exposure_radius, \
-            wavelength, LED_offset, center_indices
+            wavelength, LED_offset, center_indices, image_format
 
 def calculate_exposure_times(center_indices, BF_exposure_radius, BF_exposure_time, DF_exposure_time, array_size):
     x_size = array_size[0]

@@ -1,3 +1,5 @@
+import numpy as np
+
 from pyFPM.setup.Setup_parameters import Camera, Lens, Lens_type
 from pyFPM.aberrations.dot_array.Dot_array import Dot_array
 
@@ -29,13 +31,22 @@ MAIN_LED_ARRAY = LED_array(
 HAMAMATSU_C11440_42U30 = Camera(
     camera_pixel_size = 6.5e-6,
     raw_image_size = [2048, 2048],
-    bit_depth = int(2**16 - 1)
+    bit_depth = int(2**16 - 1),
+    float_type = np.float32
     )
 
-UI3580CP_REV2 = Camera(
+IDS_UI3580CP_REV2 = Camera(
     camera_pixel_size = 2.2e-6,
     raw_image_size = [2560, 1920],
-    bit_depth = int(2**8-1)
+    bit_depth = int(2**8-1),
+    float_type = np.float16
+)
+
+IDS_U3_31J0CP_REV_2_2 = Camera(
+    camera_pixel_size = 2.74e-6,
+    raw_image_size = [2856, 2848],
+    bit_depth = int(2**12-1),
+    float_type = np.float16
 )
 
 ###### Lenses ######
