@@ -1,5 +1,6 @@
 import numpy as np
 from dataclasses import dataclass
+import matplotlib.pyplot as plt #for debug
 
 from pyFPM.setup.Setup_parameters import Setup_parameters, get_object_to_lens_distance
 
@@ -24,9 +25,6 @@ class Imaging_system(object):
 
         object_to_lens_distance = get_object_to_lens_distance(setup_parameters.lens)
         
-        if final_object_pixel_size > calculate_required_pixel_size(spatial_cutoff_frequency = spatial_cutoff_frequency): 
-            raise "Too low pixel scale factor"
-
         # calculate offsets
         patch_offset_x, patch_offset_y = calculate_patch_offset(
             image_size = setup_parameters.camera.raw_image_size,
@@ -74,6 +72,11 @@ class Imaging_system(object):
             image_region_size = patch_size, 
             spatial_cutoff_frequency = spatial_cutoff_frequency
         )
+        high_res_CTF = calculate_coherent_transfer_function(
+            pixel_size = final_object_pixel_size,
+            image_region_size = final_image_size, 
+            spatial_cutoff_frequency = spatial_cutoff_frequency
+        )
 
 
         high_res_object_x_positions, high_res_object_y_positions = calculate_position_mesh_grids(pixel_size = final_object_pixel_size, 
@@ -115,16 +118,9 @@ class Imaging_system(object):
         self.patch_offset_y = patch_offset_y
         
         self.low_res_CTF = low_res_CTF
+        self.high_res_CTF = high_res_CTF
         self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_phase_correction
         self.high_res_Fresnel_correction = high_res_Fresnel_object_phase_correction
-
-        # import matplotlib.pyplot as plt
-        # plt.matshow(LED_shifts_x[9:24,9:24])
-        # plt.matshow(LED_shifts_x_aperture[14:19,14:19])
-        # plt.matshow(LED_shifts_y[9:24,9:24])
-        # plt.matshow(LED_shifts_y_aperture[14:19,14:19])
-        # plt.show()
-
 
 
 
@@ -227,8 +223,7 @@ def calculate_LED_shifts_from_aperture_shift(LED_locations_x, LED_locations_y,
 
 def calculate_coherent_transfer_function(pixel_size, image_region_size, spatial_cutoff_frequency):
     fx_mesh, fy_mesh = calculate_frequency_mesh_grids(pixel_size=pixel_size, image_region_size=image_region_size)
-    
-    coherent_transfer_function = (fx_mesh**2 + fy_mesh**2) < spatial_cutoff_frequency**2
+    coherent_transfer_function = (fx_mesh**2 + fy_mesh**2) <= spatial_cutoff_frequency**2
 
     return coherent_transfer_function 
 
