@@ -62,7 +62,4 @@ def setup_IDS_U3(
         max_array_size = max_array_size
     )
 
-    import matplotlib.pyplot as plt
-    plt.matshow(rawdata.images[0])
-
     return setup_parameters, data_patch, imaging_system, illumination_pattern
