@@ -19,6 +19,5 @@ def compact():
 
 
 if __name__ == "__main__":
-    #compact()
-    telecentric()
+    compact()
     plt.show()

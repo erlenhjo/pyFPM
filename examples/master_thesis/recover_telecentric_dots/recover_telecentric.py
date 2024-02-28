@@ -38,12 +38,11 @@ def recover_telecentric(title, datadirpath, patch_start, patch_size, defocus_gue
 
     step_description = get_standard_adaptive_step_description(illumination_pattern=illumination_pattern,
                                                             max_iterations=50,
-                                                            start_EPRY_at_iteration = 2,
-                                                            start_adaptive_at_iteration = 2)
+                                                            start_EPRY_at_iteration = 0,
+                                                            start_adaptive_at_iteration = 0)
 
 
-    pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = defocus_guess)
-
+    pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = defocus_guess) 
 
     algorithm_result = recover(method=method, data_patch=data_patch, imaging_system=imaging_system,
                             illumination_pattern=illumination_pattern, pupil_guess=pupil_guess,

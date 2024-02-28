@@ -3,8 +3,8 @@ import numpy as np
 
 from recover_telecentric import recover_telecentric
 
-patch_start = np.array([2856, 2848], dtype=int) // 2 - 512
-patch_size = [1024, 1024]
+patch_start = np.array([2856, 2848], dtype=int) // 2 - 256
+patch_size = [512, 512]
 
 def telecentric_9_focus():
     title = "Telecentric focused 9x9"
