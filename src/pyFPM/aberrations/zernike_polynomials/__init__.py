@@ -1,1 +1,1 @@
-from . import symbolic_synthesis, decompose, fast_synthesis
+from . import symbolic_synthesis, fast_synthesis
