@@ -29,21 +29,19 @@ class Illumination_pattern(object):
              LED_frequencies_y = LED_aperture_shifts_y * imaging_system.df_y,
              cutoff_frequency = cutoff_frequency
         )
-        # plt.matshow(self.relative_NAs[11:22,11:22])
-        # plt.matshow(self.relative_aperture_shifts[11:22,11:22])
-        # plt.show()
+
 
         self.update_order, self.update_order_matrix \
             = spiral_indices(LED_indices = LED_indices, center_indices=center_indices, 
                              LED_array_size=LED_array_size, avaliable_LEDs=avaliable_LEDs)
-
+        
 
 def calculate_relative_NA(LED_frequencies_x, LED_frequencies_y, cutoff_frequency):
     return np.sqrt(LED_frequencies_x**2 + LED_frequencies_y**2) / cutoff_frequency
 
 def determine_available_LEDs(LED_indices, LED_array_size, center_indices, 
                              max_array_size):
-    available_LEDs = np.zeros(shape = (LED_array_size[1] + 1, LED_array_size[0] + 1), dtype = bool)
+    available_LEDs = np.zeros(shape = (LED_array_size[1] + 2, LED_array_size[0] + 2), dtype = bool)
     if max_array_size is None:
         max_index_x = LED_array_size[0]
         max_index_y = LED_array_size[1]
@@ -65,7 +63,7 @@ def spiral_indices(LED_indices, center_indices, LED_array_size, avaliable_LEDs):
     center_x_index = center_indices[0]
     center_y_index = center_indices[1]
 
-    order_matrix = np.zeros(shape=(LED_array_size[1] + 1, LED_array_size[0]+1), dtype = int)
+    order_matrix = np.zeros(shape=(LED_array_size[1]+2, LED_array_size[0]+2), dtype = int)
     order_list = np.empty(shape=len(LED_indices), dtype = int)
 
 
@@ -73,15 +71,15 @@ def spiral_indices(LED_indices, center_indices, LED_array_size, avaliable_LEDs):
     y_index = center_y_index
     order_matrix[y_index,x_index] = 0  
     update_index = 1  
-    direction = 0 #when mod4 = 0 up, 1 left, 2 down, 3 right, 4 up etc
-    while (0 < x_index) and (x_index < 33) and (0 < y_index) and (y_index < 33):
+    direction = 0 #when mod4 = 0 down, 1 left, 2 up, 3 right, 4 up etc
+    while (0 < x_index) and (x_index < LED_array_size[1]+1) and (0 < y_index) and (y_index < LED_array_size[0]+1):
         for n in range(int(np.ceil((direction)//2+1))):
             if direction % 4 == 0:
-                y_index -= 1
+                y_index += 1
             elif direction % 4 == 1:
                 x_index -= 1
             elif direction % 4 == 2:
-                y_index += 1
+                y_index -= 1
             elif direction % 4 == 3:
                 x_index += 1
 
