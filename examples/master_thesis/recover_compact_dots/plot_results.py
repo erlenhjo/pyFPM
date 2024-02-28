@@ -16,9 +16,11 @@ def plot_results(
         illumination_pattern: Illumination_pattern,
         imaging_system: Imaging_system,
         algorithm_result: Algorithm_result,
+        title,
         max_j = 25
     ):
     fig, axes = plt.subplots(nrows=2, ncols=4, layout='constrained')
+    fig.suptitle(title)
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Low resolution image")

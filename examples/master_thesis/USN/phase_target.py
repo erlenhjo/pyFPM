@@ -48,5 +48,5 @@ def recover_USN_phase_target(patch_shift, title):
 
 if __name__ == "__main__":
     recover_USN_phase_target([0,0], "USN phase target centered")
-    #recover_USN_phase_target([0,-750], "USN phase target edge")
+    recover_USN_phase_target([0,-750], "USN phase target edge")
     plt.show()
