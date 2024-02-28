@@ -25,16 +25,18 @@ def fraunhofer_recovery_algorithm(
         ) -> Algorithm_result :
 
     low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
-        shifts_x, shifts_y, low_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, \
+        shifts_x, shifts_y, low_res_CTF, high_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, \
         alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, max_iterations \
                 = extract_variables(data_patch, imaging_system, illumination_pattern, step_description, correct_aperture_shift)
     
     object_phase_correction = get_object_phase_correction(imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase)
     
-    recovered_object_guess = initialize_high_res_image(low_res_images, update_order, scaling_factor, object_phase_correction)
+    recovered_object_guess, recoverd_object_spectrum_guess\
+          = initialize_high_res_image(low_res_images, update_order, scaling_factor, 
+                                      object_phase_correction, high_res_CTF)
 
     recovered_object_fourier_transform, recovered_pupil, convergence_index, real_space_error_metric \
-        = main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_images,  LED_indices,
+        = main_algorithm_loop(recoverd_object_spectrum_guess, use_epry, update_order, low_res_images,  LED_indices,
                         shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
                         low_res_CTF, pupil_guess, alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, 
                         converged_alpha, max_iterations, illumination_pattern.relative_NAs, illumination_pattern.relative_aperture_shifts
@@ -54,14 +56,62 @@ def fraunhofer_recovery_algorithm(
     ) 
     return algorithm_result
 
-
-
-def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_images,  LED_indices,
+def main_algorithm_loop_simple(recovered_object_spectrum_guess, use_epry, update_order, low_res_images,  LED_indices,
                         shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
                         low_res_CTF, pupil, alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, 
                         converged_alpha, max_iterations, relative_NAs, relative_aperture_shifts
                         ):
-    recovered_object_fourier_transform = fftshift(fft2(ifftshift(recovered_object_guess)))  
+    recovered_object_fourier_transform = recovered_object_spectrum_guess
+    convergence_index = np.zeros(max_iterations)
+    normalized_real_space_error_metric = np.zeros(max_iterations)
+    low_res_images = low_res_images * scaling_factor_squared
+    real_space_error_metric_normalization_factor = caclulate_real_space_error_normalization_factor(low_res_images,update_order)
+
+    pupil = pupil * low_res_CTF
+
+    for loop_nr in range(max_iterations):
+        real_space_error_metric = 0
+        for image_nr in range(len(update_order)):
+            index = update_order[image_nr]
+            raw_low_res_image = low_res_images[index]
+            min_x, max_x, min_y, max_y = calculate_low_res_index_range(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
+                                                                          size_high_res_x, size_high_res_y, LED_indices, index)
+            
+            recovered_low_res_fourier_transform = pupil * low_res_CTF * recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1]
+                                                
+            recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))            
+
+            real_space_error_metric += np.linalg.norm(raw_low_res_image - np.abs(recovered_low_res_image))**2
+
+
+            new_recovered_low_res_image = raw_low_res_image * recovered_low_res_image / np.abs(recovered_low_res_image)
+
+            new_recovered_low_res_fourier_transform = fftshift(fft2(ifftshift(new_recovered_low_res_image)))
+ 
+            # object_update_term = standard_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
+            # pupil_update_term = standard_step(recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1],
+            #                                     new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
+
+
+            object_update_term = gradient_descent_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform,1)
+            pupil_update_term = gradient_descent_step(recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1],
+                                                new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1000)
+            
+            recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1] += object_update_term * low_res_CTF
+            pupil += pupil_update_term * low_res_CTF
+        normalized_real_space_error_metric[loop_nr] = real_space_error_metric/real_space_error_metric_normalization_factor
+
+
+    return recovered_object_fourier_transform, pupil, convergence_index, normalized_real_space_error_metric
+
+
+
+def main_algorithm_loop(recovered_object_spectrum_guess, use_epry, update_order, low_res_images,  LED_indices,
+                        shifts_x, shifts_y, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, scaling_factor_squared, 
+                        low_res_CTF, pupil, alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, 
+                        converged_alpha, max_iterations, relative_NAs, relative_aperture_shifts
+                        ):
+    recovered_object_fourier_transform = recovered_object_spectrum_guess
     convergence_index = np.zeros(max_iterations)
     normalized_real_space_error_metric = np.zeros(max_iterations)
     low_res_images = low_res_images * scaling_factor_squared
@@ -74,26 +124,9 @@ def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_
             index = update_order[image_nr]
             
             raw_low_res_image = low_res_images[index]
-            if np.sum(raw_low_res_image)==0:
-                continue
-            # relative_NA = relative_NAs[LED_indices[index][1],LED_indices[index][0]]
-            # # relative_aperture_shift = relative_aperture_shifts[LED_indices[index][1],LED_indices[index][0]]
-            # if relative_NA>0.95 and relative_NA<1.2:
-            #     # print(relative_aperture_shift)
-            #     # print(relative_NA)
-            #     # plt.matshow(raw_low_res_image)
-            #     # plt.show()
-            #     continue
-            
 
             min_x, max_x, min_y, max_y = calculate_low_res_index_range(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
                                                                           size_high_res_x, size_high_res_y, LED_indices, index)
-
-            # plt.matshow(raw_low_res_image)
-            # plt.title(f"{image_nr}, {min_x}, {min_y}")
-            
-            # plt.show()
-
             recovered_low_res_fourier_transform = pupil * recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1]
                                                 
             recovered_low_res_image = fftshift(ifft2(ifftshift(recovered_low_res_fourier_transform)))            
@@ -102,15 +135,6 @@ def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_
                                             / np.sum(np.abs(np.abs(recovered_low_res_image) - raw_low_res_image))
             
             real_space_error_metric += np.linalg.norm(raw_low_res_image - np.abs(recovered_low_res_image))**2
-
-            # if loop_nr > 2 and loop_nr < start_EPRY_at_iteration:
-            #     intensitity_correction_factor = np.sum(np.abs(recovered_low_res_image)**2)/np.sum(raw_low_res_image**2)
-            # else:
-            #     intensitity_correction_factor = 1
-            # amplitude_correction_factor = np.sqrt(intensitity_correction_factor)
-
-            # new_recovered_low_res_image = raw_low_res_image * recovered_low_res_image / np.abs(recovered_low_res_image) * amplitude_correction_factor
-            # low_res_images[index] *= amplitude_correction_factor
 
             new_recovered_low_res_image = raw_low_res_image * recovered_low_res_image / np.abs(recovered_low_res_image)
 
@@ -123,12 +147,18 @@ def main_algorithm_loop(recovered_object_guess, use_epry, update_order, low_res_
                 pupil_update_term = 0
 
             else:
-                object_update_term = standard_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
-                pupil_update_term = standard_step(recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1],
-                                                  new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
+                # object_update_term = standard_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
+                # pupil_update_term = standard_step(recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1],
+                #                                   new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform)
+                object_update_term = gradient_descent_step(pupil, new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1)
+                pupil_update_term = gradient_descent_step(recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1],
+                                                  new_recovered_low_res_fourier_transform, recovered_low_res_fourier_transform, 1000)
                 
+
+
             recovered_object_fourier_transform[min_y:max_y+1, min_x:max_x+1] += alpha * object_update_term * low_res_CTF
-            pupil += beta * pupil_update_term * low_res_CTF
+            pupil += alpha * pupil_update_term * low_res_CTF
+            #pupil += beta * pupil_update_term * low_res_CTF
             
         normalized_real_space_error_metric[loop_nr] = real_space_error_metric/real_space_error_metric_normalization_factor
 
