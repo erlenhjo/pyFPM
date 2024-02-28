@@ -234,18 +234,18 @@ def calculate_coherent_transfer_function(pixel_size, image_region_size, spatial_
 
 def calculate_frequency_mesh_grids(pixel_size, image_region_size):
     max_frequency = 1 / (2 * pixel_size)
-    spatial_frequencies_x = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[0], endpoint = True)  
-    spatial_frequencies_y = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[1], endpoint = True)
+    spatial_frequencies_x = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[0], endpoint = False)  
+    spatial_frequencies_y = np.linspace(start = -max_frequency, stop = max_frequency, num = image_region_size[1], endpoint = False)
 
     fx_mesh, fy_mesh = np.meshgrid(spatial_frequencies_x, spatial_frequencies_y)
-    
+
     return fx_mesh, fy_mesh
 
 def calculate_position_mesh_grids(pixel_size, image_region_size, offset_x, offset_y):
     FOV_x = image_region_size[0] * pixel_size
     FOV_y = image_region_size[1] * pixel_size
-    positions_x = np.linspace(start = -FOV_x/2, stop = FOV_x/2, num = image_region_size[0], endpoint = True)# - offset_x
-    positions_y = np.linspace(start = -FOV_y/2, stop = FOV_y/2, num = image_region_size[1], endpoint = True)# - offset_y
+    positions_x = np.linspace(start = -FOV_x/2, stop = FOV_x/2, num = image_region_size[0], endpoint = False)
+    positions_y = np.linspace(start = -FOV_y/2, stop = FOV_y/2, num = image_region_size[1], endpoint = False)
 
     x_mesh, y_mesh = np.meshgrid(positions_x, positions_y)
     
