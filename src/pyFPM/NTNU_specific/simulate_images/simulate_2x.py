@@ -4,6 +4,7 @@ from pyFPM.simulation.simulate_imaging import simulate_imaging, finalize_simulat
 from pyFPM.NTNU_specific.simulate_images.simulate_setup import simulate_setup_parameters
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 
+import numpy as np
 
 
 def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, spherical_illumination, 
@@ -21,7 +22,8 @@ def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, s
     dummy_camera = Camera(
             camera_pixel_size = 6.5e-6,
             raw_image_size = low_res_image_size,
-            bit_depth = int(1)
+            bit_depth = int(1),
+            float_type= np.float64
             )
      
     slide = None # for now
