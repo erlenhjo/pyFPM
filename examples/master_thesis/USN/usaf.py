@@ -13,21 +13,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def recover_USN_phase_target(patch_shift, title):
+def recover_USN_USAF(patch_shift, title):
     method = Method.Fresnel_aperture
-    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Master_thesis\USN\Basler_PhaseTarget2"
+    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Master_thesis\USN\Basler_USAF2"
 
     setup_parameters, data_patch, imaging_system, illumination_pattern \
         = setup_USN(datadirpath=datadirpath,
                     patch_shift=np.array(patch_shift),
                     patch_size=np.array([512,512]),
                     calibration_parameters = LED_calibration_parameters(
-                        LED_distance=83e-3,
+                        LED_distance=113e-3,
                         LED_x_offset=0,
                         LED_y_offset=0,
                         LED_rotation=0
                         ),
-                    noise_threshold = 1800
+                    noise_threshold = 500
                     )
 
     step_description = get_standard_adaptive_step_description(illumination_pattern=illumination_pattern,
@@ -48,6 +48,6 @@ def recover_USN_phase_target(patch_shift, title):
 
 
 if __name__ == "__main__":
-    recover_USN_phase_target([0,0], "USN phase target centered")
-    recover_USN_phase_target([0,-750], "USN phase target edge")
+    recover_USN_USAF([0,0], "USN USAF centered")
+    recover_USN_USAF([0,-750], "USN USAF edge")
     plt.show()

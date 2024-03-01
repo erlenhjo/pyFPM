@@ -76,7 +76,7 @@ def recover_telecentric(noise_reduction: bool, adaptive: bool, epry: bool, apert
                             illumination_pattern=illumination_pattern, pupil_guess=pupil_guess,
                             step_description=step_description)
 
-    #plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result)
+    plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result)
     #plot_results_short(data_patch, illumination_pattern, algorithm_result)
     fig = plot_phase(data_patch, illumination_pattern, algorithm_result, title)
     print(imaging_system.patch_offset_x, imaging_system.patch_offset_x)

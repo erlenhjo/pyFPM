@@ -21,12 +21,12 @@ def original_adaptive():
 def epry():
     title = "epry"
     fig = recover_telecentric(noise_reduction=True, adaptive=False, epry=True, aperture=False, title=title)
-    fig.savefig(savefolder+r"\phase_"+title+".pdf")
+    #fig.savefig(savefolder+r"\phase_"+title+".pdf")
 
 def epry_adaptive():
     title = "epry + adaptive"
     fig = recover_telecentric(noise_reduction=True, adaptive=True, epry=True, aperture=False, title=title)
-    fig.savefig(savefolder+r"\phase_"+title+".pdf")
+    #fig.savefig(savefolder+r"\phase_"+title+".pdf")
 
 def original_adaptive_aperture():
     title = "adaptive + aperture"
@@ -41,11 +41,11 @@ def epry_adaptive_aperture():
 
 
 if __name__ == "__main__":
-    noisy_original()
-    original()
-    original_adaptive()
-    original_adaptive_aperture()
+    #noisy_original()
+    #original()
+    #original_adaptive()
+    #original_adaptive_aperture()
     epry()
     epry_adaptive()
-    epry_adaptive_aperture()
-    # plt.show()
+    #epry_adaptive_aperture()
+    plt.show()
