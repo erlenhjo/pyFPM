@@ -71,6 +71,7 @@ def extract_variables_simulated_anealing(data_patch: Data_patch,
     size_high_res_y = imaging_system.final_image_size[1]
 
     low_res_CTF = imaging_system.low_res_CTF
+    high_res_CTF = imaging_system.high_res_CTF
     scaling_factor = imaging_system.pixel_scale_factor
     LED_indices = data_patch.LED_indices
     center_indices = setup_parameters.LED_info.center_indices
@@ -83,5 +84,5 @@ def extract_variables_simulated_anealing(data_patch: Data_patch,
     patch_y = imaging_system.patch_offset_y
 
     return low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,\
-            low_res_CTF, scaling_factor, LED_indices, center_indices, LED_pitch,\
+            low_res_CTF, high_res_CTF, scaling_factor, LED_indices, center_indices, LED_pitch,\
             frequency, df_x, df_y, patch_x, patch_y

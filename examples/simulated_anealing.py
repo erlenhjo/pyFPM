@@ -4,7 +4,6 @@ import numpy as np
 import skimage
 
 # FPM imports
-from pyFPM.NTNU_specific.setup_2x_hamamatsu import setup_2x_hamamatsu
 from pyFPM.NTNU_specific.simulate_images.simulate_2x import simulate_2x
 from pyFPM.recovery.calibration.positional_calibration import positional_calibration_recovery_algorithm
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
