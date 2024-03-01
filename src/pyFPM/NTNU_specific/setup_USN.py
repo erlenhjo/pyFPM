@@ -29,7 +29,8 @@ def setup_USN(
     datadirpath,
     patch_shift,
     patch_size,
-    calibration_parameters
+    calibration_parameters,
+    noise_threshold
 ):
     remove_background = 0
     threshold_value = 0
@@ -58,7 +59,8 @@ def setup_USN(
         image_format = setup_parameters.image_format,
         array_size = array_size,
         patch_shift = patch_shift,
-        patch_size = patch_size
+        patch_size = patch_size,
+        noise_threshold = noise_threshold
         )
 
     preprocessed_data = Preprocessed_data(
@@ -93,15 +95,13 @@ def setup_USN(
     return setup_parameters, data_patch, imaging_system, illumination_pattern
 
 
-def get_rawdata_from_files_USN(datadirpath, image_format, array_size, patch_size, patch_shift):
+def get_rawdata_from_files_USN(datadirpath, image_format, array_size, patch_size, patch_shift, noise_threshold):
     patch_size_x, patch_size_y = patch_size
     patch_shift_x, patch_shift_y = patch_shift
     LED_indices = []
     images = []
     image_backgrounds = []
     file_nr = 0
-
-    noise_threshold = 1800
 
     for Y in range(1,array_size+1):
         for X in range(1,array_size+1):
