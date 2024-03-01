@@ -42,7 +42,7 @@ def main():
     step_description.beta = 1
 
     plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
-    plt.show()
+    #plt.show()
 
     # # define pupil guess
     pupil_guess = applied_pupil * 0 + 1

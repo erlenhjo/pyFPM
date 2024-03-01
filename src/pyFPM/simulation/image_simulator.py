@@ -1,5 +1,5 @@
 from pyFPM.setup.Imaging_system import Imaging_system
-from pyFPM.recovery.utility.k_space import calculate_low_res_index_range
+from pyFPM.recovery.utility.k_space import calculate_low_res_index_ranges
 
 import numpy as np
 from numpy.fft import ifft2, fftshift, ifftshift
@@ -29,13 +29,12 @@ def simulate_angled_imaging(high_res_fourier_transform,
     low_res_CTF = imaging_system.low_res_CTF
 
     low_res_images = np.zeros(shape=(len(LED_indices), size_low_res_y, size_low_res_x))
-
+    LED_shifts = calculate_low_res_index_ranges(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
+                                                size_high_res_x, size_high_res_y, LED_indices)
     
     for image_nr in range(len(LED_indices)):
         # calculate which wavevector-values should be present in the low res image for LED_indices[image_nr]
-        k_min_x, k_max_x, k_min_y, k_max_y = calculate_low_res_index_range(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
-                                                                          size_high_res_x, size_high_res_y, LED_indices, image_nr)
-
+        k_min_x, k_max_x, k_min_y, k_max_y = LED_shifts[image_nr]
         low_res_ft = inverse_scaling_factor_squared \
                      * high_res_fourier_transform[k_min_y:k_max_y+1, k_min_x:k_max_x+1] \
                      * low_res_CTF * pupil
