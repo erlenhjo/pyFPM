@@ -18,7 +18,7 @@ def calculate_low_res_index_ranges(shifts_x, shifts_y, size_low_res_x, size_low_
                                                 size_high_res_x, size_high_res_y)
     
         LED_shifts.append([min_x, max_x, min_y, max_y])
-    return LED_shifts
+    return np.array(LED_shifts)
 
 #@njit(cache=True)
 def calculate_low_res_index_range_core(shift_x, shift_y, size_low_res_x, size_low_res_y, 

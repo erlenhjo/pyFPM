@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.fft import fft2, ifft2, fftshift, ifftshift
-from numba import njit
+from numba import njit, vectorize
 import matplotlib.pyplot as plt
 
 from pyFPM.setup.Data import Data_patch
@@ -60,7 +60,7 @@ def fraunhofer_recovery_algorithm(
     ) 
     return algorithm_result
 
-#@njit(cache=True)
+@njit(cache=True)
 def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,
                         scaling_factor_squared, low_res_CTF, pupil, LED_shifts, 
                         alpha, beta, eta, converged_alpha, max_iterations,
@@ -97,12 +97,18 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
 
             # calculate update terms
             if loop_nr<start_EPRY_at_iteration:
-                object_update_term = gradient_descent_step(pupil, updated_lens_spectrum, current_lens_spectrum, 1)
-                pupil_update_term = 0
+                object_update_term = np.abs(pupil) * np.conj(pupil)/\
+                                    (np.max(np.abs(pupil)) * (np.abs(pupil)**2 + 1))\
+                                    * (updated_lens_spectrum - current_lens_spectrum)
+                pupil_update_term = 0 * object_update_term # just zero but of right type
             else:
-                object_update_term = gradient_descent_step(pupil, updated_lens_spectrum, current_lens_spectrum, 1)
-                pupil_update_term = gradient_descent_step(current_spectrum, updated_lens_spectrum, current_lens_spectrum, 1000)
-                
+                object_update_term = np.abs(pupil) * np.conj(pupil)/\
+                                    (np.max(np.abs(pupil)) * (np.abs(pupil)**2 + 1))\
+                                    * (updated_lens_spectrum - current_lens_spectrum)
+                pupil_update_term = np.abs(current_spectrum) * np.conj(current_spectrum)/\
+                                    (np.max(np.abs(current_spectrum)) * (np.abs(current_spectrum)**2 + 1000))\
+                                    * (updated_lens_spectrum - current_lens_spectrum)
+
             # update spectrum and pupil
             recovered_object_spectrum[min_y:max_y+1, min_x:max_x+1] += alpha * object_update_term * low_res_CTF
             pupil += beta * pupil_update_term * low_res_CTF
@@ -111,7 +117,7 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
         normalized_real_space_error_metric[loop_nr] = real_space_error_metric/real_space_error_metric_normalization_factor
 
         if loop_nr > start_adaptive_steps_at_iteration:
-            alpha, beta = update_step_sizes(alpha, beta, eta, loop_nr,
+            alpha, beta = update_step_sizes(alpha, beta, eta,
                                             error=normalized_real_space_error_metric[loop_nr],
                                             prev_error=normalized_real_space_error_metric[loop_nr-1])
 
@@ -124,13 +130,6 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
     return recovered_object_spectrum, pupil, convergence_index, normalized_real_space_error_metric
 
 
-@njit(cache=True)
-def gradient_descent_step(phi, new_FT, old_FT, delta):
-    numerator = np.abs(phi) * np.conj(phi)
-    denominator = np.max(np.abs(phi)) * (np.abs(phi)**2 + delta)
-    return numerator/denominator * (new_FT - old_FT)
-
-
 def get_object_phase_correction(imaging_system: Imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase):
     object_plane_phase_shift_correction = 1
     if correct_Fresnel_phase:
@@ -139,11 +138,10 @@ def get_object_phase_correction(imaging_system: Imaging_system, correct_spherica
         object_plane_phase_shift_correction *= imaging_system.high_res_spherical_illumination_correction
     return object_plane_phase_shift_correction
 
-
-def update_step_sizes(alpha, beta, eta, loop_nr, error, prev_error):
+@njit(cache=True)
+def update_step_sizes(alpha, beta, eta, error, prev_error):
     if (prev_error - error) > eta * prev_error:
         return alpha, beta
     else:
         alpha, beta = alpha/2, beta/2
-        print(f"Loop nr {loop_nr}, alpha={alpha}, beta={beta}")
         return alpha, beta
