@@ -30,7 +30,9 @@ def setup_hamamatsu(
 
     rawdata: Rawdata = get_rawdata_from_files(
         datadirpath = datadirpath,
-        image_format = setup_parameters.image_format
+        image_format = setup_parameters.image_format,
+        center_indices = setup_parameters.LED_info.center_indices,
+        max_array_size = max_array_size 
         )
 
     preprocessed_data = Preprocessed_data(

@@ -5,7 +5,7 @@ from PIL import Image
 from pyFPM.setup.Data import Rawdata
 
 
-def get_rawdata_from_files(datadirpath, image_format):
+def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_size):
         background_filename = "dark_image"
 
         image_files, background_file = get_image_filenames(
@@ -21,7 +21,9 @@ def get_rawdata_from_files(datadirpath, image_format):
 
         LED_indices, images = load_images(
             datadirpath = datadirpath,
-            image_files = image_files
+            image_files = image_files,
+            center_indices = center_indices,
+            max_array_size = max_array_size
         )
 
         return Rawdata(LED_indices=LED_indices, images=images, background_image=background_image)
@@ -59,13 +61,21 @@ def indices_from_image_title(filename: str):
     return x_index, y_index
     
 
-def load_images(datadirpath, image_files):
+def load_images(datadirpath, image_files, center_indices, max_array_size):
     LED_indices = []
     images = []
-    
+    max_X = center_indices[0] + max_array_size//2
+    min_X = center_indices[0] - max_array_size//2
+    max_Y = center_indices[1] + max_array_size//2
+    min_Y = center_indices[1] - max_array_size//2
+
     for n, file in enumerate(image_files):
-        x, y = indices_from_image_title(file)
-        LED_indices.append([x,y])  
+        X, Y = indices_from_image_title(file)
+
+        if (X<min_X or X>max_X ) or (Y<min_Y or Y>max_Y):
+            continue
+
+        LED_indices.append([X,Y])  
         image = load_single_image(
             datadirpath = datadirpath,
             file = file
