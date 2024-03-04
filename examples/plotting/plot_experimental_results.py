@@ -65,5 +65,4 @@ def plot_experimental_results(
     axes[7].set_yscale("log")
 
 
-    plt.show()
-    plt.close()
+

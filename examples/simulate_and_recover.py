@@ -36,12 +36,12 @@ def main():
     high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
 
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
-        = simulate_2x(high_res_complex_object, noise_fraction=0.1, zernike_coefficients=zernike_coefficients, 
+        = simulate_2x(high_res_complex_object, noise_fraction=0, zernike_coefficients=zernike_coefficients, 
                       spherical_illumination=simulate_spherical_illumination, patch_offset=[0, 0], use_aperture_shift=False)
-    step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=100, start_EPRY_at_iteration=0, start_adaptive_at_iteration=0)
+    step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=100, start_EPRY_at_iteration=0, start_adaptive_at_iteration=5)
     step_description.beta = 1
 
-    plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
+    #plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
     #plt.show()
 
     # # define pupil guess
@@ -69,10 +69,10 @@ def main():
 
     recovered_data_patch = Data_patch(data = recovered_low_res_data, patch_start=[0, 0], patch_size=recovered_low_res_images[0].shape)
     
-    plot_bright_field_images(data_patch=recovered_data_patch, setup_parameters=setup_parameters, array_size=5)
+    #plot_bright_field_images(data_patch=recovered_data_patch, setup_parameters=setup_parameters, array_size=5)
 
-    plot_simulation_results(data_patch, illumination_pattern, imaging_system, algorithm_result, 
-                            original_zernike_coefficients=zernike_coefficients, original_pupil=applied_pupil)
+    # plot_simulation_results(data_patch, illumination_pattern, imaging_system, algorithm_result, 
+    #                         original_zernike_coefficients=zernike_coefficients, original_pupil=applied_pupil)
 
 
 
@@ -87,5 +87,10 @@ def profile_main():
     stats.dump_stats(filename=r"profiling_data\simulate_and_recover.prof")
 
 if __name__ == "__main__":
-    profile_main()
-    #main()
+    #profile_main()
+
+    import time
+    start = time.perf_counter()
+    main()
+    end = time.perf_counter()
+    print(end-start)
