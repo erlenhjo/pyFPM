@@ -31,22 +31,19 @@ MAIN_LED_ARRAY = LED_array(
 HAMAMATSU_C11440_42U30 = Camera(
     camera_pixel_size = 6.5e-6,
     raw_image_size = [2048, 2048],
-    bit_depth = int(2**16 - 1),
-    float_type = np.float32
+    float_type = np.float64  
     )
 
 IDS_UI3580CP_REV2 = Camera(
     camera_pixel_size = 2.2e-6,
     raw_image_size = [2560, 1920],
-    bit_depth = int(2**8-1),
-    float_type = np.float16
+    float_type = np.float64
 )
 
 IDS_U3_31J0CP_REV_2_2 = Camera(
     camera_pixel_size = 2.74e-6,
-    raw_image_size = [2856, 2848],
-    bit_depth = int(2**12-1),
-    float_type = np.float16
+    raw_image_size = [2828, 2844], # 4 pixels missing for each coordinate?
+    float_type = np.float64
 )
 
 ###### Lenses ######
@@ -57,6 +54,16 @@ INFINITYCORRECTED_2X = Lens(
     focal_length = 100e-3,
     working_distance = 34e-3,
     depth_of_field = 91e-6,
+    max_FoV_sensor = 11e-3,
+    lens_type = Lens_type.INFINITY_CORRECTED
+)
+
+INFINITYCORRECTED_10X = Lens(
+    NA = 0.28,
+    magnification = 10,
+    focal_length = 20e-3,
+    working_distance = 34e-3,
+    depth_of_field = 3.5e-6,
     max_FoV_sensor = 11e-3,
     lens_type = Lens_type.INFINITY_CORRECTED
 )

@@ -12,7 +12,6 @@ def setup_IDS_U3(
     patch_start,
     patch_size,
     pixel_scale_factor,
-    remove_background,
     threshold_value,
     noise_reduction_regions,
     calibration_parameters,
@@ -30,13 +29,14 @@ def setup_IDS_U3(
 
     rawdata: Rawdata = get_rawdata_from_files(
         datadirpath = datadirpath,
-        image_format = setup_parameters.image_format
+        image_format = setup_parameters.image_format,
+        center_indices = setup_parameters.LED_info.center_indices,
+        max_array_size = max_array_size
         )
 
     preprocessed_data = Preprocessed_data(
         rawdata = rawdata,
         setup_parameters = setup_parameters,
-        remove_background = remove_background,
         noise_reduction_regions=noise_reduction_regions, 
         threshold_value = threshold_value, 
         )
