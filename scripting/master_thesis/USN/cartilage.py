@@ -1,6 +1,5 @@
 # FPM imports
 from pyFPM.NTNU_specific.setup_USN import setup_USN
-from pyFPM.NTNU_specific.components import TELECENTRIC_3X
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
@@ -34,8 +33,6 @@ def recover_USN_cartilage(patch_shift, title):
                                                             max_iterations=50,
                                                             start_EPRY_at_iteration = 0,
                                                             start_adaptive_at_iteration = 0)
-    step_description.alpha=1
-    step_description.beta=1
 
     pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = 0)
 
@@ -48,6 +45,6 @@ def recover_USN_cartilage(patch_shift, title):
 
 
 if __name__ == "__main__":
-    #recover_USN_cartilage([0,0], "USN cartilage centered")
-    recover_USN_cartilage([0,-750], "USN cartilage edge")
+    recover_USN_cartilage([0,0], "USN cartilage centered")
+    #recover_USN_cartilage([0,-750], "USN cartilage edge")
     plt.show()

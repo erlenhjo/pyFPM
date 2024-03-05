@@ -69,10 +69,11 @@ def main():
 
     recovered_data_patch = Data_patch(data = recovered_low_res_data, patch_start=[0, 0], patch_size=recovered_low_res_images[0].shape)
     
-    #plot_bright_field_images(data_patch=recovered_data_patch, setup_parameters=setup_parameters, array_size=5)
+    # plot_bright_field_images(data_patch=recovered_data_patch, setup_parameters=setup_parameters, array_size=5)
 
     # plot_simulation_results(data_patch, illumination_pattern, imaging_system, algorithm_result, 
-    #                         original_zernike_coefficients=zernike_coefficients, original_pupil=applied_pupil)
+    #                          original_zernike_coefficients=zernike_coefficients, original_pupil=applied_pupil)
+    print(algorithm_result.real_space_error_metric)
 
 
 
@@ -87,10 +88,10 @@ def profile_main():
     stats.dump_stats(filename=r"profiling_data\simulate_and_recover.prof")
 
 if __name__ == "__main__":
-    #profile_main()
+    profile_main()
 
-    import time
-    start = time.perf_counter()
-    main()
-    end = time.perf_counter()
-    print(end-start)
+    # import time
+    # start = time.perf_counter()
+    # main()
+    # end = time.perf_counter()
+    # print(end-start)

@@ -1,6 +1,5 @@
 # FPM imports
 from pyFPM.NTNU_specific.setup_USN import setup_USN
-from pyFPM.NTNU_specific.components import TELECENTRIC_3X
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
