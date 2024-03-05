@@ -107,7 +107,6 @@ class Imaging_system(object):
         self.df_x = 1/(final_object_pixel_size * final_image_size[0])
         self.df_y = 1/(final_object_pixel_size * final_image_size[1])
 
-
         self.patch_start = patch_start
         self.patch_size = patch_size
         self.final_image_size = final_image_size
@@ -122,7 +121,11 @@ class Imaging_system(object):
         self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_phase_correction
         self.high_res_Fresnel_correction = high_res_Fresnel_object_phase_correction
 
-
+        self.float_type = setup_parameters.camera.float_type
+        if self.float_type == np.float32:
+            self.complex_type = np.complex64
+        else:
+            self.complex_type = np.complex128 
 
 def calculate_spatial_cutoff_frequency(spatial_frequency, NA_sys):
     return spatial_frequency * NA_sys

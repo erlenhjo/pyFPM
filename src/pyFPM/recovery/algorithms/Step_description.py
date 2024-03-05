@@ -19,7 +19,7 @@ def get_standard_adaptive_step_description(illumination_pattern: Illumination_pa
                                            start_EPRY_at_iteration: int,
                                            start_adaptive_at_iteration: int):
     return Step_description(alpha=1,
-                            beta=1/np.sqrt(len(illumination_pattern.update_order)),
+                            beta=1,
                             eta=0.01,
                             converged_alpha=1e-3,
                             max_iterations=max_iterations,

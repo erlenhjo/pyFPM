@@ -12,11 +12,10 @@ class LED_infos(object):
         self.exposure_times = exposure_times # 2D array of exposure times of size (LED_array_size + 1)^2 where indexation correspondes to LED_indices
 
 class Camera(object):
-    def __init__(self, camera_pixel_size, raw_image_size, bit_depth, float_type):
+    def __init__(self, camera_pixel_size, raw_image_size, float_type):
         self.camera_pixel_size = camera_pixel_size # m
         self.raw_image_size = raw_image_size # number of pixels in [x, y]
-        self.bit_depth = bit_depth
-        self.float_type = float_type
+        self.float_type = float_type # currently requires np.float64 due to casting with numba and fft
 
 class Lens_type(Enum):
     INFINITY_CORRECTED = 1

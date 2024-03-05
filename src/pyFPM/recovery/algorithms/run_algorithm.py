@@ -22,7 +22,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = False,
             correct_spherical_wave_phase = False,
             correct_Fresnel_phase = False,
             correct_aperture_shift = False 
@@ -34,7 +33,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = True,
             correct_spherical_wave_phase = False,
             correct_Fresnel_phase = False,
             correct_aperture_shift = False 
@@ -46,7 +44,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = True,
             correct_spherical_wave_phase = True,
             correct_Fresnel_phase = True,
             correct_aperture_shift = False 
@@ -58,7 +55,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = True,
             correct_spherical_wave_phase = True,
             correct_Fresnel_phase = False,
             correct_aperture_shift = False 
@@ -70,7 +66,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = False,
             correct_spherical_wave_phase = False,
             correct_Fresnel_phase = False,
             correct_aperture_shift = True 
@@ -82,7 +77,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = True,
             correct_spherical_wave_phase = False,
             correct_Fresnel_phase = False,
             correct_aperture_shift = True 
@@ -94,7 +88,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = True,
             correct_spherical_wave_phase = True,
             correct_Fresnel_phase = True,
             correct_aperture_shift = True 
@@ -106,7 +99,6 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             illumination_pattern = illumination_pattern,
             pupil_guess = pupil_guess,
             step_description = step_description,
-            use_epry = True,
             correct_spherical_wave_phase = True,
             correct_Fresnel_phase = False,
             correct_aperture_shift = True 

@@ -9,7 +9,7 @@ from scipy.ndimage import zoom
 from numpy.fft import fftshift, ifftshift, fft2, ifft2
 
 def initialize_high_res_image(low_res_images, update_order, scaling_factor, 
-                              object_phase_correction, high_res_CTF):
+                              object_phase_correction, high_res_CTF, complex_type):
     first_image = low_res_images[update_order[0]]
     #old
     #recovered_object_guess = zoom(input=first_image, zoom=scaling_factor)*object_phase_correction
@@ -19,7 +19,7 @@ def initialize_high_res_image(low_res_images, update_order, scaling_factor,
     recovered_object_spectrum_guess = ifftshift(fft2(fftshift(recovered_object_guess \
                                                               * object_phase_correction)))
 
-    return recovered_object_guess, recovered_object_spectrum_guess
+    return recovered_object_guess.astype(complex_type), recovered_object_spectrum_guess.astype(complex_type)
 
 
 def extract_variables(data_patch: Data_patch, 
@@ -29,6 +29,8 @@ def extract_variables(data_patch: Data_patch,
                       correct_aperture_shift: bool):
     low_res_images = data_patch.amplitude_images
     update_order = illumination_pattern.update_order
+    complex_type = imaging_system.complex_type
+
     size_low_res_x = imaging_system.patch_size[0]
     size_low_res_y = imaging_system.patch_size[1]
     size_high_res_x = imaging_system.final_image_size[0]
@@ -54,7 +56,7 @@ def extract_variables(data_patch: Data_patch,
     converged_alpha = step_description.converged_alpha
     max_iterations = step_description.max_iterations
 
-    return low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, shifts_x, shifts_y,\
+    return low_res_images, update_order, complex_type, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, shifts_x, shifts_y,\
             low_res_CTF, high_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, alpha, beta, eta,\
             start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, max_iterations
 

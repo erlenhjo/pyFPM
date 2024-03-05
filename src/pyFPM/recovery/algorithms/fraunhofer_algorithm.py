@@ -1,7 +1,9 @@
 import numpy as np
 from numpy.fft import fft2, ifft2, fftshift, ifftshift
-from numba import njit, vectorize
+from numba import njit, vectorize, jit
 import matplotlib.pyplot as plt
+from rocket_fft import scipy_like
+scipy_like()
 
 from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
@@ -18,28 +20,28 @@ def fraunhofer_recovery_algorithm(
         illumination_pattern: Illumination_pattern,
         pupil_guess,
         step_description: Step_description,
-        use_epry: bool,
         correct_spherical_wave_phase: bool,
         correct_Fresnel_phase: bool,
         correct_aperture_shift: bool
         ) -> Algorithm_result :
 
-    low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
+    low_res_images, update_order, complex_type, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
         shifts_x, shifts_y, low_res_CTF, high_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, \
         alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, max_iterations \
                 = extract_variables(data_patch, imaging_system, illumination_pattern, step_description, correct_aperture_shift)
     
-    object_phase_correction = get_object_phase_correction(imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase)
+    object_phase_correction = get_object_phase_correction(imaging_system, correct_spherical_wave_phase, 
+                                                          correct_Fresnel_phase, complex_type)
     
-    recovered_object_guess, recoverd_object_spectrum_guess\
+    recovered_object_guess, recovered_object_spectrum_guess\
           = initialize_high_res_image(low_res_images, update_order, scaling_factor, 
-                                      object_phase_correction, high_res_CTF)
-    
+                                      object_phase_correction, high_res_CTF, complex_type)
+    pupil_guess = pupil_guess.astype(complex_type)
     LED_shifts = calculate_low_res_index_ranges(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
                                                 size_high_res_x, size_high_res_y, LED_indices)
 
     recovered_object_spectrum, recovered_pupil, convergence_index, real_space_error_metric \
-        = main_algorithm_loop(recoverd_object_spectrum_guess, update_order, low_res_images,  
+        = main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,  
                               scaling_factor_squared, low_res_CTF, pupil_guess, LED_shifts,
                               alpha, beta, eta, converged_alpha, max_iterations,
                               start_EPRY_at_iteration, start_adaptive_steps_at_iteration 
@@ -60,7 +62,7 @@ def fraunhofer_recovery_algorithm(
     ) 
     return algorithm_result
 
-@njit(cache=True)
+@njit(cache=True, fastmath=True)
 def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,
                         scaling_factor_squared, low_res_CTF, pupil, LED_shifts, 
                         alpha, beta, eta, converged_alpha, max_iterations,
@@ -84,7 +86,7 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
             # project current spectrum to detector
             current_spectrum = recovered_object_spectrum[min_y:max_y+1, min_x:max_x+1]
             current_lens_spectrum = pupil * low_res_CTF * current_spectrum                                    
-            projected_image = fftshift(ifft2(ifftshift(current_lens_spectrum)))            
+            projected_image = fftshift(ifft2(ifftshift(current_lens_spectrum)))      
 
             # calculate error measures
             convergence_index[loop_nr] += np.mean(np.abs(projected_image)) \
@@ -130,13 +132,13 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
     return recovered_object_spectrum, pupil, convergence_index, normalized_real_space_error_metric
 
 
-def get_object_phase_correction(imaging_system: Imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase):
+def get_object_phase_correction(imaging_system: Imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase, complex_type):
     object_plane_phase_shift_correction = 1
     if correct_Fresnel_phase:
         object_plane_phase_shift_correction *= imaging_system.high_res_Fresnel_correction
     if correct_spherical_wave_phase: 
         object_plane_phase_shift_correction *= imaging_system.high_res_spherical_illumination_correction
-    return object_plane_phase_shift_correction
+    return object_plane_phase_shift_correction.astype(complex_type)
 
 @njit(cache=True)
 def update_step_sizes(alpha, beta, eta, error, prev_error):
