@@ -39,7 +39,7 @@ def recover_telecentric(title, datadirpath, patch_start, patch_size, max_array_s
 
 
     step_description = get_standard_adaptive_step_description(illumination_pattern=illumination_pattern,
-                                                            max_iterations=2,
+                                                            max_iterations=50,
                                                             start_EPRY_at_iteration = 0,
                                                             start_adaptive_at_iteration = 10)
 
@@ -50,5 +50,6 @@ def recover_telecentric(title, datadirpath, patch_start, patch_size, max_array_s
                             step_description=step_description)
 
     fig = plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result, title)
-    fig.savefig(os.path.join(result_folder,title.replace(" ","_")+".png"))
+    filename = title.replace(" ","_")+".png"
+    fig.savefig(result_folder / filename)
     return

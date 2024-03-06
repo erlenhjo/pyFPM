@@ -11,10 +11,12 @@ from plot_results import plot_results
 import os
 
 def recover_10x(title, datadirpath, patch_start, patch_size, max_array_size, result_folder):
-    pixel_scale_factor = 4
-    remove_background = 1
-    threshold_value = 0.005
-    noise_reduction_regions = None
+    pixel_scale_factor = 6
+    threshold_value = 1000
+    noise_reduction_regions = [
+        [1100, 1100, 100, 100],
+        [1600, 1600, 100, 100]
+    ]
     method = Method.Fresnel_illumination_only
 
     setup_parameters, data_patch, imaging_system, illumination_pattern = setup_IDS_U3(
@@ -23,7 +25,6 @@ def recover_10x(title, datadirpath, patch_start, patch_size, max_array_size, res
         patch_start = patch_start,
         patch_size = patch_size,
         pixel_scale_factor = pixel_scale_factor,
-        remove_background = remove_background,
         threshold_value = threshold_value,
         noise_reduction_regions = noise_reduction_regions,
         calibration_parameters=LED_calibration_parameters(
@@ -49,5 +50,6 @@ def recover_10x(title, datadirpath, patch_start, patch_size, max_array_size, res
                             step_description=step_description)
 
     fig = plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result, title)
-    fig.savefig(os.path.join(result_folder,title.replace(" ","_")+".png"))
+    filename = title.replace(" ","_")+".png"
+    fig.savefig(result_folder / filename)
     return
