@@ -42,7 +42,7 @@ IDS_UI3580CP_REV2 = Camera(
 
 IDS_U3_31J0CP_REV_2_2 = Camera(
     camera_pixel_size = 2.74e-6,
-    raw_image_size = [2828, 2844], # 4 pixels missing for each coordinate?
+    raw_image_size = [2848, 2844], # 4 pixels missing for each coordinate?
     float_type = np.float64
 )
 
