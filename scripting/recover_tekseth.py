@@ -10,7 +10,7 @@ from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_ste
 
 
 # utility imports
-from plotting.plot_experimental_results import plot_experimental_results
+from pyFPM.visualization.plot_results import plot_results
 
 
 
@@ -61,7 +61,7 @@ algorithm_result = recover(method=method, data_patch=data_patch, imaging_system=
                            illumination_pattern=illumination_pattern, pupil_guess=pupil_guess,
                            step_description=step_description)
 
-plot_experimental_results(data_patch, illumination_pattern, imaging_system, algorithm_result)
+plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result)
 
 
 plt.show()
