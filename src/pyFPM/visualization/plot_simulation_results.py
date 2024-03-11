@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.setup.Data import Data_patch
-from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.aberrations.zernike_polynomials.plot_zernike_coefficients import plot_zernike_coefficients
 from pyFPM.aberrations.pupils.zernike_pupil import decompose_zernike_pupil
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
@@ -11,18 +8,18 @@ from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 
 
 def plot_simulation_results(
-        data_patch: Data_patch, 
-        illumination_pattern: Illumination_pattern,
-        imaging_system: Imaging_system,
         algorithm_result: Algorithm_result,
         original_zernike_coefficients,
         original_pupil
     ):
-    fig, axes = plt.subplots(nrows=3, ncols=4, layout='constrained')
+    imaging_system = algorithm_result.imaging_system
+    low_res_CTF = imaging_system.low_res_CTF
+
+    fig, axes = plt.subplots(nrows=3, ncols=4, layout='constrained', figsize=(12,9))
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Low resolution image")
-    axes[0].matshow(data_patch.amplitude_images[illumination_pattern.update_order[0]]**2)
+    axes[0].matshow(algorithm_result.low_res_image**2)
     axes[0].axis("off")
     axes[0].margins(x=0, y=0)
 
@@ -48,30 +45,31 @@ def plot_simulation_results(
 
 
     axes[4].set_title(f"Original pupil amplitude")
-    axes[4].matshow(np.abs(original_pupil) * imaging_system.low_res_CTF)
+    axes[4].matshow(np.abs(original_pupil) * low_res_CTF)
     axes[4].axis("off")
     axes[4].margins(x=0, y=0)
 
     axes[5].set_title(f"Original pupil phase")
-    axes[5].matshow(np.angle(original_pupil) * imaging_system.low_res_CTF, vmin=-np.pi, vmax=np.pi)
+    axes[5].matshow(np.angle(original_pupil) * low_res_CTF, vmin=-np.pi, vmax=np.pi)
     axes[5].axis("off")
     axes[5].margins(x=0, y=0)
 
     axes[6].set_title(f"Recovered pupil amplitude")
-    axes[6].matshow(np.abs(algorithm_result.pupil) * imaging_system.low_res_CTF)
+    axes[6].matshow(np.abs(algorithm_result.pupil) * low_res_CTF)
     axes[6].axis("off")
     axes[6].margins(x=0, y=0)
 
     axes[7].set_title(f"Recovered pupil angle")
-    axes[7].matshow(np.angle(algorithm_result.pupil) * imaging_system.low_res_CTF, vmin=-np.pi, vmax=np.pi)
+    axes[7].matshow(np.angle(algorithm_result.pupil) * low_res_CTF, vmin=-np.pi, vmax=np.pi)
     axes[7].axis("off")
     axes[7].margins(x=0, y=0)
 
-
     plot_zernike_coefficients(axes[8], original_zernike_coefficients, title="Original zernike coefficients")
 
-    recovered_zernike_coefficients = decompose_zernike_pupil(imaging_system=imaging_system, pupil=algorithm_result.pupil, 
+    recovered_zernike_coefficients = decompose_zernike_pupil(imaging_system=imaging_system,
+                                                             pupil=algorithm_result.pupil, 
                                                              max_j=original_zernike_coefficients.shape[0]-1)
+    
     plot_zernike_coefficients(axes[9], recovered_zernike_coefficients, title="Recovered zernike coefficients")
 
     error = recovered_zernike_coefficients[2:] - original_zernike_coefficients[2:]
@@ -86,6 +84,5 @@ def plot_simulation_results(
     axes[11].set_xlabel("Loop number")
 
 
-    plt.show()
-    plt.close()
+
 

@@ -3,26 +3,24 @@ from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes, mark_inset
 import numpy as np
 
 # setup imports
-from pyFPM.setup.Illumination_pattern import Illumination_pattern
-from pyFPM.setup.Data import Data_patch
-from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.aberrations.zernike_polynomials.plot_zernike_coefficients import plot_zernike_coefficients
 from pyFPM.aberrations.pupils.zernike_pupil import decompose_zernike_pupil
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 
 
 def plot_results(
-        data_patch: Data_patch, 
-        illumination_pattern: Illumination_pattern,
-        imaging_system: Imaging_system,
         algorithm_result: Algorithm_result,
+        title = "",
         max_j = 25
     ):
-    fig, axes = plt.subplots(nrows=2, ncols=4, layout='constrained')
+    imaging_system = algorithm_result.imaging_system
+
+    fig, axes = plt.subplots(nrows=2, ncols=4, layout='constrained', figsize=(12,9))
+    fig.suptitle(title)
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Low resolution image")
-    axes[0].matshow(data_patch.amplitude_images[illumination_pattern.update_order[0]]**2)
+    axes[0].matshow(algorithm_result.low_res_image**2)
     axes[0].axis("off")
     axes[0].margins(x=0, y=0)
 
@@ -65,25 +63,24 @@ def plot_results(
     axes[7].set_xlabel("Loop number")
     axes[7].set_yscale("log")
 
+    return fig
 
 
 def plot_results_short(
-        data_patch: Data_patch, 
-        illumination_pattern: Illumination_pattern,
         algorithm_result: Algorithm_result,
-        title
+        title = ""
     ):
     fig, axes = plt.subplots(nrows=1, ncols=3, layout='constrained')
     fig.suptitle(title)
     axes: list[plt.Axes] = axes.flatten()
     
     axes[0].set_title("Low resolution image")
-    axes[0].matshow(data_patch.amplitude_images[illumination_pattern.update_order[0]]**2)
+    axes[0].matshow(algorithm_result.low_res_image**2)
     axes[0].axis("off")
     axes[0].margins(x=0, y=0)
 
     axins_0 = zoomed_inset_axes(axes[0], zoom=4, loc="upper right")
-    axins_0.matshow(data_patch.amplitude_images[illumination_pattern.update_order[0]]**2)
+    axins_0.matshow(algorithm_result.low_res_image**2)
     axins_0.set_xlim(105,135)
     axins_0.set_ylim(116,141)
     axins_0.xaxis.set_ticklabels([])
@@ -109,12 +106,11 @@ def plot_results_short(
     axes[2].axis("off")
     axes[2].margins(x=0, y=0)
 
+    return fig
+
 
 def plot_phase(
-        data_patch: Data_patch, 
-        illumination_pattern: Illumination_pattern,
-        algorithm_result: Algorithm_result,
-        title
+        algorithm_result: Algorithm_result
     ):
     fig, axes = plt.subplots(nrows=1, ncols=1, constrained_layout=True, figsize=(4,4))
 
