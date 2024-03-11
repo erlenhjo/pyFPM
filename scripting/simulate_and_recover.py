@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pyFPM.NTNU_specific.simulate_images.simulate_2x import simulate_2x
 from pyFPM.simulation.image_simulator import simulate_angled_imaging
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
-from pyFPM.recovery.algorithms.Step_description import get_constant_step_description, get_standard_adaptive_step_description
+from pyFPM.recovery.algorithms.Step_description import  get_standard_adaptive_step_description
 from pyFPM.setup.Data import Data_patch, Simulated_data
 
 # import plotting
@@ -39,8 +39,7 @@ def main():
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
         = simulate_2x(high_res_complex_object, noise_fraction=0, zernike_coefficients=zernike_coefficients, 
                       spherical_illumination=simulate_spherical_illumination, patch_offset=[0, 0], use_aperture_shift=False)
-    step_description = get_standard_adaptive_step_description(illumination_pattern, max_iterations=100, start_EPRY_at_iteration=0, start_adaptive_at_iteration=5)
-    step_description.beta = 1
+    step_description = get_standard_adaptive_step_description(max_iterations=100, start_EPRY_at_iteration=0, start_adaptive_at_iteration=5)
 
     #plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)
     #plt.show()
@@ -57,26 +56,13 @@ def main():
         step_description=step_description
     )
 
-
-
-    recovered_low_res_images \
-        = simulate_angled_imaging(
-            algorithm_result.recovered_object_fourier_transform,
-            algorithm_result.pupil,
-            data_patch.LED_indices,
-            imaging_system)
+    plot_simulation_results(algorithm_result=algorithm_result,
+                            original_zernike_coefficients=zernike_coefficients,
+                            original_pupil=applied_pupil)
     
-    recovered_low_res_data = Simulated_data(LED_indices=data_patch.LED_indices, amplitude_images=recovered_low_res_images)
 
-    recovered_data_patch = Data_patch(data = recovered_low_res_data, patch_start=[0, 0], patch_size=recovered_low_res_images[0].shape)
-    
-    # plot_bright_field_images(data_patch=recovered_data_patch, setup_parameters=setup_parameters, array_size=5)
-
-    # plot_simulation_results(data_patch, illumination_pattern, imaging_system, algorithm_result, 
-    #                          original_zernike_coefficients=zernike_coefficients, original_pupil=applied_pupil)
-    print(algorithm_result.real_space_error_metric)
-
-
+    plt.show()
+    plt.close()
 
 def profile_main():
     import cProfile
@@ -89,8 +75,8 @@ def profile_main():
     stats.dump_stats(filename=r"profiling_data\simulate_and_recover.prof")
 
 if __name__ == "__main__":
-    profile_main()
-
+    #profile_main()
+    main()
     # import time
     # start = time.perf_counter()
     # main()

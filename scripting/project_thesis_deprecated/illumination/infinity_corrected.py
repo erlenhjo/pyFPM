@@ -5,7 +5,7 @@ from general_functions import illustrate_illumination_from_setup, illustrate_ill
 
 lens = INFINITYCORRECTED_2X
 array_size = 5
-savefolderpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\project_thesis\results\illumination"
+savefolderpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\scripting\project_thesis_deprecated\results\illumination"
 
 def simulate_both():
     fig = illustrate_illumination_from_simulation(lens, spherical=True, Fresnel=True, z_LED=200e-3, arraysize=array_size)
@@ -22,6 +22,6 @@ def experimental():
 
 if __name__ == "__main__": 
     simulate_illumination()
-    simulate_both()
-    experimental()
+    #simulate_both()
+    #experimental()
     plt.show()

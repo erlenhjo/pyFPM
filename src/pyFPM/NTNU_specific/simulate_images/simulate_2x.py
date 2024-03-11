@@ -22,7 +22,6 @@ def simulate_2x(high_res_complex_object, zernike_coefficients, noise_fraction, s
     dummy_camera = Camera(
             camera_pixel_size = 6.5e-6,
             raw_image_size = low_res_image_size,
-            bit_depth = int(1),
             float_type= np.float64
             )
      

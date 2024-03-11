@@ -13,7 +13,6 @@ from skimage.restoration import unwrap_phase
 usn_camera = Camera(
     camera_pixel_size = 2.4e-6,
     raw_image_size = np.array([2048,2048]),
-    bit_depth = 1,
     float_type = np.float32
 )
 usn_lens = Lens(
@@ -30,7 +29,7 @@ usn_lens = Lens(
 def main():
     defocus_values = np.array([-20,-10,10,20])*1e-6
     for defocus in defocus_values:
-        imaging_system = setup_lens(lens = usn_lens)# TELECENTRIC_3X)
+        imaging_system = setup_lens(lens = TELECENTRIC_3X)
 
         pixel_size = imaging_system.raw_object_pixel_size
         frequency = imaging_system.frequency
@@ -38,13 +37,16 @@ def main():
 
         fx_mesh, fy_mesh = calculate_frequency_mesh_grids(pixel_size=pixel_size, image_region_size=image_region_size)
         fz_mesh = np.emath.sqrt(frequency**2 - fx_mesh**2 - fy_mesh**2)
-        #pupil_phase = 2*np.pi*defocus*np.real(fz_mesh)
-        #pupil_phase = 2*np.pi*defocus*np.real(fz_mesh)
+
+        # Fresnel
         pupil_phase = 2*np.pi*defocus/(2*frequency)*(fx_mesh**2+fy_mesh**2)  
-    
+        plot_results(imaging_system, pupil_phase, defocus)
+
+        # Original FPM
+        pupil_phase = -2*np.pi*defocus*np.real(fz_mesh) + 2*np.pi*frequency*defocus
         plot_results(imaging_system, pupil_phase, defocus) 
 
-    plt.show()
+        plt.show()
 
 
 

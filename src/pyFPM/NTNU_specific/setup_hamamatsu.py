@@ -12,7 +12,6 @@ def setup_hamamatsu(
     patch_start,
     patch_size,
     pixel_scale_factor,
-    remove_background,
     threshold_value,
     noise_reduction_regions,
     calibration_parameters,
@@ -38,7 +37,6 @@ def setup_hamamatsu(
     preprocessed_data = Preprocessed_data(
         rawdata = rawdata,
         setup_parameters = setup_parameters,
-        remove_background = remove_background,
         noise_reduction_regions=noise_reduction_regions, 
         threshold_value = threshold_value, 
         )

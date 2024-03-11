@@ -10,8 +10,7 @@ from pyFPM.visualization.plot_results import plot_results, plot_results_short, p
 
 
 
-
-def recover_telecentric(noise_reduction: bool, adaptive: bool, epry: bool, aperture, title):
+def recover_telecentric(noise_reduction: bool, adaptive: bool, epry: bool, aperture, title, telecentric=False):
     #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Fourier_Ptychography\telecentric_3x_usaf"
     datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Fourier_Ptychography\telecentric_3x_usaf_better_aligned_perhaps"
     pixel_scale_factor = 8
@@ -21,15 +20,15 @@ def recover_telecentric(noise_reduction: bool, adaptive: bool, epry: bool, apert
     max_array_size = 9
 
     if noise_reduction:
-        remove_background = 1
-        threshold_value = 0.005
-        noise_reduction_regions = None
+        threshold_value = 1000
+        noise_reduction_regions = [[512,512,100,100],[1436,1436,100,100]]
     else:
-        remove_background = 0
         threshold_value = 0
         noise_reduction_regions = None
 
-    if not epry:
+    if telecentric:
+        method = Method.Fresnel_illumination_only
+    elif not epry:
         if not aperture:
             method = Method.Fraunhofer
         else:
@@ -46,7 +45,6 @@ def recover_telecentric(noise_reduction: bool, adaptive: bool, epry: bool, apert
         patch_start = patch_start,
         patch_size = patch_size,
         pixel_scale_factor = pixel_scale_factor,
-        remove_background = remove_background,
         threshold_value = threshold_value,
         noise_reduction_regions = noise_reduction_regions,
         calibration_parameters=LED_calibration_parameters(

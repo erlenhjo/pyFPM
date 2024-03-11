@@ -37,13 +37,15 @@ def illustrate_illumination_from_setup(datadirpath, lens, array_size):
         )
 
     rawdata: Rawdata = get_rawdata_from_files(
-        datadirpath = datadirpath
+        datadirpath = datadirpath,
+        image_format = setup_parameters.image_format,
+        center_indices = setup_parameters.LED_info.center_indices,
+        max_array_size = array_size
         )
 
     preprocessed_data = Preprocessed_data(
         rawdata = rawdata,
         setup_parameters = setup_parameters,
-        remove_background = False,
         noise_reduction_regions = None, 
         threshold_value = False
         )
