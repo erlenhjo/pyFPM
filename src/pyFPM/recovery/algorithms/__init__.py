@@ -1,1 +1,1 @@
-from . import Algorithm_result, fraunhofer_algorithm
+from . import Algorithm_result, standard_algorithm
