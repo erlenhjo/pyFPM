@@ -5,9 +5,8 @@ from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
+from pyFPM.visualization.plot_results import plot_results
 
-# utility imports
-from plot_results import plot_results
 import os
 import numpy as np
 

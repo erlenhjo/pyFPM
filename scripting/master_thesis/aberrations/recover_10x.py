@@ -5,10 +5,7 @@ from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
-
-# utility imports
-from plot_results import plot_results
-import os
+from pyFPM.visualization.plot_results import plot_results
 
 def recover_10x(title, datadirpath, patch_start, patch_size, max_array_size, result_folder):
     pixel_scale_factor = 6

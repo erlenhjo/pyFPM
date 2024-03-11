@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from plot_illumination import plot_bright_field_images
-
+from pyFPM.visualization.plot_illumination import plot_bright_field_images
 from pyFPM.NTNU_specific.setup_from_file import setup_parameters_from_file
 from pyFPM.NTNU_specific.rawdata_from_files import get_rawdata_from_files
 from pyFPM.NTNU_specific.components import IDS_U3_31J0CP_REV_2_2, MAIN_LED_ARRAY

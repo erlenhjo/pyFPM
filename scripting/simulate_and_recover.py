@@ -8,8 +8,9 @@ from pyFPM.recovery.algorithms.Step_description import get_constant_step_descrip
 from pyFPM.setup.Data import Data_patch, Simulated_data
 
 # import plotting
-from plotting.plot_simulation_results import plot_simulation_results
-from plotting.plot_illumination import plot_bright_field_images
+from pyFPM.visualization.plot_simulation_results import plot_simulation_results
+from pyFPM.visualization.plot_illumination import plot_bright_field_images
+from pyFPM.visualization.plot_results import plot_results
 
 import numpy as np
 import skimage

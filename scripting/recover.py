@@ -13,8 +13,8 @@ from pyFPM.setup.Data import Data_patch, Simulated_data
 from pyFPM.NTNU_specific.components import DOUBLE_CONVEX, TELECENTRIC_3X, INFINITYCORRECTED_2X
 
 # utility imports
-from plotting.plot_experimental_results import plot_experimental_results
-from plotting.plot_illumination import plot_bright_field_images
+from pyFPM.visualization.plot_results import plot_results
+from pyFPM.visualization.plot_illumination import plot_bright_field_images
 
 
 #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
@@ -82,7 +82,7 @@ algorithm_result = recover(method=method, data_patch=data_patch, imaging_system=
                            step_description=step_description)
 
 
-plot_experimental_results(data_patch, illumination_pattern, imaging_system, algorithm_result)
+plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result)
 
 plt.show()
 
