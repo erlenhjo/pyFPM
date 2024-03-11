@@ -8,9 +8,9 @@ from pyFPM.setup.Imaging_system import Imaging_system, LED_calibration_parameter
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.recovery.utility.real_space_error import compute_sum_square_error
 from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
-from pyFPM.recovery.algorithms.Step_description import get_constant_step_description
+from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
 
-from pyFPM.recovery.algorithms.run_algorithm import recover, Method
+from pyFPM.recovery.algorithms.run_algorithm import recover
 
 
 class Parameter(Enum):
@@ -33,27 +33,27 @@ def primitive_calibration(
         patch_size,
         pixel_scale_factor,
         parameter_to_calibrate,
-        number_of_steps
+        number_of_steps,
+        method
     ):
-    max_iterations = 20
-    step_description = get_constant_step_description(max_iterations=max_iterations, 
-                                                     start_EPRY_at_iteration=max_iterations+1)
-    method = Method.Fraunhofer_aperture
+    max_iterations = 30
+    step_description = get_standard_adaptive_step_description(max_iterations=max_iterations, 
+                                                              start_EPRY_at_iteration=max_iterations+1,
+                                                              start_adaptive_at_iteration=max_iterations+1)
 
     best_image = None
     best_image_defocus = None
     best_image_LED_calibration_parameters = None
     errors = []
 
-    defocus_range, LED_calibration_parameter_range = get_calibration_parameters(
-                                                defocus_guess,
-                                                rotation_guess,
-                                                distance_offset_guess,
-                                                LED_x_offset_guess,
-                                                LED_y_offset_guess,
-                                                parameter_to_calibrate,
-                                                number_of_steps
-                                                )
+    defocus_range, LED_calibration_parameter_range, calibration_parameter_range = get_calibration_parameters(defocus_guess,
+                                                                                                             rotation_guess,
+                                                                                                             distance_offset_guess,
+                                                                                                             LED_x_offset_guess,
+                                                                                                             LED_y_offset_guess,
+                                                                                                             parameter_to_calibrate,
+                                                                                                             number_of_steps
+                                                                                                            )
 
     for defocus, calibration_parameters in zip(defocus_range, LED_calibration_parameter_range):
 
@@ -97,7 +97,7 @@ def primitive_calibration(
     plt.axis("off")
 
     plt.figure()
-    plt.scatter(range(len(errors)), errors)
+    plt.scatter(calibration_parameter_range, errors)
     plt.title("Sum square error")
     plt.ylabel("SSE [a.u.]")
 
@@ -118,11 +118,12 @@ def get_calibration_parameters(
         ):
 
     if parameter_to_calibrate == Parameter.Defocus:
-        defocus_range = np.linspace(-1,1,number_of_steps) * 50e-6 + defocus_guess
+        defocus_range = np.linspace(-1,1,number_of_steps) * 20e-6 + defocus_guess
         calibration_parameters =  [LED_calibration_parameters(LED_distance_offset_guess,
                                                               LED_x_offset_guess,
                                                               LED_y_offset_guess,
                                                               LED_rotation_guess)] * number_of_steps
+        calibration_parameter_range = defocus_range
         
     elif parameter_to_calibrate == Parameter.LED_rotation:
         defocus_range = [defocus_guess] * number_of_steps
@@ -133,6 +134,7 @@ def get_calibration_parameters(
                                                               LED_x_offset_guess,
                                                               LED_y_offset_guess,
                                                               current_guess))
+        calibration_parameter_range = calibration_parameter_range
             
     elif parameter_to_calibrate == Parameter.LED_x:
         defocus_range = [defocus_guess] * number_of_steps
@@ -143,6 +145,7 @@ def get_calibration_parameters(
                                                               current_guess,
                                                               LED_y_offset_guess,
                                                               LED_rotation_guess))
+        calibration_parameter_range = x_range
             
     elif parameter_to_calibrate == Parameter.LED_y:
         defocus_range = [defocus_guess] * number_of_steps
@@ -153,15 +156,17 @@ def get_calibration_parameters(
                                                               LED_x_offset_guess,
                                                               current_guess,
                                                               LED_rotation_guess))
+        calibration_parameter_range = y_range
             
     elif parameter_to_calibrate == Parameter.LED_z:
         defocus_range = [defocus_guess] * number_of_steps
         calibration_parameters = [] 
-        z_range = np.linspace(-1,1,number_of_steps) * 1e-3 + LED_distance_offset_guess
+        z_range = np.linspace(-1,1,number_of_steps) * 10e-3 + LED_distance_offset_guess
         for current_guess in z_range:
             calibration_parameters.append(LED_calibration_parameters(current_guess,
                                                               LED_x_offset_guess,
                                                               LED_y_offset_guess,
                                                               LED_rotation_guess))
+        calibration_parameter_range = z_range
             
-    return defocus_range, calibration_parameters
+    return defocus_range, calibration_parameters, calibration_parameter_range
