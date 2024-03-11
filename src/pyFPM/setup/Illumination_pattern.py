@@ -24,7 +24,7 @@ class Illumination_pattern(object):
              cutoff_frequency = cutoff_frequency
         )
 
-        self.relative_aperture_shifts = calculate_relative_NA(   # don't worry about this, it is the same
+        self.relative_aperture_shifts = calculate_relative_NA(
              LED_frequencies_x = LED_aperture_shifts_x * imaging_system.df_x,
              LED_frequencies_y = LED_aperture_shifts_y * imaging_system.df_y,
              cutoff_frequency = cutoff_frequency
