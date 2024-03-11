@@ -28,8 +28,8 @@ class Preprocessed_data:
                 LED_indices = LED_indices,
                 exposure_times = exposure_times
                 )
-            
-        images = subtract_region_mean(images=images, threshold_value=threshold_value, noise_reduction_regions=noise_reduction_regions)
+        if noise_reduction_regions is not None:
+            images = subtract_region_mean(images=images, threshold_value=threshold_value, noise_reduction_regions=noise_reduction_regions)
         
         self.amplitude_images = np.sqrt(images).astype(float_type)   # take amplitude and set float type
         self.LED_indices = LED_indices
