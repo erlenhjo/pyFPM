@@ -1,4 +1,5 @@
-from pyFPM.setup.Imaging_system import Setup_parameters
+from pyFPM.setup.Setup_parameters import Setup_parameters
+from pyFPM.setup.Imaging_system import calculate_patch_start_and_end
 
 from dataclasses import dataclass
 import numpy as np
@@ -40,15 +41,17 @@ class Simulated_data:
     amplitude_images: np.ndarray
 
 class Data_patch:
-    def __init__(self, data: Preprocessed_data|Simulated_data, patch_start, patch_size):
-        x_start = patch_start[0]
-        x_end = patch_start[0] + patch_size[0]
-        y_start = patch_start[1]
-        y_end = patch_start[1] + patch_size[1]
-
+    def __init__(self, data: Preprocessed_data|Simulated_data, raw_image_size, patch_offset, patch_size):
+        patch_start, patch_end = calculate_patch_start_and_end(
+            image_size = raw_image_size,
+            patch_offset = patch_offset,
+            patch_size = patch_size
+        )
         self.patch_start = patch_start
+        self.patch_end = patch_end
+        self.patch_offset = patch_offset
         self.patch_size = patch_size
-        self.amplitude_images = data.amplitude_images[:, y_start:y_end, x_start:x_end]
+        self.amplitude_images = data.amplitude_images[:, patch_start[1]:patch_end[1], patch_start[0]:patch_end[0]]
         self.LED_indices = data.LED_indices
 
 

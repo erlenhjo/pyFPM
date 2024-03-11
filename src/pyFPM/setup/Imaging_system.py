@@ -14,7 +14,7 @@ class LED_calibration_parameters:
 
 class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
-                  patch_start, patch_size, LED_calibration_parameters):
+                  patch_offset, patch_size, calibration_parameters: LED_calibration_parameters):
         
         spatial_frequency = 1 / setup_parameters.LED_info.wavelength
         spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
@@ -26,11 +26,15 @@ class Imaging_system(object):
         object_to_lens_distance = get_object_to_lens_distance(setup_parameters.lens)
         
         # calculate offsets
-        patch_offset_x, patch_offset_y = calculate_patch_offset(
-            image_size = setup_parameters.camera.raw_image_size,
-            patch_start = patch_start,
-            patch_size = patch_size,
+        patch_offset_x, patch_offset_y = calculate_patch_offset_distance(
+            patch_offset = patch_offset,
             raw_object_pixel_size = raw_object_pixel_size
+        )
+
+        patch_start, patch_end = calculate_patch_start_and_end(
+            image_size = setup_parameters.camera.raw_image_size,
+            patch_offset = patch_offset,
+            patch_size = patch_size
         )
 
         # calculate LED positions
@@ -38,9 +42,9 @@ class Imaging_system(object):
             LED_array_size = setup_parameters.LED_info.LED_array_size,
             center_indices = setup_parameters.LED_info.center_indices,
             LED_pitch = setup_parameters.LED_info.LED_pitch,
-            LED_rotation = LED_calibration_parameters.LED_rotation,
+            LED_rotation = calibration_parameters.LED_rotation,
             LED_offset = np.array(setup_parameters.LED_info.LED_offset) \
-                + np.array([LED_calibration_parameters.LED_x_offset,LED_calibration_parameters.LED_y_offset])
+                + np.array([calibration_parameters.LED_x_offset,calibration_parameters.LED_y_offset])
         )
         
         # calculate frequency components for normal frequency shift model
@@ -49,7 +53,7 @@ class Imaging_system(object):
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
             patch_offset_y = patch_offset_y,
-            z_LED = LED_calibration_parameters.LED_distance, 
+            z_LED = calibration_parameters.LED_distance, 
             spatial_frequency = spatial_frequency,
             pixel_size = final_object_pixel_size,
             image_size = final_image_size
@@ -61,7 +65,7 @@ class Imaging_system(object):
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
             patch_offset_y = patch_offset_y,
-            z_LED = LED_calibration_parameters.LED_distance,
+            z_LED = calibration_parameters.LED_distance,
             z_1 = object_to_lens_distance, 
             wavelength = setup_parameters.LED_info.wavelength,
             pixel_size = final_object_pixel_size,
@@ -93,7 +97,7 @@ class Imaging_system(object):
                                                                     x_mesh = high_res_object_x_positions, 
                                                                     y_mesh = high_res_object_y_positions, 
                                                                     wavevector = 2*np.pi*spatial_frequency, 
-                                                                    distance = LED_calibration_parameters.LED_distance
+                                                                    distance = calibration_parameters.LED_distance
                                                                 )
                     
         # assign public variables
@@ -106,7 +110,9 @@ class Imaging_system(object):
         self.df_x = 1/(final_object_pixel_size * final_image_size[0])
         self.df_y = 1/(final_object_pixel_size * final_image_size[1])
 
+        self.patch_offset = patch_offset
         self.patch_start = patch_start
+        self.patch_end = patch_end
         self.patch_size = patch_size
         self.final_image_size = final_image_size
         self.raw_object_pixel_size = raw_object_pixel_size
@@ -137,17 +143,19 @@ def calculate_required_pixel_size(spatial_cutoff_frequency):
     return 1 / (2.1 * spatial_cutoff_frequency)    #technically should be 2 for Nyquist criterion, but 2.1 gives some leeway
 
 
-def calculate_patch_offset(image_size, patch_start, patch_size, raw_object_pixel_size):
-    # find center of image and patch
-    image_center_pixel_x = image_size[0] / 2
-    image_center_pixel_y = image_size[1] / 2
-    patch_center_pixel_x = patch_start[0] + patch_size[0]/2
-    patch_center_pixel_y = patch_start[1] + patch_size[1]/2
+def calculate_patch_start_and_end(image_size, patch_offset, patch_size):
+    x_start = image_size[0] // 2 + patch_offset[0] - patch_size[0]//2
+    y_start = image_size[1] // 2 + patch_offset[1] - patch_size[1]//2
+    x_end = x_start + patch_size[0]
+    y_end = y_start + patch_size[1]
+    patch_start = [x_start, y_start]
+    patch_end = [x_end, y_end]
+    return patch_start, patch_end
 
-    # calculate offset of selected patch with respect to image centre
-    patch_offset_x = (patch_center_pixel_x - image_center_pixel_x) * raw_object_pixel_size
-    patch_offset_y = (patch_center_pixel_y - image_center_pixel_y) * raw_object_pixel_size
-    
+
+def calculate_patch_offset_distance(patch_offset, raw_object_pixel_size):
+    patch_offset_x = patch_offset[0] * raw_object_pixel_size
+    patch_offset_y = patch_offset[1] * raw_object_pixel_size
     return patch_offset_x, patch_offset_y
 
 
