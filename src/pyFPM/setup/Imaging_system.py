@@ -54,6 +54,7 @@ class Imaging_system(object):
             pixel_size = final_object_pixel_size,
             image_size = final_image_size
         )
+
         # calculate frequency components for alternative frequency shift model (Fresnel propagation based?)
         LED_shifts_x_aperture, LED_shifts_y_aperture = calculate_LED_shifts_from_aperture_shift(
             LED_locations_x = LED_locations_x, 
@@ -66,7 +67,7 @@ class Imaging_system(object):
             pixel_size = final_object_pixel_size,
             image_size = final_image_size
         )
- 
+
         low_res_CTF = calculate_coherent_transfer_function(
             pixel_size = raw_object_pixel_size,
             image_region_size = patch_size, 
@@ -78,12 +79,10 @@ class Imaging_system(object):
             spatial_cutoff_frequency = spatial_cutoff_frequency
         )
 
-
-        high_res_object_x_positions, high_res_object_y_positions = calculate_position_mesh_grids(pixel_size = final_object_pixel_size, 
-                                                                                                 image_region_size = final_image_size,
-                                                                                                 offset_x = patch_offset_x, 
-                                                                                                 offset_y = patch_offset_y
-                                                                                                 ) 
+        # caculate positions relative the center of the Field of View
+        high_res_object_x_positions, high_res_object_y_positions = calculate_relative_position_mesh_grids(pixel_size = final_object_pixel_size, 
+                                                                                                          image_region_size = final_image_size
+                                                                                                        ) 
         high_res_Fresnel_object_phase_correction = calculate_object_plane_phase_shift(
                                                     x_mesh = high_res_object_x_positions, 
                                                     y_mesh = high_res_object_y_positions, 
@@ -207,15 +206,15 @@ def calculate_LED_shifts_from_in_plane_frequency_components(LED_locations_x, LED
 
 
 def calculate_LED_shifts_from_aperture_shift(LED_locations_x, LED_locations_y, 
-                                                      patch_offset_x, patch_offset_y, 
-                                                      z_LED, z_1, wavelength,
-                                                      pixel_size, image_size):
-    dx = wavelength*z_1/(pixel_size * image_size[0])
-    dy = wavelength*z_1/(pixel_size * image_size[1])
+                                             patch_offset_x, patch_offset_y, 
+                                             z_LED, z_1, wavelength,
+                                             pixel_size, image_size):
+    dx = wavelength/(pixel_size * image_size[0])
+    dy = wavelength/(pixel_size * image_size[1])
 
     #calculate spatial shift
-    spatial_shifts_x = (LED_locations_x-patch_offset_x)*z_1/z_LED - patch_offset_x
-    spatial_shifts_y = (LED_locations_y-patch_offset_y)*z_1/z_LED - patch_offset_y
+    spatial_shifts_x = (LED_locations_x-patch_offset_x)/z_LED - patch_offset_x/z_1
+    spatial_shifts_y = (LED_locations_y-patch_offset_y)/z_LED - patch_offset_y/z_1
 
     #calculate pixel shift
     pixel_shifts_x = spatial_shifts_x/dx
@@ -239,7 +238,7 @@ def calculate_frequency_mesh_grids(pixel_size, image_region_size):
 
     return fx_mesh, fy_mesh
 
-def calculate_position_mesh_grids(pixel_size, image_region_size, offset_x, offset_y):
+def calculate_relative_position_mesh_grids(pixel_size, image_region_size):
     FOV_x = image_region_size[0] * pixel_size
     FOV_y = image_region_size[1] * pixel_size
     positions_x = np.linspace(start = -FOV_x/2, stop = FOV_x/2, num = image_region_size[0], endpoint = False)
