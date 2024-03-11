@@ -14,7 +14,7 @@ from pyFPM.recovery.utility.k_space import calculate_low_res_index_ranges, calcu
 from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables
 from pyFPM.recovery.utility.real_space_error import caclulate_real_space_error_normalization_factor
 
-def fraunhofer_recovery_algorithm(
+def standard_recovery_algorithm(
         data_patch: Data_patch,
         imaging_system: Imaging_system,
         illumination_pattern: Illumination_pattern,
@@ -58,7 +58,10 @@ def fraunhofer_recovery_algorithm(
         recovered_object_fourier_transform = recovered_object_fourier_transform,
         pupil = recovered_pupil,
         convergence_index = convergence_index,
-        real_space_error_metric = real_space_error_metric
+        real_space_error_metric = real_space_error_metric,
+        low_res_image = data_patch.amplitude_images[illumination_pattern.update_order[0]],
+        recovered_CTF = recovered_CTF,
+        imaging_system = imaging_system
     ) 
     return algorithm_result
 
@@ -133,7 +136,7 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
 
 
 def get_object_phase_correction(imaging_system: Imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase, complex_type):
-    object_plane_phase_shift_correction = 1
+    object_plane_phase_shift_correction = np.complex128(1)
     if correct_Fresnel_phase:
         object_plane_phase_shift_correction *= imaging_system.high_res_Fresnel_correction
     if correct_spherical_wave_phase: 

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pyFPM.recovery.algorithms.fraunhofer_algorithm import fraunhofer_recovery_algorithm
+from pyFPM.recovery.algorithms.standard_algorithm import standard_recovery_algorithm
 
 class Method(Enum):
     Fraunhofer = 1
@@ -16,7 +16,7 @@ class Method(Enum):
 def recover(method, data_patch, imaging_system, illumination_pattern, pupil_guess, step_description):
 
     if method == Method.Fraunhofer:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -27,7 +27,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             correct_aperture_shift = False 
         )
     elif method == Method.Fraunhofer_Epry:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -38,7 +38,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             correct_aperture_shift = False 
         )
     elif method == Method.Fresnel:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -49,7 +49,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             correct_aperture_shift = False 
         )
     elif method == Method.Fresnel_illumination_only:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -60,7 +60,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             correct_aperture_shift = False 
         )
     elif method == Method.Fraunhofer_aperture:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -71,7 +71,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             correct_aperture_shift = True 
         )
     elif method == Method.Fraunhofer_Epry_aperture:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -82,7 +82,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             correct_aperture_shift = True 
         )
     elif method == Method.Fresnel_aperture:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
@@ -93,7 +93,7 @@ def recover(method, data_patch, imaging_system, illumination_pattern, pupil_gues
             correct_aperture_shift = True 
         )
     elif method == Method.Fresnel_illumination_only_aperture:
-        algorithm_result = fraunhofer_recovery_algorithm(
+        algorithm_result = standard_recovery_algorithm(
             data_patch = data_patch,
             imaging_system = imaging_system,
             illumination_pattern = illumination_pattern,
