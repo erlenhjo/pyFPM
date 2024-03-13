@@ -3,9 +3,10 @@ import numpy as np
 
 from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Setup_parameters import Setup_parameters
+from pyFPM.setup.Imaging_system import LED_calibration_parameters
 
 
-def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_parameters, array_size):
+def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_parameters, array_size: int):
     LED_indices = data_patch.LED_indices
 
     center_indices = setup_parameters.LED_info.center_indices
@@ -32,3 +33,4 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
             mean_values[m,n] = np.mean(data_patch.amplitude_images[image_nr]**2)
     
     return fig
+

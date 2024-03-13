@@ -9,7 +9,7 @@ from pyFPM.NTNU_specific.rawdata_from_files import get_rawdata_from_files
 def setup_IDS_U3(
     lens: Lens,
     datadirpath,
-    patch_start,
+    patch_offset,
     patch_size,
     pixel_scale_factor,
     threshold_value,
@@ -17,6 +17,33 @@ def setup_IDS_U3(
     calibration_parameters,
     max_array_size
 ):
+    
+    setup_parameters, preprocessed_data = setup_IDS_U3_global(lens,
+                                                              datadirpath,
+                                                              threshold_value,
+                                                              noise_reduction_regions,
+                                                              max_array_size
+                                                              )
+    
+
+    imaging_system, data_patch, illumination_pattern = setup_IDS_U3_local(setup_parameters,
+                                                                          preprocessed_data,
+                                                                          patch_offset,
+                                                                          patch_size,
+                                                                          pixel_scale_factor,
+                                                                          calibration_parameters,
+                                                                          max_array_size
+                                                                          )
+
+    return setup_parameters, data_patch, imaging_system, illumination_pattern
+
+# patch independent part of setup
+def setup_IDS_U3_global(lens: Lens,
+                        datadirpath,
+                        threshold_value,
+                        noise_reduction_regions,
+                        max_array_size):
+    
     camera = IDS_U3_31J0CP_REV_2_2
     LED_array = MAIN_LED_ARRAY
 
@@ -40,19 +67,33 @@ def setup_IDS_U3(
         noise_reduction_regions=noise_reduction_regions, 
         threshold_value = threshold_value, 
         )
-    
+
+    return setup_parameters, preprocessed_data
+
+
+# patch dependent part of setup
+def setup_IDS_U3_local(setup_parameters: Setup_parameters,
+                       preprocessed_data: Preprocessed_data,
+                       patch_offset,
+                       patch_size,
+                       pixel_scale_factor,
+                       calibration_parameters,
+                       max_array_size
+                       ):
+
     data_patch = Data_patch(
         data = preprocessed_data,
-        patch_start = patch_start,
+        raw_image_size = setup_parameters.camera.raw_image_size,
+        patch_offset = patch_offset,
         patch_size = patch_size
         )
 
     imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
-        patch_start = patch_start,
+        patch_offset = patch_offset,
         patch_size = patch_size,
-        LED_calibration_parameters=calibration_parameters
+        calibration_parameters=calibration_parameters
         )
 
     illumination_pattern = Illumination_pattern(
@@ -62,4 +103,4 @@ def setup_IDS_U3(
         max_array_size = max_array_size
     )
 
-    return setup_parameters, data_patch, imaging_system, illumination_pattern
+    return imaging_system, data_patch, illumination_pattern

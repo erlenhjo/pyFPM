@@ -1,52 +1,64 @@
-# FPM imports
-from pyFPM.NTNU_specific.setup_USN import setup_USN
+import matplotlib.pyplot as plt
+import numpy as np
+from pathlib import Path
+
+from pyFPM.experimental.recover_experiment import recover_experiment, plot_experiment, Experiment_settings
+from pyFPM.recovery.algorithms.run_algorithm import Method
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
-from pyFPM.recovery.algorithms.run_algorithm import recover, Method
-from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
 
-# utility imports
-from plot_results import plot_results
-
-import numpy as np
-import matplotlib.pyplot as plt
+from pyFPM.NTNU_specific.setup_USN import setup_USN_global, setup_USN_local, USN_lens
 
 
-def recover_USN_phase_target(patch_shift, title):
-    method = Method.Fresnel_aperture
-    datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\Master_thesis\USN\Basler_PhaseTarget2"
+patch_offsets = np.outer(np.arange(-5,6),np.array([256,0]))-np.array([0,256])
+patch_size = [256, 256]
+max_array_size = 7
 
-    setup_parameters, data_patch, imaging_system, illumination_pattern \
-        = setup_USN(datadirpath=datadirpath,
-                    patch_shift=np.array(patch_shift),
-                    patch_size=np.array([512,512]),
-                    calibration_parameters = LED_calibration_parameters(
-                        LED_distance=83e-3,
-                        LED_x_offset=0,
-                        LED_y_offset=0,
-                        LED_rotation=0
-                        ),
-                    noise_threshold = 1800
-                    )
+cwd = Path.cwd()
+data_folder = cwd / "data/Master_thesis/USN"
 
-    step_description = get_standard_adaptive_step_description(illumination_pattern=illumination_pattern,
-                                                            max_iterations=50,
-                                                            start_EPRY_at_iteration = 0,
-                                                            start_adaptive_at_iteration = 0)
-    step_description.alpha=1
-    step_description.beta=1
+recover = True
+plot = True
 
-    pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = 0)
 
-    algorithm_result = recover(method=method, data_patch=data_patch, imaging_system=imaging_system,
-                            illumination_pattern=illumination_pattern, pupil_guess=pupil_guess,
-                            step_description=step_description)
+def main():
+    USN_phase_target()
+    plt.show()
 
-    plot_results(data_patch, illumination_pattern, imaging_system, algorithm_result, title)
-    return
+def recover_and_plot(title, datadirpath):
+    if recover:
+        recover_experiment(title, datadirpath, patch_offsets, patch_size, max_array_size, experiment_settings, 
+                           setup_local=setup_USN_local, setup_global=setup_USN_global)
+    if plot:
+        plot_experiment(title)
 
+def USN_phase_target():
+    title = "USN phase target"
+    datadirpath = data_folder / "Basler_PhaseTarget2"
+    recover_and_plot(title, datadirpath)
+
+
+
+experiment_settings = Experiment_settings(lens = USN_lens,
+                                          method = Method.Fresnel_aperture,
+                                          calibration_parameters = LED_calibration_parameters(
+                                                                        LED_distance=83e-3,
+                                                                        LED_x_offset=0,
+                                                                        LED_y_offset=0,
+                                                                        LED_rotation=0
+                                                                    ),
+                                          step_description = get_standard_adaptive_step_description(max_iterations=50,
+                                                                                                    start_EPRY_at_iteration = 0,
+                                                                                                    start_adaptive_at_iteration = 10),
+                                          pixel_scale_factor = 6,
+                                          threshold_value = 1000,
+                                          noise_reduction_regions = [
+                                                                        [1100, 1100, 100, 100],
+                                                                        [2200, 2200, 100, 100]
+                                                                    ],
+                                          defocus_guess = 0
+                                          )
 
 if __name__ == "__main__":
-    recover_USN_phase_target([0,0], "USN phase target centered")
-    #recover_USN_phase_target([0,-750], "USN phase target edge")
-    plt.show()
+    main()
+    

@@ -1,6 +1,7 @@
 from pyFPM.setup.Imaging_system import Imaging_system, LED_calibration_parameters
 from pyFPM.setup.Data import Simulated_data, Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
+from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.simulation.image_simulator import simulate_angled_imaging
 from pyFPM.aberrations.pupils.zernike_pupil import get_zernike_pupil
 from pyFPM.simulation.apply_gaussian_noise import apply_gaussian_noise
@@ -35,9 +36,9 @@ def simulate_imaging(
     full_image_imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
-        patch_start = patch_offset,
+        patch_offset = patch_offset,
         patch_size = setup_parameters.camera.raw_image_size,
-        LED_calibration_parameters=calibration_parameters
+        calibration_parameters = calibration_parameters
         )
     
     pupil = get_zernike_pupil(full_image_imaging_system, zernike_coefficients)
@@ -79,7 +80,7 @@ def simulate_imaging(
     return simulated_data, pupil, full_image_imaging_system.low_res_CTF
 
 def finalize_simulation_setup(
-    setup_parameters,
+    setup_parameters: Setup_parameters,
     simulated_data,
     patch_offset,
     patch_size,
@@ -92,13 +93,14 @@ def finalize_simulation_setup(
     imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
-        patch_start = patch_offset,
+        patch_offset = patch_offset,
         patch_size = patch_size,
-        LED_calibration_parameters = calibration_parameters
+        calibration_parameters = calibration_parameters
         )
 
     data_patch = Data_patch(data = simulated_data,
-                            patch_start = [0,0],
+                            raw_image_size = setup_parameters.camera.raw_image_size,
+                            patch_offset = [0,0],
                             patch_size = patch_size)
 
     illumination_pattern = Illumination_pattern(
