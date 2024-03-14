@@ -20,6 +20,8 @@ def positional_calibration_recovery_algorithm(
         assumed_LED_calibration_parameters: LED_calibration_parameters
         ) -> tuple[Algorithm_result, LED_calibration_parameters]:
 
+    print("Warning: Does not work even sligthly")
+
     low_res_images, update_order, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y,\
             low_res_CTF, high_res_CTF, scaling_factor, LED_indices, center_indices, LED_pitch,\
             frequency, df_x, df_y, patch_x, patch_y\
