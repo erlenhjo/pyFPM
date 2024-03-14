@@ -17,8 +17,8 @@ class Preprocessed_data:
         center_indices = setup_parameters.LED_info.center_indices
         LED_indices = rawdata.LED_indices
         float_type = setup_parameters.camera.float_type
-        images = rawdata.images.astype(float_type)
-        background_image = rawdata.background_image.astype(float_type)
+        images = rawdata.images
+        background_image = rawdata.background_image
         exposure_times = setup_parameters.LED_info.exposure_times
 
         if exposure_times is not None:
