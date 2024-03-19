@@ -10,7 +10,7 @@ import numpy as np
 def bright_field_localization(data: Data_patch, setup_parameters: Setup_parameters):
     otsu_power = 2
     canny_sigma = 10
-    ransac_threshold = 3
+    ransac_threshold = 1
 
     n_and_m_values = get_n_and_m_values(LED_indices=data.LED_indices, center_indices=setup_parameters.LED_info.center_indices)
     edges_per_image = detect_edges(data.amplitude_images**otsu_power, canny_sigma)
@@ -81,7 +81,7 @@ def find_bright_field_circles(edges_per_image, images, ransac_threshold, pixel_s
 
 
 
-def fit_circle_RANSAC(edge_points, rng_gen: np.random.Generator, ransac_threshold, iterations=10000):
+def fit_circle_RANSAC(edge_points, rng_gen: np.random.Generator, ransac_threshold, iterations=100):
     indices = np.arange(edge_points.shape[0])
     best_center, best_radius, best_score = [0,0], 0, 0
     for n in range(iterations):
