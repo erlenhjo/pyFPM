@@ -93,6 +93,7 @@ def calculate_BF_edge(setup_parameters: Setup_parameters, calibration_parameters
     else:
         z_1 = focal_length*(1+1/magnification)
 
+    rotation = rotation * np.pi/180 # convert to radians
     radius = NA / (1/z_0+1/z_1) / pixel_size
     center_x = (LED_pitch*LED_n*np.cos(rotation) - LED_pitch*LED_m*np.sin(rotation) + delta_x)\
                 /pixel_size / (1+z_0/z_1)
