@@ -77,7 +77,7 @@ def subtract_region_mean(images: np.ndarray, threshold_value, noise_reduction_re
         if image_background > threshold_value:
             image_background = prev_background
 
-        images[n] -= image_background
+        images[n] = images[n] - image_background
         prev_background = image_background
     images[images<0] = 0
 
