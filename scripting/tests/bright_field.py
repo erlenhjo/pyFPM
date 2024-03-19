@@ -16,10 +16,10 @@ def main():
     simulation = False
     real = True
 
-    infcor_2x(simulation, real)
+    #infcor_2x(simulation, real)
     telecentric_3x(simulation, real)
-    double_convex(simulation, real)
-    compact_2x(simulation, real)
+    #double_convex(simulation, real)
+    #compact_2x(simulation, real)
 
     plt.show()
     
@@ -50,11 +50,11 @@ def telecentric_3x(simulation, real):
     datadirpath = main_folder / "telecentric_3x_illumination_2"
     calibration_parameters = LED_calibration_parameters(200e-3,0e-6,0e-6,0)
     if simulation:
-        illustrate_illumination_from_simulation(lens=lens, spherical=True, Fresnel=False, arraysize=5,
+        illustrate_illumination_from_simulation(lens=lens, spherical=True, Fresnel=False, arraysize=7,
                                                 calibration_parameters=calibration_parameters)
     if real:
         illustrate_illumination_from_setup(datadirpath=datadirpath, lens=lens, Fresnel=False,
-                                        array_size=5, calibration_parameters=calibration_parameters)
+                                        array_size=7, calibration_parameters=calibration_parameters)
     
 def double_convex(simulation, real):
     lens = DOUBLE_CONVEX
