@@ -20,7 +20,7 @@ import numba
 from numba import njit
 from numba.typed import List
 
-def non_linear_BFL(data: Data_patch, setup_parameters: Setup_parameters):
+def basic_BFL(data: Data_patch, setup_parameters: Setup_parameters):
     otsu_power = 4 # 1 means that the otsu threshold is based on amplitude, 2 on intensity, 4 on intesity^2
     canny_sigma = 10
     ransac_threshold_pix = 10 #pixels

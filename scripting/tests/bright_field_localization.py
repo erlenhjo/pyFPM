@@ -8,8 +8,8 @@ from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Data import Data_patch, Rawdata, Preprocessed_data
 from pyFPM.recovery.calibration.basic_BFL import basic_BFL
-from pyFPM.recovery.calibration.alternative_BFL import alternative_BFL
 from pyFPM.recovery.calibration.non_linear_BFL import non_linear_BFL
+
 
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -21,7 +21,7 @@ main_folder_2 = main_folder_1 / "defocus_illum"
 def main():
 
     #infcor_2x_200_hamamatsu()
-    telecentric_3x_200_hamamatsu()
+    #telecentric_3x_200_hamamatsu()
     #infcor_2x_205_mis_ueye3()
     #infcor_2x_200_ueye3()
     #infcor_2x_201_ueye3()
@@ -33,8 +33,8 @@ def main():
     #infcor_2x_207_ueye3()
     #infcor_2x_208_ueye3()
     #infcor_2x_205_ueye3()
-    #locate_bright_field_from_simulation()
-    #compact_2x_205()
+    locate_bright_field_from_simulation()
+    compact_2x_205()
 
     plt.show()
 
@@ -170,18 +170,19 @@ def locate_bright_field_from_simulation():
     print("Simulation:", end-start)
     
     start = time.perf_counter()
-    calibration_parameters = non_linear_BFL(data = data_patch, setup_parameters = setup_parameters)
+    calibration_parameters = non_linear_BFL(data = data_patch, setup_parameters = setup_parameters, 
+                                            assumed_calibration_parameters=assumed_parameters)
 
     end = time.perf_counter()
     print("Bright field localization:", end-start)
 
-    fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
-                                                calibration_parameters=calibration_parameters,
-                                                array_size=arraysize, Fresnel=Fresnel)
+    # fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
+    #                                             calibration_parameters=calibration_parameters,
+    #                                             array_size=arraysize, Fresnel=Fresnel)
     
-    fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
-                                                calibration_parameters=simulation_parameters,
-                                                array_size=arraysize, Fresnel=Fresnel)
+    # fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
+    #                                             calibration_parameters=simulation_parameters,
+    #                                             array_size=arraysize, Fresnel=Fresnel)
 
 
 def locate_bright_field_from_setup_hamamatsu(datadirpath, lens, Fresnel, array_size, assumed_calibration_parameters):
@@ -232,15 +233,15 @@ def locate_bright_field_from_setup_hamamatsu(datadirpath, lens, Fresnel, array_s
     print("Data patch:", end-start)
     
     start = time.perf_counter()
-    calibration_parameters = non_linear_BFL(data = data_patch, setup_parameters = setup_parameters)
+    calibration_parameters = non_linear_BFL(data = data_patch, setup_parameters = setup_parameters,
+                                            assumed_calibration_parameters=assumed_calibration_parameters)
     end = time.perf_counter()
     print("Bright field localization:", end-start)
 
-    print(calibration_parameters)
 
-    fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
-                                                calibration_parameters=calibration_parameters, 
-                                                array_size=array_size, Fresnel=Fresnel)
+    # fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
+    #                                             calibration_parameters=calibration_parameters, 
+    #                                             array_size=array_size, Fresnel=Fresnel)
     
     # fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
     #                                     calibration_parameters=assumed_calibration_parameters, 
@@ -296,15 +297,14 @@ def locate_bright_field_from_setup(datadirpath, lens, Fresnel, array_size, assum
     print("Data patch:", end-start)
 
     start = time.perf_counter()
-    calibration_parameters = non_linear_BFL(data = data_patch, setup_parameters = setup_parameters)
+    calibration_parameters = non_linear_BFL(data = data_patch, setup_parameters = setup_parameters,
+                                            assumed_calibration_parameters=assumed_calibration_parameters)
     end = time.perf_counter()
     print("Bright field localization:", end-start)
 
-    print(calibration_parameters)
-
-    fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
-                                                calibration_parameters=calibration_parameters, 
-                                                array_size=array_size, Fresnel=Fresnel)
+    # fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
+    #                                             calibration_parameters=calibration_parameters, 
+    #                                             array_size=array_size, Fresnel=Fresnel)
     
     # fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
     #                                         calibration_parameters=assumed_calibration_parameters, 
