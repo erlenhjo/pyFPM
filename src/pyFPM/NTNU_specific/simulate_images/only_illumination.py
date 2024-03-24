@@ -4,7 +4,6 @@ from pyFPM.simulation.simulate_imaging import simulate_imaging, finalize_simulat
 from pyFPM.NTNU_specific.simulate_images.simulate_setup import simulate_setup_parameters
 
 import numpy as np
-import skimage
 
 
 def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fresnel_propagation, 
@@ -12,19 +11,19 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
     noise_fraction = 0 
     zernike_coefficients = np.array([0,0,0])
 
-    dummy_camera = HAMAMATSU_C11440_42U30
+    camera = HAMAMATSU_C11440_42U30
     LED_array = MAIN_LED_ARRAY
 
     pixel_scale_factor = 4
 
-    amplitude_image = np.ones(shape=(dummy_camera.raw_image_size[1]*pixel_scale_factor, dummy_camera.raw_image_size[0]*pixel_scale_factor))
+    amplitude_image = np.ones(shape=(camera.raw_image_size[1]*pixel_scale_factor, camera.raw_image_size[0]*pixel_scale_factor))
     phase_image = np.zeros(shape=amplitude_image.shape)
     high_res_complex_object = amplitude_image * np.exp(1j*phase_image)
     
     
     setup_parameters = simulate_setup_parameters(
         lens = lens,
-        camera = dummy_camera,
+        camera = camera,
         LED_array = LED_array
         )  
 
@@ -42,7 +41,7 @@ def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fre
         calibration_parameters=calibration_parameters
     )
 
-    patch_size = dummy_camera.raw_image_size
+    patch_size = camera.raw_image_size
 
     data_patch, imaging_system, illumination_pattern \
         = finalize_simulation_setup(
