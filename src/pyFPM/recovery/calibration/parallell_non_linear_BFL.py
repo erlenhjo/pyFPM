@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from scipy.optimize import minimize
 
 
-def multi_non_linear_BFL(data_patches: List[Data_patch], setup_parameters: Setup_parameters, 
+def parallell_non_linear_BFL(data_patches: List[Data_patch], setup_parameters: Setup_parameters, 
                          assumed_calibration_parameters: LED_calibration_parameters,
                          relative_LED_distances):
     otsu_power = 4 # 1 means that the otsu threshold is based on amplitude, 2 on intensity, 4 on intesity^2

@@ -101,9 +101,10 @@ def optimize_bright_field_edge(edges_per_image, n_values, m_values,
         assumed_parameters.delta_x,
         assumed_parameters.delta_y,
         assumed_parameters.LED_distance,
-        assumed_parameters.alpha,
-        assumed_parameters.beta,
-        assumed_parameters.gamma
+        1,
+        0,
+        0,
+        0
     ]
     error_function = get_error_function(edges = edges_per_image,
                                         LED_n = n_values,
@@ -127,7 +128,8 @@ def optimize_bright_field_edge(edges_per_image, n_values, m_values,
 
 
     delta_x, delta_y, LED_distance,\
-        alpha, beta, gamma = results.x
+        q0, q1, q2, q3 = results.x
+    alpha, beta, gamma = get_angles(q0,q1,q2,q3)
 
     optimized_parameters = Calibration_parameters(
         delta_x = delta_x,
@@ -208,7 +210,9 @@ def get_error_function(edges, LED_n, LED_m, LED_pitch, pixel_size,
                                                                )
     def simplified_error_function(args):
         delta_x, delta_y, LED_distance,\
-            alpha, beta, gamma = args
+            q0, q1, q2, q3 = args
+        alpha, beta, gamma = get_angles(q0,q1,q2,q3)
+
         centers_x, centers_y, radii = center_and_radii_function(
             delta_x = delta_x, delta_y = delta_y,
             LED_distance = LED_distance,
@@ -224,9 +228,14 @@ def get_error_function(edges, LED_n, LED_m, LED_pitch, pixel_size,
     return simplified_error_function
 
 
+def get_angles(q0,q1,q2,q3):
+    norm = np.sqrt(q0**2+q1**2+q2**2+q3**2)
+    q0, q1, q2, q3 = q0/norm, q1/norm, q2/norm, q3/norm
+    gamma = np.arctan2(2*(q0*q1+q2*q3), q0**2-q1**2-q2**2+q3**2)
+    beta = np.arcsin(2*(q0*q2-q1*q3))
+    alpha = np.arctan2(2*(q0*q3+q1*q2), q0**2+q1**2-q2**2-q3**2)
 
-
-
+    return alpha, beta, gamma
 
 
 

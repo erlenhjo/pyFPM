@@ -14,8 +14,8 @@ def detect_edges_per_image(images, canny_sigma, LED_indices, center_indices,
     images = images[:,::downsample_image, ::downsample_image]
 
     image_center = np.flip(images[0].shape) // 2
-    #threshold = threshold_otsu(images) # global threshold appears best, less outliers, slight difference
-    threshold = 4e9
+    threshold = threshold_otsu(images) # global threshold appears best, less outliers, slight difference
+    #threshold = 4e9
     #threshold = 0.5
 
     for image, image_indices in zip(images, np.array(LED_indices)):
