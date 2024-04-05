@@ -240,7 +240,7 @@ def get_angles(q0,q1,q2,q3):
 
 
 def plot_bright_field_images_with_BF_edge(data_patch: Data_patch, setup_parameters: Setup_parameters, 
-                                          calibration_parameters: LED_calibration_parameters,
+                                          calibration_parameters: Calibration_parameters,
                                           inverse_object_to_lens_distance, numerical_aperture, 
                                           array_size: int):
     LED_indices = data_patch.LED_indices

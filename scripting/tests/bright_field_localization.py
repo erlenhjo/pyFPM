@@ -33,9 +33,9 @@ def main():
     #test_BFL()
     #compact_2x_205()
     #double_convex()
-    multi_comp_2x()
-    # multi_tele_3x()
-    # plt.show()
+    #multi_comp_2x()
+    multi_tele_3x()
+    plt.show()
 
 def infcor_2x_200_hamamatsu():
     lens = INFINITYCORRECTED_2X
@@ -152,22 +152,6 @@ def compact_2x_205():
     locate_bright_field_from_setup(datadirpath=datadirpath, lens=lens, camera=camera, array_size=5, 
                                    assumed_calibration_parameters=assumed_calibration_parameters)
     
-def multi_infcor_2x():
-    lens = INFINITYCORRECTED_2X
-    camera = IDS_U3_31J0CP_REV_2_2
-    datadirpaths = [
-        main_folder_2 / "infcor2x_illum_200",
-        main_folder_2 / "infcor2x_illum_204",
-        main_folder_2 / "infcor2x_illum_208",
-        main_folder_2 / "infcor2x_illum_212"
-    ]
-    relative_LED_distances = [0, 4e-3, 8e-3, 12e-3]
-
-    assumed_calibration_parameters = LED_calibration_parameters(200e-3,0e-6,0e-6,0)
-    locate_bright_field_from_setup_series(datadirpaths=datadirpaths, 
-                                         relative_LED_distances=relative_LED_distances, 
-                                         lens=lens, camera=camera, array_size=5, 
-                                         assumed_calibration_parameters=assumed_calibration_parameters)
     
 def multi_comp_2x():
     lens = COMPACT_2X
@@ -179,7 +163,7 @@ def multi_comp_2x():
         main_folder_3 / "comp2x_illum_misalign_p10",
         main_folder_3 / "comp2x_illum_misalign_p20"
     ]
-    relative_LED_distances = - np.array([-20e-3, 10e-3, 0, 10e-3, 20e-3])
+    relative_LED_distances = - np.array([-20e-3, -10e-3, 0, 10e-3, 20e-3])
 
     assumed_calibration_parameters = LED_calibration_parameters(200e-3,0e-6,0e-6,0)
     locate_bright_field_from_setup_series(datadirpaths=datadirpaths, 
@@ -199,7 +183,13 @@ def multi_tele_3x():
         main_folder_3 / "tele3x_illum_misalign_p10",
         main_folder_3 / "tele3x_illum_misalign_p20"
     ]
-    relative_LED_distances = - np.array([-20e-3, 10e-3, 0, 10e-3, 20e-3])
+    relative_LED_distances = - np.array([-20e-3, -10e-3, 0, 10e-3, 20e-3])
+
+    datadirpaths = [
+        main_folder_3 / "tele3x_illum_misalign_p10",
+        main_folder_3 / "tele3x_illum_misalign_p20"
+    ]
+    relative_LED_distances = - np.array([10e-3, 20e-3])
 
     assumed_calibration_parameters = LED_calibration_parameters(200e-3,0e-6,0e-6,0)
     locate_bright_field_from_setup_series(datadirpaths=datadirpaths, 
