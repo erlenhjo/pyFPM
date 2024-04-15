@@ -7,7 +7,7 @@ from pyFPM.setup.Illumination_pattern import Illumination_pattern
 from pyFPM.setup.Imaging_system import Imaging_system, LED_calibration_parameters
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.recovery.utility.real_space_error import compute_sum_square_error
-from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
+from pyFPM.aberrations.pupils.defocus_and_window import get_defocused_pupil
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
 
 from pyFPM.recovery.algorithms.run_algorithm import recover
