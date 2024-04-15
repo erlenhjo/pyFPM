@@ -2,7 +2,7 @@
 from pyFPM.setup.Setup_parameters import Lens
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
-from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
+from pyFPM.aberrations.pupils.defocus_and_window import get_defocused_pupil
 from pyFPM.recovery.algorithms.Step_description import Step_description
 from pyFPM.experimental.pickle_results import pickle_algorithm_results, plot_pickled_experiment
 

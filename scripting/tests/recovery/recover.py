@@ -6,15 +6,15 @@ import numpy as np
 from pyFPM.NTNU_specific.setup_hamamatsu import setup_hamamatsu
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.run_algorithm import recover, Method
-from pyFPM.aberrations.pupils.defocused_pupil import get_defocused_pupil
+from pyFPM.aberrations.pupils.defocus_and_window import get_defocused_pupil
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description, get_constant_step_description
 from pyFPM.simulation.simulate_imaging import simulate_angled_imaging
 from pyFPM.setup.Data import Data_patch, Simulated_data
 from pyFPM.NTNU_specific.components import DOUBLE_CONVEX, TELECENTRIC_3X, INFINITYCORRECTED_2X
 
 # utility imports
-from pyFPM.visualization.plot_results import plot_results
-from pyFPM.visualization.plot_illumination import plot_bright_field_images
+from pyFPM.experimental.plot_results import plot_results
+from pyFPM.experimental.plot_illumination import plot_bright_field_images
 
 
 #datadirpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\data\20230825_USAFtarget"
