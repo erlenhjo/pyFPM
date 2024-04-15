@@ -1,17 +1,17 @@
 from pyFPM.NTNU_specific.components import MAIN_LED_ARRAY, HAMAMATSU_C11440_42U30
-from pyFPM.setup.Setup_parameters import Camera
+from pyFPM.setup.Setup_parameters import Camera, Lens
 from pyFPM.simulation.simulate_imaging import simulate_imaging, finalize_simulation_setup
 from pyFPM.NTNU_specific.simulate_images.simulate_setup import simulate_setup_parameters
 
 import numpy as np
 
 
-def simulate_illumination(lens, correct_spherical_wave_illumination, correct_Fresnel_propagation, 
+def simulate_illumination(lens: Lens, camera: Camera,
+                          correct_spherical_wave_illumination, correct_Fresnel_propagation, 
                           arraysize, calibration_parameters, patch_offset=[0,0]):
     noise_fraction = 0 
     zernike_coefficients = np.array([0,0,0])
 
-    camera = HAMAMATSU_C11440_42U30
     LED_array = MAIN_LED_ARRAY
 
     pixel_scale_factor = 4
