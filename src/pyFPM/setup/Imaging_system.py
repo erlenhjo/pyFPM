@@ -87,13 +87,13 @@ class Imaging_system(object):
         high_res_object_x_positions, high_res_object_y_positions = calculate_relative_position_mesh_grids(pixel_size = final_object_pixel_size, 
                                                                                                           image_region_size = final_image_size
                                                                                                         ) 
-        high_res_Fresnel_object_phase_correction = calculate_object_plane_phase_shift(
+        high_res_Fresnel_object_phase_correction = calculate_object_plane_phase_curvature(
                                                     x_mesh = high_res_object_x_positions, 
                                                     y_mesh = high_res_object_y_positions, 
                                                     wavevector = 2*np.pi*spatial_frequency, 
                                                     distance = object_to_lens_distance
                                                 )
-        high_res_spherical_illumination_object_phase_correction = calculate_object_plane_phase_shift(
+        high_res_spherical_illumination_object_phase_correction = calculate_object_plane_phase_curvature(
                                                                     x_mesh = high_res_object_x_positions, 
                                                                     y_mesh = high_res_object_y_positions, 
                                                                     wavevector = 2*np.pi*spatial_frequency, 
@@ -169,8 +169,8 @@ def calculate_LED_locations(LED_array_size, center_indices, LED_pitch, LED_rotat
     x_offset = LED_offset[0]
     y_offset = LED_offset[1]
 
-    x_locations = np.zeros(shape = (y_size , x_size))
-    y_locations = np.zeros(shape = (y_size , x_size))
+    x_locations = np.zeros(shape=(y_size , x_size))
+    y_locations = np.zeros(shape=(y_size , x_size))
 
     # calculate locations relative center LED
     rotation_radians = 3.14/180 * LED_rotation
@@ -257,5 +257,5 @@ def calculate_relative_position_mesh_grids(pixel_size, image_region_size):
     return x_mesh, y_mesh
 
 
-def calculate_object_plane_phase_shift(x_mesh, y_mesh, wavevector, distance):
+def calculate_object_plane_phase_curvature(x_mesh, y_mesh, wavevector, distance):
     return np.exp(1j * wavevector * 1/(2*distance) * (x_mesh**2 + y_mesh**2))
