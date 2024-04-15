@@ -5,7 +5,8 @@ from PIL import Image
 from pyFPM.setup.Data import Rawdata
 
 
-def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_size):
+def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_size, 
+                           float_type, desired_step_nr = 0):
         background_filename = "dark_image"
 
         image_files, background_file = get_image_filenames(
@@ -13,20 +14,21 @@ def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_
             image_format = image_format,
             background_filename = background_filename
         )
-        
+
         background_image = load_single_image(
             datadirpath = datadirpath,
             file = background_file
             )
-
+        
         LED_indices, images = load_images(
             datadirpath = datadirpath,
             image_files = image_files,
             center_indices = center_indices,
-            max_array_size = max_array_size
+            max_array_size = max_array_size,
+            desired_step_nr = desired_step_nr
         )
 
-        return Rawdata(LED_indices=LED_indices, images=images, background_image=background_image)
+        return Rawdata(LED_indices=LED_indices, images=images.astype(float_type), background_image=background_image)
 
         
         
@@ -49,19 +51,22 @@ def get_image_filenames(datadirpath, image_format, background_filename):
 
     return image_files, background_file
 
-
 def indices_from_image_title(filename: str):
     filename = filename.split(".")[0]
-    filename = filename.split("-")[1]
-    filename = filename.split("_")
+    filename = filename.split("-")
+    filename_start = filename[0]
+    filename_end = filename[1]
 
-    x_index = int(filename[0])
-    y_index = int(filename[1])
+    step_nr_image_nr = filename_start.split("_")
+    x_y_index = filename_end.split("_")
 
-    return x_index, y_index
-    
+    step_nr = int(step_nr_image_nr[0])
+    x_index = int(x_y_index[0])
+    y_index = int(x_y_index[1])
 
-def load_images(datadirpath, image_files, center_indices, max_array_size):
+    return x_index, y_index, step_nr
+
+def load_images(datadirpath, image_files, center_indices, max_array_size, desired_step_nr):
     LED_indices = []
     images = []
     max_X = center_indices[0] + max_array_size//2
@@ -69,10 +74,13 @@ def load_images(datadirpath, image_files, center_indices, max_array_size):
     max_Y = center_indices[1] + max_array_size//2
     min_Y = center_indices[1] - max_array_size//2
 
-    for n, file in enumerate(image_files):
-        X, Y = indices_from_image_title(file)
+    for file in image_files:
+        X, Y, step_nr = indices_from_image_title(file)
 
         if (X<min_X or X>max_X ) or (Y<min_Y or Y>max_Y):
+            continue
+
+        if step_nr != desired_step_nr:
             continue
 
         LED_indices.append([X,Y])  
