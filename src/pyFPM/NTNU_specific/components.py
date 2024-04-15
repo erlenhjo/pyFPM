@@ -68,6 +68,16 @@ INFINITYCORRECTED_10X = Lens(
     lens_type = Lens_type.INFINITY_CORRECTED
 )
 
+INFINITYCORRECTED_50X = Lens(
+    NA = 0.55,
+    magnification = 50,
+    focal_length = 4e-3,
+    working_distance = 13e-3,
+    depth_of_field = 0.9e-6,
+    max_FoV_sensor = 11e-3,
+    lens_type = Lens_type.INFINITY_CORRECTED
+)
+
 TELECENTRIC_3X = Lens(
     NA = 0.09,
     magnification = 3,
