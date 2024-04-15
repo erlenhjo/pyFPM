@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pyFPM.visualization.plot_illumination import plot_bright_field_images
+from pyFPM.experimental.plot_illumination import plot_bright_field_images
 from pyFPM.NTNU_specific.simulate_images.only_illumination import simulate_illumination
 from pyFPM.NTNU_specific.setup_from_file import setup_parameters_from_file
 from pyFPM.NTNU_specific.rawdata_from_files import get_rawdata_from_files
@@ -23,7 +23,7 @@ def illustrate_illumination_from_simulation(lens, spherical, Fresnel, z_LED, arr
     return fig
 
 def illustrate_illumination_from_setup(datadirpath, lens, array_size):
-    patch_start = [0, 0] # [x, y]
+    patch_offset = [0, 0] # [x, y]
     patch_size = [2048, 2048] # [x, y]
 
     camera = HAMAMATSU_C11440_42U30
@@ -40,7 +40,8 @@ def illustrate_illumination_from_setup(datadirpath, lens, array_size):
         datadirpath = datadirpath,
         image_format = setup_parameters.image_format,
         center_indices = setup_parameters.LED_info.center_indices,
-        max_array_size = array_size
+        max_array_size = array_size,
+        float_type = setup_parameters.camera.float_type
         )
 
     preprocessed_data = Preprocessed_data(
@@ -52,11 +53,13 @@ def illustrate_illumination_from_setup(datadirpath, lens, array_size):
     
     data_patch = Data_patch(
         data = preprocessed_data,
-        patch_start = patch_start,
+        raw_image_size = setup_parameters.camera.raw_image_size,
+        patch_offset = patch_offset,
         patch_size = patch_size
         )
 
-    fig = plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=array_size)
+    fig = plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, 
+                                                array_size=array_size)
     return fig
 
     

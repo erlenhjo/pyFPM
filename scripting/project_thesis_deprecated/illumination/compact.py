@@ -4,7 +4,7 @@ from pyFPM.NTNU_specific.components import COMPACT_2X
 from general_functions import illustrate_illumination_from_setup, illustrate_illumination_from_simulation
 
 lens = COMPACT_2X
-array_size = 3
+array_size = 7
 
 savefolderpath = r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\project_thesis\results\illumination"
 
@@ -28,7 +28,7 @@ def experimental():
 
 if __name__ == "__main__": 
     #simulate_illumination()
-    simulate_both()
-    simulate_both_WD()
+    # simulate_both()
+    # simulate_both_WD()
     experimental()
     plt.show()

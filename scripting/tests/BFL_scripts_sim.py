@@ -2,8 +2,6 @@ from pyFPM.NTNU_specific.simulate_images.only_illumination import simulate_illum
 from pyFPM.NTNU_specific.components import (IDS_U3_31J0CP_REV_2_2, MAIN_LED_ARRAY, INFINITYCORRECTED_2X,
                                             HAMAMATSU_C11440_42U30, TELECENTRIC_3X, DOUBLE_CONVEX, COMPACT_2X)
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
-from pyFPM.recovery.calibration.parallell_non_linear_BFL import parallell_non_linear_BFL
-from pyFPM.recovery.calibration.series_non_linear_BFL import series_non_linear_BFL
 from pyFPM.recovery.calibration.non_linear_BFL import non_linear_BFL, calculate_BF_edge_circle, Calibration_parameters
 from pyFPM.NTNU_specific.simulate_images.simulate_setup import simulate_setup_parameters
 from pyFPM.setup.Data import Simulated_data, Data_patch

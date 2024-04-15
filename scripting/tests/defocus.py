@@ -39,12 +39,15 @@ def main():
         fz_mesh = np.emath.sqrt(frequency**2 - fx_mesh**2 - fy_mesh**2)
 
         # Fresnel
-        pupil_phase = 2*np.pi*defocus/(2*frequency)*(fx_mesh**2+fy_mesh**2)  
+        pupil_phase = -np.pi*defocus/frequency*(fx_mesh**2+fy_mesh**2)  
         plot_results(imaging_system, pupil_phase, defocus)
 
         # Original FPM
-        pupil_phase = -2*np.pi*defocus*np.real(fz_mesh) + 2*np.pi*frequency*defocus
+        pupil_phase = 2*np.pi*defocus*np.real(fz_mesh) - 2*np.pi*frequency*defocus
         plot_results(imaging_system, pupil_phase, defocus) 
+
+        NA = TELECENTRIC_3X.NA
+        print(-np.pi*frequency*defocus*NA**2/(np.sqrt(3)*2))
 
         plt.show()
 
@@ -55,7 +58,7 @@ def setup_lens(
 ):
     pixel_scale_factor = 4
     calibration_parameters = LED_calibration_parameters(200e-3,0,0,0)
-    patch_start = np.array([2856, 2848], dtype=int) // 2 - 256
+    patch_offset = [0,0]
     patch_size = [512, 512]
 
     #camera = IDS_U3_31J0CP_REV_2_2
@@ -78,9 +81,9 @@ def setup_lens(
     imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
-        patch_start = patch_start,
+        patch_offset = patch_offset,
         patch_size = patch_size,
-        LED_calibration_parameters=calibration_parameters
+        calibration_parameters=calibration_parameters
     )
 
     return imaging_system
@@ -100,6 +103,8 @@ def plot_results(
 
     recovered_zernike_coefficients = decompose_zernike_pupil(imaging_system=imaging_system, pupil=np.exp(1j*pupil_phase), 
                                                              max_j=6)
+
+    print(recovered_zernike_coefficients[4])
 
     fig.suptitle(f"{defocus}, {recovered_zernike_coefficients[4]}")
 
