@@ -9,10 +9,8 @@ class Illumination_pattern(object):
                  imaging_system: Imaging_system, setup_parameters: Setup_parameters):
         LED_array_size = setup_parameters.LED_info.LED_array_size
         center_indices = setup_parameters.LED_info.center_indices
-        LED_frequencies_x = imaging_system.LED_shifts_x * imaging_system.df_x
-        LED_frequencies_y = imaging_system.LED_shifts_y * imaging_system.df_y
-        LED_aperture_shifts_x = imaging_system.LED_shifts_x_aperture 
-        LED_aperture_shifts_y = imaging_system.LED_shifts_y_aperture
+        LED_frequencies_x = imaging_system.LED_shifts_x_Fresnel * imaging_system.df_x
+        LED_frequencies_y = imaging_system.LED_shifts_y_Fresnel * imaging_system.df_y
         cutoff_frequency = imaging_system.cutoff_frequency
         
         avaliable_LEDs = determine_available_LEDs(LED_indices=LED_indices, LED_array_size=LED_array_size, 
@@ -23,13 +21,6 @@ class Illumination_pattern(object):
              LED_frequencies_y = LED_frequencies_y,
              cutoff_frequency = cutoff_frequency
         )
-
-        self.relative_aperture_shifts = calculate_relative_NA(
-             LED_frequencies_x = LED_aperture_shifts_x * imaging_system.df_x,
-             LED_frequencies_y = LED_aperture_shifts_y * imaging_system.df_y,
-             cutoff_frequency = cutoff_frequency
-        )
-
 
         self.update_order, self.update_order_matrix \
             = spiral_indices(LED_indices = LED_indices, center_indices=center_indices, 
@@ -98,5 +89,4 @@ def spiral_indices(LED_indices, center_indices, LED_array_size, avaliable_LEDs):
         order_list[update_index] = n
 
     return order_list, order_matrix
-    
     

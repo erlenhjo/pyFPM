@@ -80,43 +80,4 @@ def create_single_dot_mask(dot_radius, object_pixel_size):
     return single_dot
 
 
-from pyFPM.NTNU_specific.components import EO_DOT_ARRAY
-
-def simulate_dot_array(image_size):
-    pixel_size = 6.5e-6 
-    magnification = 2
-    dot_radius = EO_DOT_ARRAY.diameter / 2 # m
-    dot_spacing = EO_DOT_ARRAY.spacing # m
-
-    pixel_scale_factor = 2
-    high_res_image_size = [size * pixel_scale_factor for size in image_size]
-    high_res_pixel_size = pixel_size / pixel_scale_factor
-
-    dot_array_image, _ = get_dot_array_image(
-                            dot_radius=dot_radius, 
-                            dot_spacing=dot_spacing, 
-                            image_size=high_res_image_size,
-                            object_pixel_size=high_res_pixel_size/magnification
-                            )
-
-    return dot_array_image
-
-
-def main_test():
-    image_size = [4096,4096]
-    image = simulate_dot_array(image_size)
-
-
-def profile_main_test():
-    import cProfile
-    import pstats
-
-    with cProfile.Profile() as pr:
-        main_test()
-    stats = pstats.Stats(pr)
-    stats.sort_stats(pstats.SortKey.TIME)
-    stats.dump_stats(filename=r"profiling_data\dot_array_image_generation_convolution.prof")
-
-if __name__ == "__main__":
-    profile_main_test()
 

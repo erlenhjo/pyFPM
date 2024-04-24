@@ -38,7 +38,7 @@ def main():
 
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
         = simulate_2x(high_res_complex_object, noise_fraction=0, zernike_coefficients=zernike_coefficients, 
-                      spherical_illumination=simulate_spherical_illumination, patch_offset=[0, 0], use_aperture_shift=False)
+                      spherical_illumination=simulate_spherical_illumination, patch_offset=[0, 0], use_Fresnel_shift=True)
     step_description = get_standard_adaptive_step_description(max_iterations=100, start_EPRY_at_iteration=0, start_adaptive_at_iteration=5)
 
     #plot_bright_field_images(data_patch=data_patch, setup_parameters=setup_parameters, array_size=5)

@@ -17,49 +17,39 @@ class Camera(object):
         self.raw_image_size = raw_image_size # number of pixels in [x, y]
         self.float_type = float_type # currently requires np.float64 due to casting with numba and fft
 
-class Lens_type(Enum):
-    INFINITY_CORRECTED = 1
-    TELECENTRIC = 2
-    SINGLE_LENS = 3
-    COMPACT = 4
-
 class Lens(object):
     def __init__(
             self, 
             NA, 
             magnification,
+            effectiv_object_to_aperture_distance,
             focal_length,
             working_distance,
             depth_of_field, 
             max_FoV_sensor,
-            lens_type: Lens_type
+            
         ):
         self.NA = NA
         self.magnification = magnification
+        self.effective_object_to_aperture_distance = effectiv_object_to_aperture_distance
         self.focal_length = focal_length # m
         self.working_distance = working_distance # m
         self.depth_of_field = depth_of_field # m
-        self.lens_type: Lens_type = lens_type
         
         if max_FoV_sensor is not None:
             self.max_FoV = max_FoV_sensor/magnification # m in diameter at the object plane
         else:
             self.max_FoV = None
-        
-
-def get_object_to_lens_distance(lens: Lens):
-    if lens.lens_type == Lens_type.INFINITY_CORRECTED:
-        return lens.focal_length
-    elif lens.lens_type == Lens_type.TELECENTRIC or lens.lens_type == Lens_type.COMPACT or lens.lens_type == Lens_type.SINGLE_LENS:
-        return (1+1/lens.magnification)*lens.focal_length
 
 
 class Setup_parameters(object):
-    def __init__(self, lens: Lens, camera: Camera, LED_info: LED_infos, image_format: str = ""):
+    def __init__(self, lens: Lens, camera: Camera, LED_info: LED_infos, 
+                 image_format: str = "", binning_factor = 1):
         self.lens: Lens = lens
         self.camera: Camera = camera
         self.LED_info: LED_infos = LED_info
-        self.image_format:str = image_format
+        self.image_format: str = image_format
+        self.binning_factor: int = binning_factor
 
         
 

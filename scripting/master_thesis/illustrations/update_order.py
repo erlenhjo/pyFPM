@@ -1,13 +1,13 @@
-import matplotlib.pyplot as plt
-
 # FPM imports
 from pyFPM.NTNU_specific.simulate_images.simulate_2x import simulate_2x
 
-
 import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
 
-
-
+main_result_folder = Path.cwd() / "results" / "master_thesis"
+illustration_folder = main_result_folder / "illustrations"
+illustration_folder.mkdir(parents=True, exist_ok=True)
 
 
 def illustrate_update_order():
@@ -32,12 +32,12 @@ def illustrate_update_order():
     ax.set_aspect("equal")
     cbar = plt.colorbar(cax, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label("Update index")
-    print(data_patch.LED_indices[illumination_pattern.update_order[1]], data_patch.LED_indices[illumination_pattern.update_order[2]])
-    fig.savefig(r"C:\Users\erlen\Documents\GitHub\pyFPM\examples\project_thesis\results\illustrations"+r"\update_order.png", dpi=400)
-
-    plt.show()
+    
+    fig.savefig(illustration_folder / "illustrate_update_order.pdf")
+    fig.savefig(illustration_folder / "illustrate_update_order.png")
+    
 
 if __name__ == "__main__":
     illustrate_update_order()
-
+    plt.show()
 

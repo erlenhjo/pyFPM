@@ -11,7 +11,7 @@ from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.recovery.algorithms.Step_description import Step_description
 from pyFPM.recovery.algorithms.Algorithm_result import Algorithm_result
 from pyFPM.recovery.utility.k_space import calculate_low_res_index_ranges, calculate_recovered_CTF
-from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables
+from pyFPM.recovery.algorithms.initialization import initialize_high_res_image, extract_variables, unpack_mask_indices
 from pyFPM.recovery.utility.real_space_error import caclulate_real_space_error_normalization_factor
 
 def standard_recovery_algorithm(
@@ -22,13 +22,14 @@ def standard_recovery_algorithm(
         step_description: Step_description,
         correct_spherical_wave_phase: bool,
         correct_Fresnel_phase: bool,
-        correct_aperture_shift: bool
+        use_Fresnel_shifts: bool
         ) -> Algorithm_result :
 
     low_res_images, update_order, complex_type, size_low_res_x, size_low_res_y, size_high_res_x, size_high_res_y, \
         shifts_x, shifts_y, low_res_CTF, high_res_CTF, scaling_factor_squared, scaling_factor, LED_indices, \
-        alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, max_iterations \
-                = extract_variables(data_patch, imaging_system, illumination_pattern, step_description, correct_aperture_shift)
+        alpha, beta, eta, start_EPRY_at_iteration, start_adaptive_steps_at_iteration, converged_alpha, \
+             apply_BF_mask_from_iteration, max_iterations \
+                = extract_variables(data_patch, imaging_system, illumination_pattern, step_description, use_Fresnel_shifts)
     
     object_phase_correction = get_object_phase_correction(imaging_system, correct_spherical_wave_phase, 
                                                           correct_Fresnel_phase, complex_type)
@@ -37,14 +38,19 @@ def standard_recovery_algorithm(
           = initialize_high_res_image(low_res_images, update_order, scaling_factor, 
                                       object_phase_correction, high_res_CTF, complex_type)
     pupil_guess = pupil_guess.astype(complex_type)
+
     LED_shifts = calculate_low_res_index_ranges(shifts_x, shifts_y, size_low_res_x, size_low_res_y,
                                                 size_high_res_x, size_high_res_y, LED_indices)
+    BF_edge_masks = imaging_system.BF_edge_masks
+    mask_indices = unpack_mask_indices(mask_indices = imaging_system.mask_index_per_LED,
+                                       LED_indices = LED_indices)
 
     recovered_object_spectrum, recovered_pupil, convergence_index, real_space_error_metric \
         = main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,  
                               scaling_factor_squared, low_res_CTF, pupil_guess, LED_shifts,
                               alpha, beta, eta, converged_alpha, max_iterations,
-                              start_EPRY_at_iteration, start_adaptive_steps_at_iteration 
+                              start_EPRY_at_iteration, start_adaptive_steps_at_iteration,
+                              BF_edge_masks, mask_indices, apply_BF_mask_from_iteration
                               )
 
     recovered_CTF = calculate_recovered_CTF(update_order, LED_shifts, low_res_CTF, size_high_res_x, size_high_res_y)
@@ -65,11 +71,12 @@ def standard_recovery_algorithm(
     ) 
     return algorithm_result
 
-@njit(cache=True, fastmath=True)
+#@njit(cache=True, fastmath=True)
 def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,
                         scaling_factor_squared, low_res_CTF, pupil, LED_shifts, 
                         alpha, beta, eta, converged_alpha, max_iterations,
-                        start_EPRY_at_iteration, start_adaptive_steps_at_iteration
+                        start_EPRY_at_iteration, start_adaptive_steps_at_iteration,
+                        BF_edge_masks, mask_indices, apply_BF_mask_from_iteration
                         ):
     recovered_object_spectrum = recovered_object_spectrum_guess
     low_res_images = low_res_images * scaling_factor_squared
@@ -85,7 +92,19 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
             index = update_order[image_nr]
             raw_image = low_res_images[index]
             min_x, max_x, min_y, max_y = LED_shifts[index]
-            
+            mask_index = mask_indices[index]
+            if mask_index == -1 or loop_nr < apply_BF_mask_from_iteration:
+                mask = 0
+                inverse_mask = 1
+            else:
+                mask = BF_edge_masks[mask_index]
+                inverse_mask = np.invert(mask)
+                # plt.matshow(mask)
+                # plt.matshow(raw_image)
+                # plt.matshow(raw_image*mask)
+                # plt.matshow(raw_image*inverse_mask)
+                # plt.show()
+
             # project current spectrum to detector
             current_spectrum = recovered_object_spectrum[min_y:max_y+1, min_x:max_x+1]
             current_lens_spectrum = pupil * low_res_CTF * current_spectrum                                    
@@ -97,7 +116,7 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
             real_space_error_metric += np.linalg.norm(raw_image - np.abs(projected_image))**2
 
             # calculated updated spectrum at lens
-            updated_image = raw_image * projected_image / np.abs(projected_image)
+            updated_image = projected_image * mask + raw_image * projected_image / np.abs(projected_image) * inverse_mask
             updated_lens_spectrum = fftshift(fft2(ifftshift(updated_image)))
 
             # calculate update terms

@@ -15,14 +15,16 @@ def setup_IDS_U3(
     threshold_value,
     noise_reduction_regions,
     calibration_parameters,
-    max_array_size
+    max_array_size,
+    binning_factor
 ):
     
     setup_parameters, preprocessed_data = setup_IDS_U3_global(lens,
                                                               datadirpath,
                                                               threshold_value,
                                                               noise_reduction_regions,
-                                                              max_array_size
+                                                              max_array_size,
+                                                              binning_factor
                                                               )
     
 
@@ -42,7 +44,8 @@ def setup_IDS_U3_global(lens: Lens,
                         datadirpath,
                         threshold_value,
                         noise_reduction_regions,
-                        max_array_size):
+                        max_array_size,
+                        binning_factor):
     
     camera = IDS_U3_31J0CP_REV_2_2
     LED_array = MAIN_LED_ARRAY
@@ -51,7 +54,8 @@ def setup_IDS_U3_global(lens: Lens,
         datadirpath = datadirpath,
         lens = lens,
         camera = camera,
-        LED_array = LED_array
+        LED_array = LED_array,
+        binning_factor = binning_factor
         )
 
     rawdata: Rawdata = get_rawdata_from_files(
@@ -59,7 +63,8 @@ def setup_IDS_U3_global(lens: Lens,
         image_format = setup_parameters.image_format,
         center_indices = setup_parameters.LED_info.center_indices,
         max_array_size = max_array_size,
-        float_type = setup_parameters.camera.float_type
+        float_type = setup_parameters.camera.float_type,
+        binning_factor = binning_factor
         )
 
     preprocessed_data = Preprocessed_data(
@@ -82,11 +87,14 @@ def setup_IDS_U3_local(setup_parameters: Setup_parameters,
                        max_array_size
                        ):
 
+    binned_image_size = [preprocessed_data.amplitude_images[0].shape[1], 
+                         preprocessed_data.amplitude_images[0].shape[0]]
+
     data_patch = Data_patch(
         data = preprocessed_data,
-        raw_image_size = setup_parameters.camera.raw_image_size,
         patch_offset = patch_offset,
-        patch_size = patch_size
+        patch_size = patch_size,
+        binned_image_size = binned_image_size
         )
 
     imaging_system = Imaging_system(
@@ -94,7 +102,8 @@ def setup_IDS_U3_local(setup_parameters: Setup_parameters,
         pixel_scale_factor = pixel_scale_factor,
         patch_offset = patch_offset,
         patch_size = patch_size,
-        calibration_parameters=calibration_parameters
+        calibration_parameters=calibration_parameters,
+        binned_image_size = binned_image_size
         )
 
     illumination_pattern = Illumination_pattern(

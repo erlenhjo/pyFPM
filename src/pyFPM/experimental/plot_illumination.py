@@ -33,7 +33,7 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
 
 def plot_bright_field_images_with_BF_edge(data_patch: Data_patch, setup_parameters: Setup_parameters, 
                                           calibration_parameters: LED_calibration_parameters, 
-                                          array_size: int, Fresnel: bool):
+                                          array_size: int):
     LED_indices = data_patch.LED_indices
 
     center_indices = setup_parameters.LED_info.center_indices
@@ -61,37 +61,32 @@ def plot_bright_field_images_with_BF_edge(data_patch: Data_patch, setup_paramete
 
             center, radius = calculate_BF_edge(setup_parameters=setup_parameters,
                                                calibration_parameters=calibration_parameters,
-                                               LED_n=LED_n, LED_m=LED_m, Fresnel=Fresnel)
+                                               LED_n=LED_n, LED_m=LED_m)
             circle = plt.Circle(center, radius, fill=False, color="r", linestyle="dashed")
             axes[m,n].add_patch(circle)
             
     return fig
 
 def calculate_BF_edge(setup_parameters: Setup_parameters, calibration_parameters: LED_calibration_parameters,
-                      LED_n, LED_m, Fresnel):
+                      LED_n, LED_m):
     pixel_size = setup_parameters.camera.camera_pixel_size/setup_parameters.lens.magnification
     LED_pitch = setup_parameters.LED_info.LED_pitch
     image_center_x = setup_parameters.camera.raw_image_size[0] // 2
     image_center_y = setup_parameters.camera.raw_image_size[1] // 2
     z_0 = calibration_parameters.LED_distance
+    z_q = setup_parameters.lens.effective_object_to_aperture_distance
     delta_x = calibration_parameters.LED_x_offset
     delta_y = calibration_parameters.LED_y_offset
     rotation = calibration_parameters.LED_rotation
     NA = setup_parameters.lens.NA
-    focal_length = setup_parameters.lens.focal_length
-    magnification = setup_parameters.lens.magnification
-
-    if not Fresnel:
-        z_1 = np.inf
-    else:
-        z_1 = focal_length*(1+1/magnification)
+    
 
     rotation = rotation * np.pi/180 # convert to radians
-    radius = NA / (1/z_0+1/z_1) / pixel_size
+    radius = NA*z_0 / (1 + z_0/z_q) / pixel_size
     center_x = (LED_pitch*LED_n*np.cos(rotation) - LED_pitch*LED_m*np.sin(rotation) + delta_x)\
-                /pixel_size / (1+z_0/z_1)
+                /pixel_size / (1+z_0/z_q)
     center_y = (LED_pitch*LED_n*np.sin(rotation) + LED_pitch*LED_m*np.cos(rotation) + delta_y)\
-                /pixel_size / (1+z_0/z_1)
+                /pixel_size / (1+z_0/z_q)
 
     
     return (center_x + image_center_x, center_y + image_center_y), radius

@@ -19,7 +19,7 @@ def define_plot_folder(experiment_name):
 
 def define_pickle_path(pickle_folder: Path, file_name):
     pickle_path: Path = pickle_folder / file_name
-    return pickle_path
+    return pickle_path.with_suffix(".obj")
 
 def define_plot_path(plot_folder: Path, file_name):
     plot_path: Path = plot_folder / file_name
@@ -45,5 +45,5 @@ def plot_pickled_experiment(experiment_name):
         algorithm_result = unpickle_algorithm_results(pickle_path)
         fig = plot_results(algorithm_result=algorithm_result, title=file_name)
         plot_path = define_plot_path(plot_folder=plot_folder, file_name=file_name)
-        #fig.savefig(plot_path.with_suffix(".pdf"), format = "pdf")
+        fig.savefig(plot_path.with_suffix(".pdf"), format = "pdf")
         fig.savefig(plot_path.with_suffix(".png"), format = "png")

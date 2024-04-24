@@ -6,7 +6,7 @@ from pyFPM.setup.Data import Rawdata
 
 
 def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_size, 
-                           float_type, desired_step_nr = 0):
+                           float_type, binning_factor, desired_step_nr = 0):
         background_filename = "dark_image"
 
         image_files, background_file = get_image_filenames(
@@ -17,7 +17,8 @@ def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_
 
         background_image = load_single_image(
             datadirpath = datadirpath,
-            file = background_file
+            file = background_file,
+            binning_factor = binning_factor
             )
         
         LED_indices, images = load_images(
@@ -25,10 +26,12 @@ def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_
             image_files = image_files,
             center_indices = center_indices,
             max_array_size = max_array_size,
-            desired_step_nr = desired_step_nr
+            desired_step_nr = desired_step_nr,
+            binning_factor = binning_factor
         )
 
-        return Rawdata(LED_indices=LED_indices, images=images.astype(float_type), background_image=background_image)
+        return Rawdata(LED_indices=LED_indices, images=images.astype(float_type), 
+                       background_image=background_image)
 
         
         
@@ -66,7 +69,7 @@ def indices_from_image_title(filename: str):
 
     return x_index, y_index, step_nr
 
-def load_images(datadirpath, image_files, center_indices, max_array_size, desired_step_nr):
+def load_images(datadirpath, image_files, center_indices, max_array_size, desired_step_nr, binning_factor):
     LED_indices = []
     images = []
     max_X = center_indices[0] + max_array_size//2
@@ -86,12 +89,41 @@ def load_images(datadirpath, image_files, center_indices, max_array_size, desire
         LED_indices.append([X,Y])  
         image = load_single_image(
             datadirpath = datadirpath,
-            file = file
+            file = file,
+            binning_factor = binning_factor
             )
         images.append(image)
 
     return LED_indices, np.array(images)
      
 
-def load_single_image(datadirpath, file):
-    return np.array(Image.open(os.path.join(datadirpath, file)))
+def load_single_image(datadirpath, file, binning_factor):
+    full_image = np.array(Image.open(os.path.join(datadirpath, file)))
+
+    return bin_image(full_image, binning_factor)
+
+
+def bin_image(image, binning_factor):
+    binned_image = 0
+    image_size = np.array(image.shape)    
+    
+    binning_shift = image_size % binning_factor / 2
+    image = image[int(np.floor(binning_shift[0])):image_size[0]-int(np.ceil(binning_shift[0])),
+                  int(np.floor(binning_shift[1])):image_size[1]-int(np.ceil(binning_shift[1]))]
+    # print(image_size)
+    # print(np.array(image.shape))
+    # binned_image_size = image_size//binning_factor
+    # print(binned_image_size)
+    # print(np.array(image.shape) // binning_factor)
+    # print(binning_shift)    
+    # print(np.array(image.shape) % binning_factor)
+    # input()
+
+    for dx in range(binning_factor):
+        for dy in range(binning_factor):
+            binned_image = binned_image + image[dy::binning_factor,
+                                                dx::binning_factor]
+
+    return binned_image / (binning_factor**2)
+
+

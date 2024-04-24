@@ -6,7 +6,7 @@ from .components import LED_array
 
 
 def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera, 
-                                LED_array: LED_array):
+                                LED_array: LED_array, binning_factor: int):
 
     BF_exposure_time, DF_exposure_time, \
         BF_exposure_radius, wavelength, \
@@ -27,7 +27,8 @@ def setup_parameters_from_file(datadirpath, lens: Lens, camera: Camera,
         lens = lens,
         camera = camera,
         LED_info = LED_info,
-        image_format = image_format
+        image_format = image_format,
+        binning_factor = binning_factor
     )
 
     return setup_parameters

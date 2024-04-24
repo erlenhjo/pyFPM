@@ -2,64 +2,54 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 
-from pyFPM.aberrations.pupils.defocus_and_window import spherical_aberration_from_window_zernike_coefficient
 from pyFPM.experimental.recover_experiment import recover_experiment, plot_experiment, Experiment_settings
 from pyFPM.recovery.algorithms.run_algorithm import Method
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
 
-from pyFPM.NTNU_specific.components import INFINITYCORRECTED_50X
+from pyFPM.NTNU_specific.components import COMPACT_2X
 from pyFPM.NTNU_specific.setup_IDS_U3 import setup_IDS_U3_global, setup_IDS_U3_local
 
-patch_offsets = [[0,0]] #np.outer(np.arange(-5,6),np.array([256,0]))-np.array([0,256])
+patch_offsets = [[0,0]]  #np.outer(np.arange(-5,6),np.array([256,0]))-np.array([0,256])
 patch_size = [256, 256]
-max_array_size = 3
+max_array_size = 7
 
 cwd = Path.cwd()
-data_folder = cwd / "data/Master_thesis"
+data_folder = cwd / "data"
 
 recover = True
 plot = True
 
 
 def main():
-    inf50x_usaf_window()
-    inf50x_usaf_no_window()
-    plt.show()
+    compact2x_phase_target_test()
+    compact2x_usaf_test()
 
-def recover_and_plot(title, datadirpath, zernike_coefficients = None):
+    #plt.show()
+
+def recover_and_plot(title, datadirpath):
     if recover:
         recover_experiment(title, datadirpath, patch_offsets, patch_size, max_array_size, experiment_settings, 
-                           setup_local=setup_IDS_U3_local, setup_global=setup_IDS_U3_global, zernike_coefficients=zernike_coefficients)
+                           setup_local=setup_IDS_U3_local, setup_global=setup_IDS_U3_global)
     if plot:
         plot_experiment(title)
 
 
-def inf50x_usaf_window():
-    title = "Infinity 50x USAF Window"
-    datadirpath = data_folder / "window" / "usaf_50x_inf_window_best_focus"
+def compact2x_usaf_test():
+    title = "Compact 2x USAF test uncalibrated"
+    datadirpath = data_folder / "Master_thesis" / "calibration_test" / "com2x_usaf_calib_test_175"
+    recover_and_plot(title, datadirpath)
 
-    zernike_coefficients = np.zeros(12)
-    zernike_coefficients[11] = spherical_aberration_from_window_zernike_coefficient(
-        refractive_index = 1.77,
-        thickness = 5e-3,
-        numerical_aperture = INFINITYCORRECTED_50X.NA,
-        frequency = 1/520e-9
-    )
-    print(zernike_coefficients)
-    recover_and_plot(title, datadirpath, zernike_coefficients=zernike_coefficients)
-
-def inf50x_usaf_no_window():
-    title = "Infinity 50x USAF no Window"
-    datadirpath = data_folder / "window" / "usaf_50x_inf_no_window"
+def compact2x_phase_target_test():
+    title = "Compact 2x phase target test uncalibrated"
+    datadirpath = data_folder / "Master_thesis" / "calibration_test" / "com2x_phasefocus_calib_test_175"
     recover_and_plot(title, datadirpath)
 
 
-
-experiment_settings = Experiment_settings(lens = INFINITYCORRECTED_50X,
+experiment_settings = Experiment_settings(lens = COMPACT_2X,
                                           method = Method.Fresnel,
                                           calibration_parameters = LED_calibration_parameters(
-                                                                        LED_distance=40e-3,
+                                                                        LED_distance=175e-3,
                                                                         LED_x_offset=0,
                                                                         LED_y_offset=0,
                                                                         LED_rotation=0
@@ -67,12 +57,12 @@ experiment_settings = Experiment_settings(lens = INFINITYCORRECTED_50X,
                                           step_description = get_standard_adaptive_step_description(max_iterations=50,
                                                                                                     start_EPRY_at_iteration = 0,
                                                                                                     start_adaptive_at_iteration = 10),
-                                          binning_factor = 3,
                                           pixel_scale_factor = 6,
+                                          binning_factor = 2, 
                                           threshold_value = 1000,
                                           noise_reduction_regions = [
-                                                                        [1100, 1100, 100, 100],
-                                                                        [1600, 1600, 100, 100]
+                                                                        [500, 500, 100, 100],
+                                                                        [800, 800, 100, 100]
                                                                     ],
                                           defocus_guess = 0,
                                           mask_BF_edge = False

@@ -9,8 +9,8 @@ from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_ste
 
 from pyFPM.NTNU_specific.setup_USN import setup_USN_global, setup_USN_local, USN_lens
 
-patch_offsets = np.outer(np.arange(-5,6),np.array([256,0]))-np.array([0,256])
-patch_size = [256, 256]
+patch_offsets = [[0,0]] # np.outer(np.arange(-5,6),np.array([256,0]))-np.array([0,256])
+patch_size = [64, 64]
 max_array_size = 5
 
 cwd = Path.cwd()

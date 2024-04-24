@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyFPM.setup.Setup_parameters import Camera, Lens, Lens_type
+from pyFPM.setup.Setup_parameters import Camera, Lens
 from pyFPM.aberrations.dot_array.Dot_array import Dot_array
 
 ###### LED array ######
@@ -42,7 +42,7 @@ IDS_UI3580CP_REV2 = Camera(
 
 IDS_U3_31J0CP_REV_2_2 = Camera(
     camera_pixel_size = 2.74e-6,
-    raw_image_size = [2848, 2844], # 4 pixels missing for each coordinate?
+    raw_image_size = [2848, 2844],
     float_type = np.float64
 )
 
@@ -51,51 +51,61 @@ IDS_U3_31J0CP_REV_2_2 = Camera(
 INFINITYCORRECTED_2X = Lens(
     NA = 0.055,
     magnification = 2,
+    effectiv_object_to_aperture_distance = np.inf,
     focal_length = 100e-3,
     working_distance = 34e-3,
     depth_of_field = 91e-6,
-    max_FoV_sensor = 11e-3,
-    lens_type = Lens_type.INFINITY_CORRECTED
+    max_FoV_sensor = 11e-3
 )
 
 INFINITYCORRECTED_10X = Lens(
     NA = 0.28,
     magnification = 10,
+    effectiv_object_to_aperture_distance = np.inf,
     focal_length = 20e-3,
     working_distance = 34e-3,
     depth_of_field = 3.5e-6,
-    max_FoV_sensor = 11e-3,
-    lens_type = Lens_type.INFINITY_CORRECTED
+    max_FoV_sensor = 11e-3
 )
 
 INFINITYCORRECTED_50X = Lens(
     NA = 0.55,
     magnification = 50,
+    effectiv_object_to_aperture_distance = np.inf,
     focal_length = 4e-3,
     working_distance = 13e-3,
     depth_of_field = 0.9e-6,
-    max_FoV_sensor = 11e-3,
-    lens_type = Lens_type.INFINITY_CORRECTED
+    max_FoV_sensor = 11e-3
 )
 
 TELECENTRIC_3X = Lens(
     NA = 0.09,
     magnification = 3,
+    effectiv_object_to_aperture_distance = np.inf,
     focal_length = 58.51e-3,
     working_distance = 77e-3,
     depth_of_field = 34e-6,
-    max_FoV_sensor = 11e-3,
-    lens_type = Lens_type.TELECENTRIC
+    max_FoV_sensor = 11e-3
 )
 
 COMPACT_2X = Lens(
     NA = 0.06,
     magnification = 2,
+    effectiv_object_to_aperture_distance = 60.33e-3*(1 + 1/2),
     focal_length = 60.33e-3,
     working_distance = 92e-3,
     depth_of_field = 76e-6,
-    max_FoV_sensor = 11e-3,
-    lens_type = Lens_type.COMPACT
+    max_FoV_sensor = 11e-3
+)
+
+COMPACT_2X_CALIBRATED = Lens(
+    NA = 0.06,
+    magnification = 2,
+    effectiv_object_to_aperture_distance = 1/9.35,
+    focal_length = 60.33e-3,
+    working_distance = 92e-3,
+    depth_of_field = 76e-6,
+    max_FoV_sensor = 11e-3
 )
 
 
@@ -115,11 +125,11 @@ double_convex_magnification = double_convex_extension_length/double_convex_worki
 DOUBLE_CONVEX = Lens(
     NA = double_convex_numerical_aperture,
     magnification = double_convex_magnification,
+    effectiv_object_to_aperture_distance = double_convex_working_distance,
     focal_length = double_convex_focal_length,
     working_distance = double_convex_working_distance,
     depth_of_field = None,
-    max_FoV_sensor = None,
-    lens_type = Lens_type.SINGLE_LENS
+    max_FoV_sensor = None
 )
 
 ###### Aberration target ######

@@ -20,7 +20,7 @@ def simulate_imaging(
     Fresnel_correction,
     spherical_illumination_correction,
     patch_offset,
-    use_aperture_shift,
+    use_Fresnel_shift,
     calibration_parameters: LED_calibration_parameters
 ):
       
@@ -58,7 +58,7 @@ def simulate_imaging(
             pupil,
             LED_indices,
             full_image_imaging_system,
-            use_aperture_shift=use_aperture_shift)
+            use_Fresnel_shift=use_Fresnel_shift)
     
     
     # for n in range(low_res_images.shape[0]):   # may be used to simulate LED intensity fluctuations temporarily

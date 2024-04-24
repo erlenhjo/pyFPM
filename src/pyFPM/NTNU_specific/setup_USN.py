@@ -1,4 +1,4 @@
-from pyFPM.setup.Setup_parameters import Setup_parameters, LED_infos, Lens, Camera, Lens_type
+from pyFPM.setup.Setup_parameters import Setup_parameters, LED_infos, Lens, Camera
 from pyFPM.setup.Imaging_system import Imaging_system
 from pyFPM.setup.Data import Preprocessed_data, Rawdata, Data_patch
 from pyFPM.setup.Illumination_pattern import Illumination_pattern
@@ -17,11 +17,11 @@ USN_camera = Camera(
 USN_lens = Lens(
     NA = 0.1,
     magnification = 4,
+    effectiv_object_to_aperture_distance = (1+1/4)*7.6e-3,
     focal_length = 7.6e-3,
     working_distance = 9.5e-3,
     depth_of_field = None,
     max_FoV_sensor = None,
-    lens_type = Lens_type.SINGLE_LENS,
 )
 
 

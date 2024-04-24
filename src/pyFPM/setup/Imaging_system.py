@@ -2,7 +2,7 @@ import numpy as np
 from dataclasses import dataclass
 import matplotlib.pyplot as plt #for debug
 
-from pyFPM.setup.Setup_parameters import Setup_parameters, get_object_to_lens_distance
+from pyFPM.setup.Setup_parameters import Setup_parameters
 
 @dataclass
 class LED_calibration_parameters:
@@ -14,16 +14,18 @@ class LED_calibration_parameters:
 
 class Imaging_system(object):
     def __init__(self, setup_parameters: Setup_parameters, pixel_scale_factor,
-                  patch_offset, patch_size, calibration_parameters: LED_calibration_parameters):
+                  patch_offset, patch_size, calibration_parameters: LED_calibration_parameters,
+                  binned_image_size):
         
         spatial_frequency = 1 / setup_parameters.LED_info.wavelength
         spatial_cutoff_frequency = calculate_spatial_cutoff_frequency(spatial_frequency, setup_parameters.lens.NA)
-
-        raw_object_pixel_size = setup_parameters.camera.camera_pixel_size / setup_parameters.lens.magnification
+        
+        binning_factor = setup_parameters.binning_factor
+        raw_object_pixel_size = setup_parameters.camera.camera_pixel_size / setup_parameters.lens.magnification * binning_factor
         final_object_pixel_size = raw_object_pixel_size / pixel_scale_factor
         final_image_size = [pixel_scale_factor * size for size in patch_size]
 
-        object_to_lens_distance = get_object_to_lens_distance(setup_parameters.lens)
+        effective_object_to_aperture_distance = setup_parameters.lens.effective_object_to_aperture_distance
         
         # calculate offsets
         patch_offset_x, patch_offset_y = calculate_patch_offset_distance(
@@ -32,7 +34,7 @@ class Imaging_system(object):
         )
 
         patch_start, patch_end = calculate_patch_start_and_end(
-            image_size = setup_parameters.camera.raw_image_size,
+            image_size = binned_image_size,
             patch_offset = patch_offset,
             patch_size = patch_size
         )
@@ -47,8 +49,8 @@ class Imaging_system(object):
                 + np.array([calibration_parameters.LED_x_offset,calibration_parameters.LED_y_offset])
         )
         
-        # calculate frequency components for normal frequency shift model
-        LED_shifts_x, LED_shifts_y = calculate_LED_shifts_from_in_plane_frequency_components(
+        # calculate frequency components for Zheng's frequency shift model
+        LED_shifts_x_Zheng, LED_shifts_y_Zheng = calculate_LED_shifts_from_in_plane_frequency_components(
             LED_locations_x = LED_locations_x, 
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
@@ -60,13 +62,13 @@ class Imaging_system(object):
         )
 
         # calculate frequency components for alternative frequency shift model (Fresnel propagation based?)
-        LED_shifts_x_aperture, LED_shifts_y_aperture = calculate_LED_shifts_from_aperture_shift(
+        LED_shifts_x_Fresnel, LED_shifts_y_Fresnel = calculate_LED_shifts_Fresnel(
             LED_locations_x = LED_locations_x, 
             LED_locations_y = LED_locations_y,
             patch_offset_x = patch_offset_x,
             patch_offset_y = patch_offset_y,
             z_LED = calibration_parameters.LED_distance,
-            z_1 = object_to_lens_distance, 
+            z_q = effective_object_to_aperture_distance, 
             wavelength = setup_parameters.LED_info.wavelength,
             pixel_size = final_object_pixel_size,
             image_size = final_image_size
@@ -84,14 +86,15 @@ class Imaging_system(object):
         )
 
         # caculate positions relative the center of the Field of View
-        high_res_object_x_positions, high_res_object_y_positions = calculate_relative_position_mesh_grids(pixel_size = final_object_pixel_size, 
-                                                                                                          image_region_size = final_image_size
-                                                                                                        ) 
+        high_res_object_x_positions, high_res_object_y_positions = calculate_relative_position_mesh_grids(
+                                                                            pixel_size = final_object_pixel_size, 
+                                                                            image_region_size = final_image_size
+                                                                        ) 
         high_res_Fresnel_object_phase_correction = calculate_object_plane_phase_curvature(
                                                     x_mesh = high_res_object_x_positions, 
                                                     y_mesh = high_res_object_y_positions, 
                                                     wavevector = 2*np.pi*spatial_frequency, 
-                                                    distance = object_to_lens_distance
+                                                    distance = effective_object_to_aperture_distance
                                                 )
         high_res_spherical_illumination_object_phase_correction = calculate_object_plane_phase_curvature(
                                                                     x_mesh = high_res_object_x_positions, 
@@ -99,14 +102,26 @@ class Imaging_system(object):
                                                                     wavevector = 2*np.pi*spatial_frequency, 
                                                                     distance = calibration_parameters.LED_distance
                                                                 )
-                    
+        
+        BF_edge_masks, mask_index_per_LED = get_BF_edge_mask(
+                                                LED_locations_x = LED_locations_x, 
+                                                LED_locations_y = LED_locations_y, 
+                                                patch_offset_x = patch_offset_x, 
+                                                patch_offset_y = patch_offset_y,
+                                                z_LED = calibration_parameters.LED_distance, 
+                                                z_q = effective_object_to_aperture_distance, 
+                                                numerical_aperture = setup_parameters.lens.NA,
+                                                raw_object_pixel_size = raw_object_pixel_size, 
+                                                patch_size = patch_size
+                                            )
+                            
         # assign public variables
         self.frequency = spatial_frequency
         self.cutoff_frequency = spatial_cutoff_frequency
-        self.LED_shifts_x = LED_shifts_x
-        self.LED_shifts_y = LED_shifts_y
-        self.LED_shifts_x_aperture = LED_shifts_x_aperture
-        self.LED_shifts_y_aperture = LED_shifts_y_aperture
+        self.LED_shifts_x_Zheng = LED_shifts_x_Zheng
+        self.LED_shifts_y_Zheng = LED_shifts_y_Zheng
+        self.LED_shifts_x_Fresnel = LED_shifts_x_Fresnel
+        self.LED_shifts_y_Fresnel = LED_shifts_y_Fresnel
         self.df_x = 1/(final_object_pixel_size * final_image_size[0])
         self.df_y = 1/(final_object_pixel_size * final_image_size[1])
 
@@ -125,6 +140,8 @@ class Imaging_system(object):
         self.high_res_CTF = high_res_CTF
         self.high_res_spherical_illumination_correction = high_res_spherical_illumination_object_phase_correction
         self.high_res_Fresnel_correction = high_res_Fresnel_object_phase_correction
+        self.BF_edge_masks = BF_edge_masks
+        self.mask_index_per_LED = mask_index_per_LED
 
         self.float_type = setup_parameters.camera.float_type
         if self.float_type == np.float32:
@@ -213,20 +230,20 @@ def calculate_LED_shifts_from_in_plane_frequency_components(LED_locations_x, LED
     return pixel_shifts_x, pixel_shifts_y
 
 
-def calculate_LED_shifts_from_aperture_shift(LED_locations_x, LED_locations_y, 
-                                             patch_offset_x, patch_offset_y, 
-                                             z_LED, z_1, wavelength,
-                                             pixel_size, image_size):
-    dx = wavelength/(pixel_size * image_size[0])
-    dy = wavelength/(pixel_size * image_size[1])
+def calculate_LED_shifts_Fresnel(LED_locations_x, LED_locations_y, 
+                                 patch_offset_x, patch_offset_y, 
+                                 z_LED, z_q, wavelength,
+                                 pixel_size, image_size):
+    df_x = 1/(pixel_size * image_size[0])
+    df_y = 1/(pixel_size * image_size[1])
 
     #calculate spatial shift
-    spatial_shifts_x = (LED_locations_x-patch_offset_x)/z_LED - patch_offset_x/z_1
-    spatial_shifts_y = (LED_locations_y-patch_offset_y)/z_LED - patch_offset_y/z_1
+    frequency_shifts_x = ((LED_locations_x-patch_offset_x)/z_LED - patch_offset_x/z_q)/wavelength
+    frequency_shifts_y = ((LED_locations_y-patch_offset_y)/z_LED - patch_offset_y/z_q)/wavelength
 
     #calculate pixel shift
-    pixel_shifts_x = spatial_shifts_x/dx
-    pixel_shifts_y = spatial_shifts_y/dy
+    pixel_shifts_x = frequency_shifts_x/df_x
+    pixel_shifts_y = frequency_shifts_y/df_y
     
     return pixel_shifts_x, pixel_shifts_y
 
@@ -259,3 +276,39 @@ def calculate_relative_position_mesh_grids(pixel_size, image_region_size):
 
 def calculate_object_plane_phase_curvature(x_mesh, y_mesh, wavevector, distance):
     return np.exp(1j * wavevector * 1/(2*distance) * (x_mesh**2 + y_mesh**2))
+
+
+def get_BF_edge_mask(LED_locations_x, LED_locations_y, 
+                     patch_offset_x, patch_offset_y,
+                     z_LED, z_q, numerical_aperture,
+                     raw_object_pixel_size, patch_size):
+    
+
+    local_x_coords, local_y_coords = calculate_relative_position_mesh_grids(pixel_size = raw_object_pixel_size, 
+                                                                            image_region_size = patch_size)
+    
+    x_coords = local_x_coords + patch_offset_x
+    y_coords = local_y_coords + patch_offset_y
+
+    BF_edge_masks = []
+    mask_nr_per_LED = np.full(shape=LED_locations_x.shape, fill_value=-1, dtype=np.int8)
+    current_mask_nr = 0
+
+    for Y in range(LED_locations_x.shape[0]):
+        for X in range(LED_locations_x.shape[1]):
+            relative_frequency_shift_x_per_pixel = ((LED_locations_x[Y,X] - x_coords)/z_LED - x_coords/z_q)
+            relative_frequency_shift_y_per_pixel = ((LED_locations_y[Y,X] - y_coords)/z_LED - y_coords/z_q)
+
+            absolute_frequency_per_pixel = np.sqrt(relative_frequency_shift_x_per_pixel**2 + relative_frequency_shift_y_per_pixel**2)
+            mask_inner = absolute_frequency_per_pixel > numerical_aperture * 0.9
+            mask_outer = absolute_frequency_per_pixel < numerical_aperture * 1.2
+
+            mask: np.ndarray = mask_inner & mask_outer # elementwise and
+
+            
+            if mask.sum():
+                mask_nr_per_LED[Y,X] = current_mask_nr
+                current_mask_nr += 1
+                BF_edge_masks.append(mask)
+
+    return np.array(BF_edge_masks), mask_nr_per_LED
