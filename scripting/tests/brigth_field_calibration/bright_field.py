@@ -101,7 +101,8 @@ def illustrate_illumination_from_setup(datadirpath, lens, Fresnel, array_size, c
         datadirpath = datadirpath,
         image_format = setup_parameters.image_format,
         center_indices = setup_parameters.LED_info.center_indices,
-        max_array_size = array_size
+        max_array_size = array_size,
+        float_type = setup_parameters.camera.float_type
         )
 
     preprocessed_data = Preprocessed_data(

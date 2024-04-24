@@ -18,9 +18,9 @@ main_result_folder = Path.cwd() / "results" / "BFL"
 def main():
     #infcor_2x_200_hamamatsu()
     #telecentric_3x_200_hamamatsu()
-    #step_comp_2x()
-    step_inf_2x()
-    step_tele_3x()
+    step_comp_2x()
+    #step_inf_2x()
+    #step_tele_3x()
 
 
 def infcor_2x_200_hamamatsu():
@@ -42,7 +42,7 @@ def telecentric_3x_200_hamamatsu():
 def step_comp_2x():
     lens = COMPACT_2X
     camera = IDS_U3_31J0CP_REV_2_2
-    experiment_name = "2xcomp_illum_step"
+    experiment_name = "2xcomp_illum_step_5"
     dataset_names = [
         "2xcomp_illum_step_150_p4",
         "2xcomp_illum_step_175_p4",

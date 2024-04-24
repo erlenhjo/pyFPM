@@ -26,7 +26,8 @@ def locate_bright_field_from_setup(datadirpath, lens, camera, array_size, assume
         datadirpath = datadirpath,
         image_format = setup_parameters.image_format,
         center_indices = setup_parameters.LED_info.center_indices,
-        max_array_size = array_size
+        max_array_size = array_size,
+        float_type = setup_parameters.camera.float_type
         )
     end = time.perf_counter()
     print("Rawdata:", end-start)

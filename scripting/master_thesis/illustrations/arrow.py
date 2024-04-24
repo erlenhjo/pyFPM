@@ -64,20 +64,31 @@ class Arrow_text:
 # within the two axes and creates an arrow according to arrow_values between the desired points
 # needs ylim, xlim to be updated?
 def add_arrow(fig: plt.Figure, ax_from: plt.Axes, ax_to: plt.Axes, coord_from, coord_to, 
-              arrow_style: Arrow_style, arrow_text: Arrow_text|None):
-    data_transform_from = ax_from.transData
-    data_transform_to = ax_to.transData
+              arrow_style: Arrow_style, arrow_text: Arrow_text|None, 
+              axes_coordinates = False):
+    
+    if axes_coordinates:
+        data_transform_from = ax_from.transAxes
+        data_transform_to = ax_to.transAxes
+    else: # data coordinates
+        data_transform_from = ax_from.transData
+        data_transform_to = ax_to.transData
+    
+    
     figure_transform = fig.transFigure.inverted()
 
     # add arrow
     point_from = figure_transform.transform(data_transform_from.transform(coord_from))
     point_to = figure_transform.transform(data_transform_to.transform(coord_to))
+
     arrow = matplotlib.patches.FancyArrowPatch(
-        point_from, point_to, transform=fig.transFigure,
+        point_from, 
+        point_to,
+        transform = fig.transFigure,
         fc = arrow_style.face_color,
         ec = arrow_style.edge_color,
-        connectionstyle=arrow_style.connection_style, 
-        arrowstyle=arrow_style.arrow_style, 
+        connectionstyle = arrow_style.connection_style, 
+        arrowstyle = arrow_style.arrow_style, 
         alpha = arrow_style.alpha,
         mutation_scale = arrow_style.mutation_scale
     )

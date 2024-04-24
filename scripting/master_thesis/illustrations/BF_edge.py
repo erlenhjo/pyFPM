@@ -46,7 +46,7 @@ def illustrate_illumination_from_simulation(lens, camera,
     return fig
 
 
-def simulate_both():
+def illustrate_BF_edge():
     fig = illustrate_illumination_from_simulation(lens=lens, camera=camera,
                                                   spherical=True, Fresnel=True, 
                                                   z_LED=200e-3, arraysize=array_size)
@@ -55,5 +55,5 @@ def simulate_both():
 
 
 if __name__ == "__main__": 
-    simulate_both()
+    illustrate_BF_edge()
     plt.show()
