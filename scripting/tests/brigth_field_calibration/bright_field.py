@@ -13,11 +13,11 @@ from pathlib import Path
 main_folder = Path.cwd() / "data"/ "Illumination" 
 
 def main():
-    simulation = False
-    real = True
+    simulation = True
+    real = False
 
-    #infcor_2x(simulation, real)
-    telecentric_3x(simulation, real)
+    infcor_2x(simulation, real)
+    #telecentric_3x(simulation, real)
     #double_convex(simulation, real)
     #compact_2x(simulation, real)
 
@@ -26,9 +26,9 @@ def main():
 def infcor_2x(simulation, real):
     lens = INFINITYCORRECTED_2X
     datadirpath = main_folder / "infinity_2x_illumnation"
-    calibration_parameters = LED_calibration_parameters(200e-3,0e-6,0e-6,0)
+    calibration_parameters = LED_calibration_parameters(200e-3,500e-6, -500e-6, 2)
     if simulation:
-        illustrate_illumination_from_simulation(lens=lens, spherical=True, Fresnel=False, arraysize=5,
+        illustrate_illumination_from_simulation(lens=lens, spherical=True, Fresnel=True, arraysize=5,
                                                 calibration_parameters=calibration_parameters)
     if real:
         illustrate_illumination_from_setup(datadirpath=datadirpath, lens=lens, Fresnel=False,
@@ -70,7 +70,8 @@ def double_convex(simulation, real):
 
 def illustrate_illumination_from_simulation(lens, spherical, Fresnel, arraysize, calibration_parameters):
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, high_res_complex_object\
-       = simulate_illumination(lens = lens, 
+       = simulate_illumination(lens = lens,
+                               camera = HAMAMATSU_C11440_42U30,
                                correct_spherical_wave_illumination = spherical, 
                                correct_Fresnel_propagation = Fresnel,
                                arraysize=arraysize,
@@ -79,7 +80,7 @@ def illustrate_illumination_from_simulation(lens, spherical, Fresnel, arraysize,
 
     fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, setup_parameters=setup_parameters, 
                                                 calibration_parameters=calibration_parameters,
-                                                array_size=arraysize, Fresnel=Fresnel)
+                                                array_size=arraysize)
 
     return fig
 

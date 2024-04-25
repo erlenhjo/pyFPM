@@ -1,7 +1,6 @@
 
 from pyFPM.calibration.non_linear_BFL.shared import Calibration_parameters
-
-from BFL_step import unpickle_calibration_results_per_step, unpickle_optimization_results_per_step
+from pyFPM.NTNU_specific.calibrate_BF.BFL_step import unpickle_calibration_results_per_step, unpickle_optimization_results_per_step
 
 from typing import List
 import numpy as np
