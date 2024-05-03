@@ -18,11 +18,11 @@ def plot_zernike_coefficients(ax: plt.Axes, zernike_coefficients: np.ndarray, ti
     ax.grid(visible=True, which="major", axis="y")
     ax.set_axisbelow(True)
     ax.set_ylim([-y_max, y_max])
-    ax.set_title(title)
     ax.set_ylabel("Amplitude")
     ax.set_xlabel("Mode number")
 
-    
+    if title is not None:
+        ax.set_title(title)
 
 
 def main():

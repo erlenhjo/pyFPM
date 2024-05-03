@@ -33,7 +33,6 @@ def plot_calibration_results(n_values, m_values, LED_pitch, pixel_size,
         axes.set_ylim(bottom=-data.images[0].shape[0]//2, top=data.images[0].shape[0]//2)
 
     fig2 = plot_bright_field_images_with_BF_edge(data = data, 
-                                                setup_parameters = setup_parameters, 
                                                 calibration_parameters = calibration_parameters,
                                                 array_size = int(np.sqrt(len(data.LED_indices))),
                                                 center_indices = setup_parameters.LED_info.center_indices,
@@ -77,8 +76,8 @@ def plot_bright_field_images_with_BF_edge(data: Rawdata,
     for image_nr, indices in enumerate(LED_indices):
         x,y = indices
         if x>=x_min and x<x_max and y>=y_min and y<y_max:
-            m = y_max-y-1
-            n = x_max-x-1
+            m = (array_size-1) - (y_max-y-1)
+            n = (array_size-1) - (x_max-x-1)
             LED_n = x - center_x
             LED_m = y - center_y
 
