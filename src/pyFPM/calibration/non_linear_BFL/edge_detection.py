@@ -29,6 +29,11 @@ def detect_edges_per_image(images, canny_sigma,
         if edge_points.shape[0]==0:
             continue
 
+        # plt.matshow(binary)
+        # plt.matshow(image)
+        # plt.scatter(edge_points[:,0], edge_points[:,1])
+        # plt.show()
+
         n, m = image_indices - center_indices
 
         n_values.append(n)

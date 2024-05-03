@@ -108,6 +108,15 @@ COMPACT_2X_CALIBRATED = Lens(
     max_FoV_sensor = 11e-3
 )
 
+FUJINON_MINWD_MAXNA = Lens(
+    NA = 0.044,
+    magnification = 0.1766,
+    effectiv_object_to_aperture_distance = 1/10.49,
+    focal_length = 16e-3,
+    working_distance = 100e-3, #???
+    depth_of_field = None, # large
+    max_FoV_sensor = None 
+)
 
 
 double_convex_focal_length = 36e-3
