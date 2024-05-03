@@ -7,48 +7,50 @@ from pyFPM.recovery.algorithms.run_algorithm import Method
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
 
-from pyFPM.NTNU_specific.components import INFINITYCORRECTED_10X
+from pyFPM.NTNU_specific.components import COMPACT_2X_CALIBRATED
 from pyFPM.NTNU_specific.setup_IDS_U3 import setup_IDS_U3_global, setup_IDS_U3_local
 
 patch_size = [512, 512]
-max_array_size = 11
+max_array_size = 15
 
-cwd = Path.cwd()
-data_folder = cwd / "data"
+data_folder = Path.cwd() / "data"
+main_result_folder = Path.cwd() / "results" / "master_thesis" / "window"
 
-recover = True
+recover = False
 plot = True
 
 
 def main():
-    inf10x_usaf_window()
-    #inf10x_usaf_windowless()
+    compact2x_usaf_window()
+    compact2x_usaf_windowless()
 
-    if plot:
-        plt.show()
+    # if plot:
+    #     plt.show()
 
-def recover_and_plot(title, datadirpath, patch_offsets):
+def recover_and_plot(title, datadirpath, patch_offsets, result_folder):
     if recover:
         recover_experiment(title, datadirpath, patch_offsets, patch_size, max_array_size, experiment_settings, 
                            setup_local=setup_IDS_U3_local, setup_global=setup_IDS_U3_global)
     if plot:
-        plot_experiment(title)
+        plot_experiment(title, result_folder)
 
 
-def inf10x_usaf_window():
-    patch_offsets = [[-256,-76]]
-    title = "Infinity 10x USAF window 2"
-    datadirpath = data_folder / "Master_thesis" / "sapphire window" / "inf10x_usaf_window_200mm"
-    recover_and_plot(title, datadirpath, patch_offsets)
+def compact2x_usaf_window():
+    patch_offsets = [np.array([-46, -36])]
+    title = "Compact 2x USAF window"
+    datadirpath = data_folder / "Master_thesis" / "sapphire window" / "compact2x_usaf_window_200mm"
+    result_folder = main_result_folder / "comp2x_recover_window"
+    recover_and_plot(title, datadirpath, patch_offsets, result_folder)
 
-def inf10x_usaf_windowless():
-    patch_offsets = [[-226,-266]]
-    title = "Infinity 10x usaf windowless 2"
-    datadirpath = data_folder / "Master_thesis" / "sapphire window" / "inf10x_usaf_200mm"
-    recover_and_plot(title, datadirpath, patch_offsets)
+def compact2x_usaf_windowless():
+    patch_offsets = [np.array([-48,-72])]
+    title = "Compact 2x usaf windowless"
+    datadirpath = data_folder / "Master_thesis" / "sapphire window" / "compact2x_usaf_200mm"
+    result_folder = main_result_folder / "comp2x_recover"
+    recover_and_plot(title, datadirpath, patch_offsets, result_folder)
 
 
-experiment_settings = Experiment_settings(lens = INFINITYCORRECTED_10X,
+experiment_settings = Experiment_settings(lens = COMPACT_2X_CALIBRATED,
                                           method = Method.Fresnel,
                                           calibration_parameters = LED_calibration_parameters(LED_distance=0.20153892853221111, 
                                                                                               LED_x_offset=-0.00012446193565815314, 
@@ -64,10 +66,10 @@ experiment_settings = Experiment_settings(lens = INFINITYCORRECTED_10X,
                                           threshold_value = 1000,
                                           noise_reduction_regions = [
                                                                         [0, 0, 100, 100],
-                                                                        [412, 412, 100, 100]
+                                                                        [1100, 1100, 100, 100]
                                                                     ],
                                           defocus_guess = 0,
-                                          limited_import = [1054,1054]
+                                          limited_import = [1200,1200]
                                           )
 
 if __name__ == "__main__":

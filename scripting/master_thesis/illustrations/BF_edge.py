@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pyFPM.experimental.plot_illumination import plot_bright_field_images_with_BF_edge
 from pyFPM.NTNU_specific.simulate_images.only_illumination import simulate_illumination
-from pyFPM.setup.Setup_parameters import Lens, Lens_type
+from pyFPM.setup.Setup_parameters import Lens
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.NTNU_specific.components import IDS_U3_31J0CP_REV_2_2
 
@@ -12,11 +12,11 @@ from pyFPM.NTNU_specific.components import IDS_U3_31J0CP_REV_2_2
 lens = Lens(
     NA = 0.05,
     magnification = 2,
+    effectiv_object_to_aperture_distance = np.inf, # not currently used for simulation, should fix ;)
     focal_length = 60e-3,
     working_distance = None,
     depth_of_field = None,
     max_FoV_sensor = None,
-    lens_type = Lens_type.SINGLE_LENS
 )
 camera = IDS_U3_31J0CP_REV_2_2
 array_size = 5

@@ -1,7 +1,7 @@
 from pyFPM.NTNU_specific.components import (IDS_U3_31J0CP_REV_2_2, COMPACT_2X_CALIBRATED)
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 
-from pyFPM.NTNU_specific.calibrate_BF.BFL_single import locate_bright_field_from_setup_single_step
+from pyFPM.NTNU_specific.calibrate_BF.BFL_single import calibrate_dataset
 
 from pathlib import Path
 import numpy as np
@@ -27,7 +27,9 @@ def single_step_comp_2x_usaf_test():
     
     calibrate_dataset(dataset_name=dataset_name, experiment_name=experiment_name,
                         lens=lens, camera=camera, array_size=array_size,
-                        assumed_calibration_parameters=assumed_calibration_parameters)
+                        assumed_calibration_parameters=assumed_calibration_parameters,
+                        main_data_folder = main_data_folder,
+                        main_result_folder = main_result_folder)
     
 def single_step_comp_2x_phasetarget_test():
     lens = COMPACT_2X_CALIBRATED
@@ -39,7 +41,9 @@ def single_step_comp_2x_phasetarget_test():
     
     calibrate_dataset(dataset_name=dataset_name, experiment_name=experiment_name,
                         lens=lens, camera=camera, array_size=array_size,
-                        assumed_calibration_parameters=assumed_calibration_parameters)
+                        assumed_calibration_parameters=assumed_calibration_parameters,
+                        main_data_folder = main_data_folder,
+                        main_result_folder = main_result_folder)
 
 
 def single_step_comp_2x_usaf_window():
@@ -52,33 +56,15 @@ def single_step_comp_2x_usaf_window():
     
     calibrate_dataset(dataset_name=dataset_name, experiment_name=experiment_name,
                         lens=lens, camera=camera, array_size=array_size,
-                        assumed_calibration_parameters=assumed_calibration_parameters)
+                        assumed_calibration_parameters=assumed_calibration_parameters,
+                        main_data_folder = main_data_folder,
+                        main_result_folder = main_result_folder)
 
     
         
     
 
-def get_folders(dataset_name, experiment_name):
-    data_folder = main_data_folder / "BFL calibration" / dataset_name
-    result_folder = BFL_result_folder / experiment_name
-    result_folder.mkdir(parents=True, exist_ok=True)
 
-    return data_folder, result_folder
-
-
-def calibrate_dataset(dataset_name, experiment_name,
-                      lens, camera, array_size, 
-                      assumed_calibration_parameters):
-    
-    data_folder, result_folder = get_folders(dataset_name = dataset_name,
-                                             experiment_name = experiment_name)
-
-    locate_bright_field_from_setup_single_step(data_folder=data_folder, 
-                                                lens=lens, camera=camera, 
-                                                array_size=array_size, 
-                                                assumed_calibration_parameters=assumed_calibration_parameters,
-                                                raw_result_folder=result_folder
-                                                )
     
 
 

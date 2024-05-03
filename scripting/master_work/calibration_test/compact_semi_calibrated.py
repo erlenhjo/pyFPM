@@ -25,7 +25,7 @@ def main():
     compact2x_phase_target_test()
     compact2x_usaf_test()
 
-    #plt.show()
+    plt.show()
 
 def recover_and_plot(title, datadirpath):
     if recover:
@@ -55,15 +55,17 @@ experiment_settings = Experiment_settings(lens = COMPACT_2X,
                                                                                               ),
                                           step_description = get_standard_adaptive_step_description(max_iterations=50,
                                                                                                     start_EPRY_at_iteration = 0,
+                                                                                                    apply_BF_mask_from_iteration = 10, 
                                                                                                     start_adaptive_at_iteration = 10),
                                           pixel_scale_factor = 6,
-                                          binning_factor = 2, 
-                                          threshold_value = 1000,
+                                          binning_factor = 1, 
+                                          threshold_value = 1500,
                                           noise_reduction_regions = [
-                                                                        [500, 500, 100, 100],
-                                                                        [800, 800, 100, 100]
+                                                                        [0, 0, 100, 100],
+                                                                        [1100, 1100, 100, 100]
                                                                     ],
-                                          defocus_guess = 0
+                                          defocus_guess = 0,
+                                          limited_import = [1200,1200]
                                           )
 
 if __name__ == "__main__":

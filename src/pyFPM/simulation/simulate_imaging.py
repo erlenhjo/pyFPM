@@ -38,7 +38,8 @@ def simulate_imaging(
         pixel_scale_factor = pixel_scale_factor,
         patch_offset = patch_offset,
         patch_size = setup_parameters.camera.raw_image_size,
-        calibration_parameters = calibration_parameters
+        calibration_parameters = calibration_parameters,
+        binned_image_size = setup_parameters.camera.raw_image_size
         )
     
     pupil = get_zernike_pupil(full_image_imaging_system, zernike_coefficients)
@@ -95,13 +96,14 @@ def finalize_simulation_setup(
         pixel_scale_factor = pixel_scale_factor,
         patch_offset = patch_offset,
         patch_size = patch_size,
-        calibration_parameters = calibration_parameters
+        calibration_parameters = calibration_parameters,
+        binned_image_size = setup_parameters.camera.raw_image_size
         )
 
     data_patch = Data_patch(data = simulated_data,
-                            raw_image_size = setup_parameters.camera.raw_image_size,
                             patch_offset = [0,0],
-                            patch_size = patch_size)
+                            patch_size = patch_size,
+                            binned_image_size = setup_parameters.camera.raw_image_size)
 
     illumination_pattern = Illumination_pattern(
         LED_indices = simulated_data.LED_indices,

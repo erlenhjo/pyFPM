@@ -44,6 +44,7 @@ def standard_recovery_algorithm(
     BF_edge_masks = imaging_system.BF_edge_masks
     mask_indices = unpack_mask_indices(mask_indices = imaging_system.mask_index_per_LED,
                                        LED_indices = LED_indices)
+    
 
     recovered_object_spectrum, recovered_pupil, convergence_index, real_space_error_metric \
         = main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,  
@@ -103,28 +104,29 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
                 # plt.matshow(raw_image)
                 # plt.matshow(raw_image*mask)
                 # plt.matshow(raw_image*inverse_mask)
-                # plt.show()
+                #plt.show()
 
             # project current spectrum to detector
             current_spectrum = recovered_object_spectrum[min_y:max_y+1, min_x:max_x+1]
             current_lens_spectrum = pupil * low_res_CTF * current_spectrum                                    
             projected_image = fftshift(ifft2(ifftshift(current_lens_spectrum)))      
 
-            # calculate error measures
-            convergence_index[loop_nr] += np.mean(np.abs(projected_image)) \
-                                            / np.sum(np.abs(np.abs(projected_image) - raw_image))
-            real_space_error_metric += np.linalg.norm(raw_image - np.abs(projected_image))**2
-
             # calculated updated spectrum at lens
             updated_image = projected_image * mask + raw_image * projected_image / np.abs(projected_image) * inverse_mask
             updated_lens_spectrum = fftshift(fft2(ifftshift(updated_image)))
+
+            # calculate error measures
+            if np.sum(np.abs(np.abs(projected_image) - np.abs(updated_image))) != 0:
+                convergence_index[loop_nr] += np.mean(np.abs(projected_image)) \
+                                                / np.sum(np.abs(np.abs(projected_image) - np.abs(updated_image)))
+            real_space_error_metric += np.linalg.norm(np.abs(updated_image) - np.abs(projected_image))**2
 
             # calculate update terms
             if loop_nr<start_EPRY_at_iteration:
                 object_update_term = np.abs(pupil) * np.conj(pupil)/\
                                     (np.max(np.abs(pupil)) * (np.abs(pupil)**2 + 1))\
                                     * (updated_lens_spectrum - current_lens_spectrum)
-                pupil_update_term = 0 * object_update_term # just zero but of right type
+                pupil_update_term = 0 * object_update_term # just zero but of right type and shape
             else:
                 object_update_term = np.abs(pupil) * np.conj(pupil)/\
                                     (np.max(np.abs(pupil)) * (np.abs(pupil)**2 + 1))\

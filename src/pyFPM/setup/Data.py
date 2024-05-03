@@ -3,6 +3,7 @@ from pyFPM.setup.Imaging_system import calculate_patch_start_and_end
 
 from dataclasses import dataclass
 import numpy as np
+import matplotlib.pyplot as plt
 
 @dataclass
 class Rawdata:
@@ -41,11 +42,12 @@ class Simulated_data:
     amplitude_images: np.ndarray
 
 class Data_patch:
-    def __init__(self, data: Preprocessed_data|Simulated_data, patch_offset, patch_size, binned_image_size):
+    def __init__(self, data: Preprocessed_data|Simulated_data, patch_offset, patch_size, 
+                 binned_image_size, binned_limited_import_shift):
 
         patch_start, patch_end = calculate_patch_start_and_end(
             image_size = binned_image_size,
-            patch_offset = patch_offset,
+            patch_offset = patch_offset - binned_limited_import_shift,
             patch_size = patch_size
         )
 

@@ -26,7 +26,7 @@ def plot_dots():
 
     magnification = FUJINON_MINWD_MAXNA.magnification
     rotation = -0.1
-    center_shift = np.array([-2.25,-2.5])
+    center_shift = np.array([-2.5,-2.5])
 
     object_pixel_size = camera.camera_pixel_size / magnification
 
@@ -81,7 +81,7 @@ def get_rotation_matrix(degrees):
 
 def overlay_grid_points(image, grid_points):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,4), constrained_layout=True)
-    ax.imshow(image, cmap="gist_gray")
+    ax.imshow(image)
     ax.set_axis_off()
     for im in ax.get_images():
         im.set_clim(vmin=np.min(image), vmax=np.max(image))
@@ -110,7 +110,8 @@ def overlay_grid_points(image, grid_points):
     grid_marker = "x"
     grin_marker_size = 2
     border_thickness = 1
-    border_color = "red"
+    border_color = "black"
+    inset_line_color = "red"
 
     for (x, y, size), inset_axes_position in zip(inset_regions, inset_axes_pos):
         start_x = x - size//2
@@ -125,7 +126,7 @@ def overlay_grid_points(image, grid_points):
             xlim = (start_x, stop_x),
             ylim = (start_y, stop_y)
         )
-        _, connector_lines = ax.indicate_inset_zoom(axin, edgecolor=border_color)
+        _, connector_lines = ax.indicate_inset_zoom(axin, edgecolor=inset_line_color)
         for line in connector_lines:
             line: ConnectionPatch = line
             line.set_visible(True)
@@ -134,7 +135,7 @@ def overlay_grid_points(image, grid_points):
 
         axin.set_xlim(auto=True)
         axin.set_ylim(auto=True)
-        axin.imshow(subimage, cmap="gist_gray")
+        axin.imshow(subimage)
         axin.set_xticks([])
         axin.set_yticks([])
 
@@ -173,6 +174,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    plt.show()
 
 
 

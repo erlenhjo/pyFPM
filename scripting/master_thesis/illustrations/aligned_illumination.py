@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 
-datapath = Path.cwd() / "data" / "Assorted" / "Aligned_telecentric.tif"
+datapath = Path.cwd() / "data" / "Master_thesis" / "Assorted" / "alignment_compact2x_200mm.png"
 
 main_result_folder = Path.cwd() / "results" / "master_thesis"
 illustration_folder = main_result_folder / "illustrations"
