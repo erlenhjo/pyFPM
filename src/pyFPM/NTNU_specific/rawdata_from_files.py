@@ -3,10 +3,12 @@ import numpy as np
 from PIL import Image
 
 from pyFPM.setup.Data import Rawdata
+from pyFPM.setup.Imaging_system import calculate_patch_start_and_end
 
 
 def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_size, 
-                           float_type, binning_factor, desired_step_nr = 0):
+                           float_type, binning_factor, desired_step_nr = 0, 
+                           limited_import_patch = None, limited_import_shift = np.array([0,0])):
         background_filename = "dark_image"
 
         image_files, background_file = get_image_filenames(
@@ -18,7 +20,9 @@ def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_
         background_image = load_single_image(
             datadirpath = datadirpath,
             file = background_file,
-            binning_factor = binning_factor
+            binning_factor = binning_factor,
+            limited_import_patch = limited_import_patch,
+            limited_import_shift = limited_import_shift
             )
         
         LED_indices, images = load_images(
@@ -27,7 +31,9 @@ def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_
             center_indices = center_indices,
             max_array_size = max_array_size,
             desired_step_nr = desired_step_nr,
-            binning_factor = binning_factor
+            binning_factor = binning_factor,
+            limited_import_patch = limited_import_patch,
+            limited_import_shift = limited_import_shift
         )
 
         return Rawdata(LED_indices=LED_indices, images=images.astype(float_type), 
@@ -69,7 +75,8 @@ def indices_from_image_title(filename: str):
 
     return x_index, y_index, step_nr
 
-def load_images(datadirpath, image_files, center_indices, max_array_size, desired_step_nr, binning_factor):
+def load_images(datadirpath, image_files, center_indices, max_array_size, desired_step_nr, 
+                binning_factor, limited_import_patch, limited_import_shift):
     LED_indices = []
     images = []
     max_X = center_indices[0] + max_array_size//2
@@ -90,17 +97,28 @@ def load_images(datadirpath, image_files, center_indices, max_array_size, desire
         image = load_single_image(
             datadirpath = datadirpath,
             file = file,
-            binning_factor = binning_factor
+            binning_factor = binning_factor,
+            limited_import_patch = limited_import_patch,
+            limited_import_shift = limited_import_shift
             )
         images.append(image)
 
     return LED_indices, np.array(images)
      
 
-def load_single_image(datadirpath, file, binning_factor):
+def load_single_image(datadirpath, file, binning_factor, limited_import_patch, limited_import_shift):
     full_image = np.array(Image.open(os.path.join(datadirpath, file)))
 
-    return bin_image(full_image, binning_factor)
+    if limited_import_patch is not None: # only supported with center at [0,0] currently
+        patch_start, patch_end = calculate_patch_start_and_end(
+            image_size = np.array([full_image.shape[1], full_image.shape[0]]),
+            patch_offset = limited_import_shift,
+            patch_size = limited_import_patch
+        )
+        limited_image = full_image[patch_start[1]:patch_end[1], patch_start[0]:patch_end[0]]
+        return bin_image(limited_image, binning_factor)
+    else:
+        return bin_image(full_image, binning_factor)
 
 
 def bin_image(image, binning_factor):

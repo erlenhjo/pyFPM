@@ -9,6 +9,7 @@ from pyFPM.experimental.pickle_results import pickle_algorithm_results, plot_pic
 
 from dataclasses import dataclass
 from typing import List, Callable
+import numpy as np
 
 @dataclass
 class Experiment_settings:
@@ -21,17 +22,32 @@ class Experiment_settings:
     threshold_value: int
     noise_reduction_regions: List[List[int]]
     defocus_guess: float
+    limited_import: List[int]
 
 def recover_experiment(experiment_name, datadirpath, patch_offsets, patch_size, max_array_size, experiment_settings: Experiment_settings, 
                        setup_local: Callable, setup_global: Callable, zernike_coefficients = None):
+    
+    if experiment_settings.limited_import is None:
+        limited_import_patch = None
+        limited_import_shift = np.array([0,0])
+    elif len(experiment_settings.limited_import) == 2:
+        limited_import_patch = np.array(experiment_settings.limited_import)
+        limited_import_shift = np.array([0,0])
+    elif len(experiment_settings.limited_import) == 4:
+        limited_import_patch = np.array(experiment_settings.limited_import[0:2])
+        limited_import_shift = np.array(experiment_settings.limited_import[2:4])
+        limited_import_shift = limited_import_shift // experiment_settings.binning_factor * experiment_settings.binning_factor
 
     setup_parameters, preprocessed_data = setup_global(experiment_settings.lens,
                                                         datadirpath,
                                                         experiment_settings.threshold_value,
                                                         experiment_settings.noise_reduction_regions,
                                                         max_array_size,
-                                                        experiment_settings.binning_factor
+                                                        experiment_settings.binning_factor,
+                                                        limited_import_patch,
+                                                        limited_import_shift
                                                         )
+    
     
 
     for patch_offset in patch_offsets:
@@ -42,7 +58,8 @@ def recover_experiment(experiment_name, datadirpath, patch_offsets, patch_size, 
                                                                             patch_size,
                                                                             experiment_settings.pixel_scale_factor,
                                                                             experiment_settings.calibration_parameters,
-                                                                            max_array_size
+                                                                            max_array_size,
+                                                                            limited_import_shift // experiment_settings.binning_factor
                                                                             )
 
         pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = experiment_settings.defocus_guess)
@@ -61,8 +78,7 @@ def recover_experiment(experiment_name, datadirpath, patch_offsets, patch_size, 
     return
 
 
-def plot_experiment(experiment_name):
-
-    plot_pickled_experiment(experiment_name)
+def plot_experiment(experiment_name, alternative_result_folder = None):    
+    plot_pickled_experiment(experiment_name, alternative_result_folder)
 
     

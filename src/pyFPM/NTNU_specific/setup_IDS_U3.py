@@ -6,6 +6,8 @@ from pyFPM.NTNU_specific.components import IDS_U3_31J0CP_REV_2_2, MAIN_LED_ARRAY
 from pyFPM.NTNU_specific.setup_from_file import setup_parameters_from_file
 from pyFPM.NTNU_specific.rawdata_from_files import get_rawdata_from_files
 
+import numpy as np
+
 def setup_IDS_U3(
     lens: Lens,
     datadirpath,
@@ -45,7 +47,9 @@ def setup_IDS_U3_global(lens: Lens,
                         threshold_value,
                         noise_reduction_regions,
                         max_array_size,
-                        binning_factor):
+                        binning_factor,
+                        limited_import_patch = None,
+                        limited_import_shift = np.array([0,0])):
     
     camera = IDS_U3_31J0CP_REV_2_2
     LED_array = MAIN_LED_ARRAY
@@ -64,7 +68,9 @@ def setup_IDS_U3_global(lens: Lens,
         center_indices = setup_parameters.LED_info.center_indices,
         max_array_size = max_array_size,
         float_type = setup_parameters.camera.float_type,
-        binning_factor = binning_factor
+        binning_factor = binning_factor,
+        limited_import_patch = limited_import_patch,
+        limited_import_shift = limited_import_shift
         )
 
     preprocessed_data = Preprocessed_data(
@@ -84,7 +90,8 @@ def setup_IDS_U3_local(setup_parameters: Setup_parameters,
                        patch_size,
                        pixel_scale_factor,
                        calibration_parameters,
-                       max_array_size
+                       max_array_size,
+                       binned_limited_import_shift
                        ):
 
     binned_image_size = [preprocessed_data.amplitude_images[0].shape[1], 
@@ -94,7 +101,8 @@ def setup_IDS_U3_local(setup_parameters: Setup_parameters,
         data = preprocessed_data,
         patch_offset = patch_offset,
         patch_size = patch_size,
-        binned_image_size = binned_image_size
+        binned_image_size = binned_image_size,
+        binned_limited_import_shift = binned_limited_import_shift
         )
 
     imaging_system = Imaging_system(
