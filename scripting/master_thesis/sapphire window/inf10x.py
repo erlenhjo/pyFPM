@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 
-from pyFPM.experimental.recover_experiment import recover_experiment, plot_experiment, Experiment_settings
+from pyFPM.experimental.recover_experiment import recover_experiment, Experiment_settings
+from pyFPM.experimental.pickle_results import plot_pickled_experiment, compare_experiment_pupils
+from pyFPM.experimental.plot_info import Plot_types, Plot_parameters, Zoom_location
 from pyFPM.recovery.algorithms.run_algorithm import Method
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_step_description
@@ -11,18 +13,21 @@ from pyFPM.NTNU_specific.components import INFINITYCORRECTED_10X
 from pyFPM.NTNU_specific.setup_IDS_U3 import setup_IDS_U3_global, setup_IDS_U3_local
 
 patch_size = [512, 512]
-max_array_size = 11
+max_array_size = 13
 
 data_folder = Path.cwd() / "data"
 main_result_folder = Path.cwd() / "results" / "master_thesis" / "window"
 
-recover = True
+recover = False
 plot = True
 
-
 def main():
-    inf10x_usaf_window()
-    inf10x_usaf_windowless()
+    # inf10x_usaf_window()
+    # plt.close("all")
+    # inf10x_usaf_windowless()
+    # plt.close("all")
+    compare_zernike()
+    plt.close("all")
 
     if plot:
         plt.show()
@@ -32,23 +37,30 @@ def recover_and_plot(title, datadirpath, patch_offsets, result_folder):
         recover_experiment(title, datadirpath, patch_offsets, patch_size, max_array_size, experiment_settings, 
                            setup_local=setup_IDS_U3_local, setup_global=setup_IDS_U3_global)
     if plot:
-        plot_experiment(title, result_folder)
+        plot_pickled_experiment(title, result_folder, plot_types, plot_parameters)
 
 
 def inf10x_usaf_window():
-    patch_offsets = [np.array([-316,-26])]
+    patch_offsets = [np.array([-232,-64])]
     title = "Infinity 10x USAF window"
     datadirpath = data_folder / "Master_thesis" / "sapphire window" / "inf10x_usaf_window_200mm"
-    result_folder = main_result_folder / "inf10x_recover_window"
-    recover_and_plot(title, datadirpath, patch_offsets, result_folder)
+    recover_and_plot(title, datadirpath, patch_offsets, main_result_folder)
 
 def inf10x_usaf_windowless():
-    patch_offsets = [np.array([-271,-216])]
+    patch_offsets = [np.array([-205,-248])]
     title = "Infinity 10x usaf windowless"
     datadirpath = data_folder / "Master_thesis" / "sapphire window" / "inf10x_usaf_200mm"
-    result_folder = main_result_folder / "inf10x_recover"
-    recover_and_plot(title, datadirpath, patch_offsets, result_folder)
+    recover_and_plot(title, datadirpath, patch_offsets, main_result_folder)
 
+def compare_zernike():
+    titles = ["Infinity 10x usaf windowless", "Infinity 10x USAF window"]
+    labels = ["No window", "Window"]
+    compare_experiment_pupils(experiment_names=titles,
+                                          result_folder=main_result_folder,
+                                          plot_parameters=plot_parameters,
+                                          labels=labels, lens_name = "inf10x",
+                                          pupil_amplitude_limits = [0.2, 1.4], 
+                                          pupil_phase_limits = [-0.86, 0.86])
 
 experiment_settings = Experiment_settings(lens = INFINITYCORRECTED_10X,
                                           method = Method.Fresnel,
@@ -63,14 +75,37 @@ experiment_settings = Experiment_settings(lens = INFINITYCORRECTED_10X,
                                                                                                     apply_BF_mask_from_iteration = 10),
                                           pixel_scale_factor = 6,
                                           binning_factor = 1, 
-                                          threshold_value = 1000,
+                                          threshold_value = 1500,
                                           noise_reduction_regions = [
                                                                         [0, 0, 100, 100],
                                                                         [1100, 1100, 100, 100]
                                                                     ],
                                           defocus_guess = 0,
-                                          limited_import = [1200,1200]
+                                          limited_import = [1200,1200],
+                                          circular_LED_pattern = True
                                           )
+
+plot_types = Plot_types(overview = 0, 
+                        object_overview = 0,
+                        raw_image_with_zoom = 1,
+                        recovered_intensity_with_zoom = 0,
+                        recovered_intensity_zoom_only= 1,
+                        recovered_phase = 0,
+                        recovered_phase_with_zoom = 0,
+                        recovered_phase_zoom_only = 1,
+                        recovered_pupil_amplitude = 0,
+                        recovered_pupil_coefficients = 0,
+                        recovered_pupil_overview = 0,
+                        recovered_pupil_phase = 0,
+                        recovered_spectrum = 0)
+plot_parameters = Plot_parameters(format="pdf",
+                                  zernike_coefficient_max=0.11,
+                                  zernike_coefficient_min=-0.23,
+                                  max_zernike_j = 25,
+                                  low_res_intensity_zoom_location = Zoom_location.right,
+                                  recovered_intensity_zoom_location = Zoom_location.right,
+                                  recovered_phase_zoom_location = Zoom_location.right, 
+                                  zoom_ratio = 2)
 
 if __name__ == "__main__":
     main()

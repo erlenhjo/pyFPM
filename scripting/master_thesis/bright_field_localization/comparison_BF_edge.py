@@ -10,13 +10,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dataset_name =  Path.cwd() / "data" / "Master_thesis" / "sapphire window" / "compact2x_usaf_200mm_illum"
+#dataset_name =  Path.cwd() / "data" / "Master_thesis" / "sapphire window" / "compact2x_usaf_200mm"
 main_result_folder = Path.cwd() / "results" / "master_thesis" / "BFL"
-
 
 
 def main():
     lenses = [COMPACT_2X, COMPACT_2X_CALIBRATED]
-    lens_colors = ["magenta", "red"]
+    lens_colors = ["red", "yellow"]
     camera = IDS_U3_31J0CP_REV_2_2
 
     array_size = 5
@@ -33,7 +33,7 @@ def main():
     
     fig.savefig(main_result_folder / "comparison_BF_edge.png")
     fig.savefig(main_result_folder / "comparison_BF_edge.pdf")
-
+    plt.show()
 
 def get_setup(array_size):
     LED_array = MAIN_LED_ARRAY 

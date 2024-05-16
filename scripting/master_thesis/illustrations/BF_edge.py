@@ -12,7 +12,7 @@ from pyFPM.NTNU_specific.components import IDS_U3_31J0CP_REV_2_2
 lens = Lens(
     NA = 0.05,
     magnification = 2,
-    effectiv_object_to_aperture_distance = np.inf, # not currently used for simulation, should fix ;)
+    effectiv_object_to_aperture_distance = 90e-3, # not currently used for simulation, should fix ;)
     focal_length = 60e-3,
     working_distance = None,
     depth_of_field = None,
@@ -40,8 +40,7 @@ def illustrate_illumination_from_simulation(lens, camera,
     fig = plot_bright_field_images_with_BF_edge(data_patch=data_patch, 
                                                 setup_parameters=setup_parameters, 
                                                 calibration_parameters=LED_calibration_parameters(z_LED,0,0,0),
-                                                array_size=arraysize,
-                                                Fresnel = Fresnel)
+                                                array_size=arraysize)
 
     return fig
 

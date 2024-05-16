@@ -10,22 +10,23 @@ from pyFPM.recovery.algorithms.Step_description import get_standard_adaptive_ste
 from pyFPM.NTNU_specific.components import COMPACT_2X_CALIBRATED
 from pyFPM.NTNU_specific.setup_IDS_U3 import setup_IDS_U3_global, setup_IDS_U3_local
 
-patch_offsets = [[0,0]]  #np.outer(np.arange(-5,6),np.array([256,0]))-np.array([0,256])
-patch_size = [1024, 1024]
+patch_offsets = [[0,0]] 
+patch_size = [948, 948]
 max_array_size = 7
 
 cwd = Path.cwd()
 data_folder = cwd / "data"
 
 recover = True
-plot = False
+plot = True
 
 
 def main():
     compact2x_phase_target_test()
     compact2x_usaf_test()
 
-    #plt.show()
+    if plot:
+        plt.show()
 
 def recover_and_plot(title, datadirpath):
     if recover:
@@ -55,16 +56,18 @@ experiment_settings = Experiment_settings(lens = COMPACT_2X_CALIBRATED,
                                                                                               ),
                                           step_description = get_standard_adaptive_step_description(max_iterations=50,
                                                                                                     start_EPRY_at_iteration = 0,
-                                                                                                    start_adaptive_at_iteration = 10),
+                                                                                                    start_adaptive_at_iteration = 10,
+                                                                                                    apply_BF_mask_from_iteration = 50),
                                           pixel_scale_factor = 6,
-                                          binning_factor = 2, 
-                                          threshold_value = 1000,
+                                          binning_factor = 3, 
+                                          threshold_value = 2000,
                                           noise_reduction_regions = [
                                                                         [500, 500, 100, 100],
                                                                         [800, 800, 100, 100]
                                                                     ],
                                           defocus_guess = 0,
-                                          mask_BF_edge = False
+                                          limited_import = None,
+                                          circular_LED_pattern = True
                                           )
 
 if __name__ == "__main__":

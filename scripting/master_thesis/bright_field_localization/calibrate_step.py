@@ -14,11 +14,11 @@ main_data_folder = Path("E:") / "BFL step"
 main_result_folder = Path.cwd() / "results" / "master_thesis" / "BFL"
 
 def main():
-    calibrate=True
+    calibrate=False
     plot=True
 
-    #multi_step_comp_2x(calibrate=calibrate, plot=plot)
-    multi_step_inf_10x(calibrate=calibrate, plot=plot)
+    multi_step_comp_2x(calibrate=calibrate, plot=plot)
+    #multi_step_inf_10x(calibrate=calibrate, plot=plot)
     multi_step_tele_3x(calibrate=calibrate, plot=plot)
     #multi_step_comp_2x_corner(calibrate=calibrate, plot=plot)
 
@@ -31,7 +31,6 @@ algorithm_parameters = NBFL_parameters(
     limited_import = None
 )
 
-    
 
 def multi_step_comp_2x(calibrate, plot):
     lens = COMPACT_2X
@@ -62,19 +61,22 @@ def multi_step_comp_2x(calibrate, plot):
                                 experiment_name=experiment_name,
                                 relative_LED_distances=relative_LED_distances,
                                 main_data_folder = main_data_folder,
-                                main_result_folder = main_result_folder)
+                                main_result_folder = main_result_folder,
+                                filter_factor = 1.7)
                 
 def multi_step_tele_3x(calibrate, plot):
     lens = TELECENTRIC_3X
     camera = IDS_U3_31J0CP_REV_2_2
-    experiment_name = "3xtele_illum_step_2mm_240"
+    experiment_name = "3xtele_illum_step_2mm"
     dataset_names = [
-        "tele3x_illum_step_240_p2"
+        #"3xtele_illum_step_85_p2",
+        #"3xtele_illum_step_135_p2",
+        "3xtele_illum_step_185_p2"
     ]
-    array_sizes = [9]
+    array_sizes = [7]
     number_of_steps = 26
     relative_LED_distances = np.arange(number_of_steps) * 2e-3
-    assumed_calibration_parameters = LED_calibration_parameters(240e-3,0,0,0)
+    assumed_calibration_parameters = LED_calibration_parameters(185e-3,0,0,0)
     
     if calibrate:
         calibrate_datasets(dataset_names=dataset_names, experiment_name=experiment_name,
@@ -89,7 +91,8 @@ def multi_step_tele_3x(calibrate, plot):
                                 experiment_name=experiment_name,
                                 relative_LED_distances=relative_LED_distances,
                                 main_data_folder = main_data_folder,
-                                main_result_folder = main_result_folder)
+                                main_result_folder = main_result_folder,
+                                filter_factor = 10)
                 
 def multi_step_inf_10x(calibrate, plot):
     lens = INFINITYCORRECTED_10X
@@ -116,7 +119,8 @@ def multi_step_inf_10x(calibrate, plot):
                                 experiment_name=experiment_name,
                                 relative_LED_distances=relative_LED_distances,
                                 main_data_folder = main_data_folder,
-                                main_result_folder = main_result_folder)
+                                main_result_folder = main_result_folder,
+                                filter_factor = 10)
 
 def multi_step_comp_2x_corner(calibrate, plot):
     lens = COMPACT_2X
@@ -143,7 +147,8 @@ def multi_step_comp_2x_corner(calibrate, plot):
                                 experiment_name=experiment_name,
                                 relative_LED_distances=relative_LED_distances,
                                 main_data_folder = main_data_folder,
-                                main_result_folder = main_result_folder)
+                                main_result_folder = main_result_folder,
+                                filter_factor = 1.7)
 
 
         

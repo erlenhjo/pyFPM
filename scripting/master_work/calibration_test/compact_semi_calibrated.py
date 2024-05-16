@@ -65,7 +65,8 @@ experiment_settings = Experiment_settings(lens = COMPACT_2X,
                                                                         [1100, 1100, 100, 100]
                                                                     ],
                                           defocus_guess = 0,
-                                          limited_import = [1200,1200]
+                                          limited_import = [1200,1200],
+                                          circular_LED_pattern = True
                                           )
 
 if __name__ == "__main__":

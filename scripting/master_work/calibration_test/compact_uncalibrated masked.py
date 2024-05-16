@@ -12,7 +12,7 @@ from pyFPM.NTNU_specific.setup_IDS_U3 import setup_IDS_U3_global, setup_IDS_U3_l
 
 patch_offsets = [[0,0]]  #np.outer(np.arange(-5,6),np.array([256,0]))-np.array([0,256])
 patch_size = [256, 256]
-max_array_size = 3
+max_array_size = 13
 
 cwd = Path.cwd()
 data_folder = cwd / "data"

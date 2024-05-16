@@ -21,6 +21,8 @@ image_type_names = [
     "window_best_focus"
 ]
 
+plot_central_region = [1024,1024]
+
 images = []
 for lens_name in lens_names:
     for image_type_name in image_type_names:
