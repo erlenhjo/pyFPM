@@ -6,6 +6,10 @@ import numpy as np
 def defocus_zernike_coefficient(defocus, numerical_aperture, frequency):
     return (-np.pi * defocus * numerical_aperture**2 * frequency) / (2 * np.sqrt(3))
 
+def defocus_distance_from_zernike_coefficient(defocus_coefficient, numerical_aperture, frequency):
+    return ( -2 * np.sqrt(3) * defocus_coefficient)/(np.pi * numerical_aperture**2 * frequency) 
+
+
 def defocus_distance_from_window(refractive_index, thickness):
     return (refractive_index - 1)/ refractive_index * thickness
 
@@ -36,7 +40,6 @@ def calculate_defocused_pupil(defocus, pixel_size, frequency, image_region_size)
 
     pupil_phase = -np.pi*defocus*frequency*(fx_mesh**2+fy_mesh**2) / (frequency**2)
     return np.exp(1j*pupil_phase)
-
 
 
 
