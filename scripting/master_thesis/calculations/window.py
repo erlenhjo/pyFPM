@@ -1,5 +1,5 @@
 from pyFPM.aberrations.pupils.defocus_and_window import spherical_aberration_from_window_zernike_coefficient
-from pyFPM.NTNU_specific.components import INFINITYCORRECTED_10X, INFINITYCORRECTED_2X, INFINITYCORRECTED_50X, TELECENTRIC_3X
+from pyFPM.NTNU_specific.components import INFINITYCORRECTED_10X, COMPACT_2X_CALIBRATED, TELECENTRIC_3X
 from pyFPM.aberrations.zernike_polynomials.fast_synthesis import evaluate_zernike_polynomial
 
 import numpy as np
@@ -20,7 +20,7 @@ def get_spherical_zernike_aberration(coefficient):
 zernike_coefficient = spherical_aberration_from_window_zernike_coefficient(
     refractive_index = 1.77,
     thickness = 5e-3,
-    numerical_aperture = INFINITYCORRECTED_2X.NA,
+    numerical_aperture = COMPACT_2X_CALIBRATED.NA,
     frequency = 1/520e-9
 )
 zernike_pupil = get_spherical_zernike_aberration(zernike_coefficient)
@@ -47,20 +47,3 @@ zernike_pupil = get_spherical_zernike_aberration(zernike_coefficient)
 print(zernike_coefficient)
 plt.matshow((zernike_pupil + np.pi) % (2 *np.pi) - np.pi, vmin=-np.pi, vmax=np.pi)
 
-zernike_coefficient = spherical_aberration_from_window_zernike_coefficient(
-    refractive_index = 1.77,
-    thickness = 5e-3,
-    numerical_aperture = INFINITYCORRECTED_50X.NA,
-    frequency = 1/520e-9
-)
-zernike_pupil = get_spherical_zernike_aberration(zernike_coefficient)
-print(zernike_coefficient)
-plt.matshow((zernike_pupil + np.pi) % (2 *np.pi) - np.pi, vmin=-np.pi, vmax=np.pi)
-
-
-n = np.linspace(1,3, 1000)
-N = (n**2-1)/(n**3)
-plt.figure()
-plt.plot(n,N)
-
-plt.show()
