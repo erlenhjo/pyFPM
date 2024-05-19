@@ -1,6 +1,6 @@
 from pyFPM.NTNU_specific.setup_from_file import setup_parameters_from_file
 from pyFPM.NTNU_specific.rawdata_from_files import get_rawdata_from_files
-from pyFPM.NTNU_specific.calibrate_BF.plot_BFL_step_results import plot_BFL_step_experiments, plot_BFL_step_experiments_combined
+from pyFPM.NTNU_specific.calibrate_BF.plot_BFL_step_results import plot_BFL_step_experiments_combined
 from pyFPM.NTNU_specific.components import MAIN_LED_ARRAY
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
@@ -55,19 +55,18 @@ def calibrate_datasets(dataset_names, experiment_name, number_of_steps,
                                                     )
     
 
-def plot_experiment_results(dataset_names, experiment_name, relative_LED_distances, main_data_folder, main_result_folder):
+def plot_experiment_results(dataset_names, experiment_name, relative_LED_distances, 
+                            main_data_folder, main_result_folder, filter_factor):
     data_folders, result_folder, raw_result_folders = get_folders(dataset_names = dataset_names,
                                                                   experiment_name = experiment_name,
                                                                   main_data_folder = main_data_folder,
                                                                   main_result_folder = main_result_folder)
 
-    # plot_BFL_step_experiments(raw_result_folders,
-    #                           result_folder,
-    #                           relative_LED_distances)
 
     plot_BFL_step_experiments_combined(raw_result_folders,
                                         result_folder,
-                                        relative_LED_distances)
+                                        relative_LED_distances,
+                                        filter_factor)
     
 
     

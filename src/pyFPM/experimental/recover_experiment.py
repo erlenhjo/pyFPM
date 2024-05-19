@@ -23,6 +23,7 @@ class Experiment_settings:
     noise_reduction_regions: List[List[int]]
     defocus_guess: float
     limited_import: List[int]
+    circular_LED_pattern: bool
 
 def recover_experiment(experiment_name, datadirpath, patch_offsets, patch_size, max_array_size, experiment_settings: Experiment_settings, 
                        setup_local: Callable, setup_global: Callable, zernike_coefficients = None):
@@ -45,7 +46,8 @@ def recover_experiment(experiment_name, datadirpath, patch_offsets, patch_size, 
                                                         max_array_size,
                                                         experiment_settings.binning_factor,
                                                         limited_import_patch,
-                                                        limited_import_shift
+                                                        limited_import_shift,
+                                                        experiment_settings.circular_LED_pattern
                                                         )
     
     
@@ -59,7 +61,8 @@ def recover_experiment(experiment_name, datadirpath, patch_offsets, patch_size, 
                                                                             experiment_settings.pixel_scale_factor,
                                                                             experiment_settings.calibration_parameters,
                                                                             max_array_size,
-                                                                            limited_import_shift // experiment_settings.binning_factor
+                                                                            limited_import_shift // experiment_settings.binning_factor,
+                                                                            experiment_settings.circular_LED_pattern
                                                                             )
 
         pupil_guess = get_defocused_pupil(imaging_system = imaging_system, defocus = experiment_settings.defocus_guess)
@@ -78,7 +81,6 @@ def recover_experiment(experiment_name, datadirpath, patch_offsets, patch_size, 
     return
 
 
-def plot_experiment(experiment_name, alternative_result_folder = None):    
-    plot_pickled_experiment(experiment_name, alternative_result_folder)
+
 
     
