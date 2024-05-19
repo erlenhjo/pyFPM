@@ -8,7 +8,8 @@ from pyFPM.setup.Imaging_system import calculate_patch_start_and_end
 
 def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_size, 
                            float_type, binning_factor, desired_step_nr = 0, 
-                           limited_import_patch = None, limited_import_shift = np.array([0,0])):
+                           limited_import_patch = None, limited_import_shift = np.array([0,0]),
+                           LED_circle = False):
         background_filename = "dark_image"
 
         image_files, background_file = get_image_filenames(
@@ -33,7 +34,8 @@ def get_rawdata_from_files(datadirpath, image_format, center_indices, max_array_
             desired_step_nr = desired_step_nr,
             binning_factor = binning_factor,
             limited_import_patch = limited_import_patch,
-            limited_import_shift = limited_import_shift
+            limited_import_shift = limited_import_shift,
+            LED_circle = LED_circle
         )
 
         return Rawdata(LED_indices=LED_indices, images=images.astype(float_type), 
@@ -76,19 +78,27 @@ def indices_from_image_title(filename: str):
     return x_index, y_index, step_nr
 
 def load_images(datadirpath, image_files, center_indices, max_array_size, desired_step_nr, 
-                binning_factor, limited_import_patch, limited_import_shift):
+                binning_factor, limited_import_patch, limited_import_shift, LED_circle):
     LED_indices = []
     images = []
-    max_X = center_indices[0] + max_array_size//2
-    min_X = center_indices[0] - max_array_size//2
-    max_Y = center_indices[1] + max_array_size//2
-    min_Y = center_indices[1] - max_array_size//2
+
+    center_x = center_indices[0]
+    center_y = center_indices[1]
+    max_X = center_x + max_array_size//2
+    min_X = center_x - max_array_size//2
+    max_Y = center_y + max_array_size//2
+    min_Y = center_y - max_array_size//2
+    radius = max_array_size/2
 
     for file in image_files:
         X, Y, step_nr = indices_from_image_title(file)
 
-        if (X<min_X or X>max_X ) or (Y<min_Y or Y>max_Y):
-            continue
+        if not LED_circle:
+            if (X<min_X or X>max_X ) or (Y<min_Y or Y>max_Y):
+                continue
+        else:
+            if ((X-center_x)**2 + (Y-center_y)**2 > radius**2):
+                continue
 
         if step_nr != desired_step_nr:
             continue

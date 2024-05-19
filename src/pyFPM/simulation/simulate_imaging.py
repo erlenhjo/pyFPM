@@ -21,7 +21,8 @@ def simulate_imaging(
     spherical_illumination_correction,
     patch_offset,
     use_Fresnel_shift,
-    calibration_parameters: LED_calibration_parameters
+    calibration_parameters: LED_calibration_parameters,
+    limit_LED_indices = None
 ):
       
     # Define simulated data set
@@ -31,7 +32,10 @@ def simulate_imaging(
     x_stop = x_start + arraysize
     y_stop = y_start + arraysize
 
-    LED_indices = [[x, y] for x in range(x_start, x_stop) for y in range(y_start, y_stop)]
+    if limit_LED_indices is None:
+        LED_indices = [[x, y] for x in range(x_start, x_stop) for y in range(y_start, y_stop)]
+    else:
+        LED_indices = limit_LED_indices 
 
     full_image_imaging_system = Imaging_system(
         setup_parameters = setup_parameters,
@@ -68,7 +72,8 @@ def simulate_imaging(
     illumination_pattern = Illumination_pattern(LED_indices=LED_indices,
                                                 imaging_system=full_image_imaging_system,
                                                 setup_parameters=setup_parameters,
-                                                max_array_size=arraysize) 
+                                                max_array_size=arraysize,
+                                                circle = False) 
     if noise_fraction:
         low_res_images = apply_gaussian_noise(low_res_images = low_res_images, #might not work for arraysize = 1 ? or something?
                                             noise_fraction = noise_fraction, 
@@ -101,15 +106,17 @@ def finalize_simulation_setup(
         )
 
     data_patch = Data_patch(data = simulated_data,
-                            patch_offset = [0,0],
+                            patch_offset = np.array([0,0]),
                             patch_size = patch_size,
-                            binned_image_size = setup_parameters.camera.raw_image_size)
+                            binned_image_size = setup_parameters.camera.raw_image_size,
+                            binned_limited_import_shift = ([0,0]))
 
     illumination_pattern = Illumination_pattern(
         LED_indices = simulated_data.LED_indices,
         imaging_system = imaging_system,
         setup_parameters = setup_parameters,
-        max_array_size=arraysize
+        max_array_size=arraysize,
+        circle = False
     )
 
     return data_patch, imaging_system, illumination_pattern

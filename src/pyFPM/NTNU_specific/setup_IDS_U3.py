@@ -49,7 +49,8 @@ def setup_IDS_U3_global(lens: Lens,
                         max_array_size,
                         binning_factor,
                         limited_import_patch = None,
-                        limited_import_shift = np.array([0,0])):
+                        limited_import_shift = np.array([0,0]),
+                        circular_LED_pattern = False):
     
     camera = IDS_U3_31J0CP_REV_2_2
     LED_array = MAIN_LED_ARRAY
@@ -70,7 +71,8 @@ def setup_IDS_U3_global(lens: Lens,
         float_type = setup_parameters.camera.float_type,
         binning_factor = binning_factor,
         limited_import_patch = limited_import_patch,
-        limited_import_shift = limited_import_shift
+        limited_import_shift = limited_import_shift,
+        LED_circle = circular_LED_pattern
         )
 
     preprocessed_data = Preprocessed_data(
@@ -91,7 +93,8 @@ def setup_IDS_U3_local(setup_parameters: Setup_parameters,
                        pixel_scale_factor,
                        calibration_parameters,
                        max_array_size,
-                       binned_limited_import_shift
+                       binned_limited_import_shift,
+                       circular_LED_pattern = False
                        ):
 
     binned_image_size = [preprocessed_data.amplitude_images[0].shape[1], 
@@ -118,7 +121,8 @@ def setup_IDS_U3_local(setup_parameters: Setup_parameters,
         LED_indices = data_patch.LED_indices,
         imaging_system = imaging_system,
         setup_parameters = setup_parameters,
-        max_array_size = max_array_size
+        max_array_size = max_array_size,
+        circle = circular_LED_pattern
     )
 
     return imaging_system, data_patch, illumination_pattern

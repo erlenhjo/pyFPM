@@ -300,8 +300,8 @@ def get_BF_edge_mask(LED_locations_x, LED_locations_y,
             relative_frequency_shift_y_per_pixel = ((LED_locations_y[Y,X] - y_coords)/z_LED - y_coords/z_q)
 
             absolute_frequency_per_pixel = np.sqrt(relative_frequency_shift_x_per_pixel**2 + relative_frequency_shift_y_per_pixel**2)
-            mask_inner = absolute_frequency_per_pixel > numerical_aperture * 0.9
-            mask_outer = absolute_frequency_per_pixel < numerical_aperture * 1.2
+            mask_inner = absolute_frequency_per_pixel > numerical_aperture * 0.85
+            mask_outer = absolute_frequency_per_pixel < numerical_aperture * 1.15
 
             mask: np.ndarray = mask_inner & mask_outer # elementwise and
 

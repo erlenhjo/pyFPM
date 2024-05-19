@@ -5,16 +5,21 @@ from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import Imaging_system
 
 class Illumination_pattern(object):
-    def __init__(self, LED_indices, max_array_size,
+    def __init__(self, LED_indices, max_array_size, circle: bool,
                  imaging_system: Imaging_system, setup_parameters: Setup_parameters):
         LED_array_size = setup_parameters.LED_info.LED_array_size
         center_indices = setup_parameters.LED_info.center_indices
         LED_frequencies_x = imaging_system.LED_shifts_x_Fresnel * imaging_system.df_x
         LED_frequencies_y = imaging_system.LED_shifts_y_Fresnel * imaging_system.df_y
         cutoff_frequency = imaging_system.cutoff_frequency
+
+        if not circle:
+            avaliable_LEDs = determine_available_LEDs(LED_indices=LED_indices, LED_array_size=LED_array_size, 
+                                                    center_indices = center_indices, max_array_size = max_array_size)
+        else:
+            avaliable_LEDs = determine_available_LEDs_circle(LED_indices=LED_indices, LED_array_size=LED_array_size, 
+                                                            center_indices = center_indices, max_array_size = max_array_size)
         
-        avaliable_LEDs = determine_available_LEDs(LED_indices=LED_indices, LED_array_size=LED_array_size, 
-                                                  center_indices = center_indices, max_array_size = max_array_size)
 
         self.relative_NAs = calculate_relative_NA(
              LED_frequencies_x = LED_frequencies_x,
@@ -22,9 +27,14 @@ class Illumination_pattern(object):
              cutoff_frequency = cutoff_frequency
         )
 
+        # self.update_order, self.update_order_matrix \
+        #     = spiral_indices(LED_indices = LED_indices, center_indices=center_indices, 
+        #                      LED_array_size=LED_array_size, avaliable_LEDs=avaliable_LEDs)
+        
         self.update_order, self.update_order_matrix \
-            = spiral_indices(LED_indices = LED_indices, center_indices=center_indices, 
-                             LED_array_size=LED_array_size, avaliable_LEDs=avaliable_LEDs)
+            = low_NA_first_indices(LED_indices = LED_indices, center_indices=center_indices, 
+                                   LED_array_size=LED_array_size, avaliable_LEDs=avaliable_LEDs,
+                                   relative_LED_frequencies = self.relative_NAs)
         
 
 def calculate_relative_NA(LED_frequencies_x, LED_frequencies_y, cutoff_frequency):
@@ -49,6 +59,19 @@ def determine_available_LEDs(LED_indices, LED_array_size, center_indices,
             available_LEDs[y,x] = True
 
     return available_LEDs
+
+def determine_available_LEDs_circle(LED_indices, LED_array_size, center_indices, 
+                             max_array_size):
+    available_LEDs = np.zeros(shape = (LED_array_size[1] + 2, LED_array_size[0] + 2), dtype = bool)
+
+    radius = max_array_size/2
+    center_x = center_indices[0]
+    center_y = center_indices[1]
+    for x, y in LED_indices:
+        if ((x-center_x)**2 + (y-center_y)**2 <= radius**2):
+            available_LEDs[y,x] = True
+    return available_LEDs
+
 
 def spiral_indices(LED_indices, center_indices, LED_array_size, avaliable_LEDs):
     center_x_index = center_indices[0]
@@ -81,12 +104,25 @@ def spiral_indices(LED_indices, center_indices, LED_array_size, avaliable_LEDs):
         direction += 1
 
 
-    for n, indices in enumerate(LED_indices):
-        x = indices[0]
-        y = indices[1]
-
+    for n, (x, y) in enumerate(LED_indices):
         update_index = order_matrix[y,x]
         order_list[update_index] = n
 
+    return order_list, order_matrix
+    
+
+def low_NA_first_indices(LED_indices, center_indices, LED_array_size, avaliable_LEDs, relative_LED_frequencies):
+    order_matrix = np.zeros(shape=(LED_array_size[1]+2, LED_array_size[0]+2), dtype = int)
+    order_list = np.empty(shape=len(LED_indices), dtype = int)
+
+    numerical_apertures = []
+
+    for n, (x, y) in enumerate(LED_indices):
+        numerical_apertures.append(relative_LED_frequencies[y,x])
+
+    order_list = np.array(numerical_apertures).argsort()
+    for n, (x, y) in enumerate(LED_indices):
+        order_matrix[y,x] = np.argwhere(order_list == n)
+    
     return order_list, order_matrix
     

@@ -46,13 +46,14 @@ def standard_recovery_algorithm(
                                        LED_indices = LED_indices)
     
 
-    recovered_object_spectrum, recovered_pupil, convergence_index, real_space_error_metric \
-        = main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,  
-                              scaling_factor_squared, low_res_CTF, pupil_guess, LED_shifts,
-                              alpha, beta, eta, converged_alpha, max_iterations,
-                              start_EPRY_at_iteration, start_adaptive_steps_at_iteration,
-                              BF_edge_masks, mask_indices, apply_BF_mask_from_iteration
-                              )
+    recovered_object_spectrum, recovered_pupil, convergence_index, \
+        real_space_error_metric, amplitude_error, masked_amplitude_error\
+            = main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_images,  
+                                scaling_factor_squared, low_res_CTF, pupil_guess, LED_shifts,
+                                alpha, beta, eta, converged_alpha, max_iterations,
+                                start_EPRY_at_iteration, start_adaptive_steps_at_iteration,
+                                BF_edge_masks, mask_indices, apply_BF_mask_from_iteration
+                                )
 
     recovered_CTF = calculate_recovered_CTF(update_order, LED_shifts, low_res_CTF, size_high_res_x, size_high_res_y)
     recovered_object_spectrum = recovered_object_spectrum * recovered_CTF
@@ -68,7 +69,9 @@ def standard_recovery_algorithm(
         real_space_error_metric = real_space_error_metric,
         low_res_image = data_patch.amplitude_images[illumination_pattern.update_order[0]],
         recovered_CTF = recovered_CTF,
-        imaging_system = imaging_system
+        imaging_system = imaging_system,
+        amplitude_error = amplitude_error,
+        masked_amplitude_error = masked_amplitude_error
     ) 
     return algorithm_result
 
@@ -86,6 +89,8 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
     convergence_index = np.zeros(max_iterations)
     normalized_real_space_error_metric = np.zeros(max_iterations)
     real_space_error_metric_normalization_factor = caclulate_real_space_error_normalization_factor(low_res_images,update_order)
+    amplitude_error_per_image_per_loop = np.zeros((max_iterations, len(update_order)))
+    masked_amplitude_error_per_image_per_loop = np.zeros((max_iterations, len(update_order)))
 
     for loop_nr in range(max_iterations):
         real_space_error_metric = 0
@@ -95,11 +100,11 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
             min_x, max_x, min_y, max_y = LED_shifts[index]
             mask_index = mask_indices[index]
             if mask_index == -1 or loop_nr < apply_BF_mask_from_iteration:
-                mask = 0
-                inverse_mask = 1
+                retain_mask = 0
+                update_mask = 1
             else:
-                mask = BF_edge_masks[mask_index]
-                inverse_mask = np.invert(mask)
+                retain_mask = BF_edge_masks[mask_index]
+                update_mask = np.invert(retain_mask)
                 # plt.matshow(mask)
                 # plt.matshow(raw_image)
                 # plt.matshow(raw_image*mask)
@@ -109,17 +114,38 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
             # project current spectrum to detector
             current_spectrum = recovered_object_spectrum[min_y:max_y+1, min_x:max_x+1]
             current_lens_spectrum = pupil * low_res_CTF * current_spectrum                                    
-            projected_image = fftshift(ifft2(ifftshift(current_lens_spectrum)))      
+            projected_image = fftshift(ifft2(ifftshift(current_lens_spectrum)))
 
             # calculated updated spectrum at lens
-            updated_image = projected_image * mask + raw_image * projected_image / np.abs(projected_image) * inverse_mask
+            updated_image = projected_image * retain_mask + raw_image * projected_image / np.abs(projected_image) * update_mask
             updated_lens_spectrum = fftshift(fft2(ifftshift(updated_image)))
+
 
             # calculate error measures
             if np.sum(np.abs(np.abs(projected_image) - np.abs(updated_image))) != 0:
                 convergence_index[loop_nr] += np.mean(np.abs(projected_image)) \
                                                 / np.sum(np.abs(np.abs(projected_image) - np.abs(updated_image)))
-            real_space_error_metric += np.linalg.norm(np.abs(updated_image) - np.abs(projected_image))**2
+            
+            amplitude_error = np.abs(np.abs(projected_image) - np.abs(raw_image))
+            masked_amplitude_error =  np.abs(np.abs(projected_image) - np.abs(updated_image))
+            amplitude_error_per_image_per_loop[loop_nr,image_nr] = np.mean(amplitude_error)
+            masked_amplitude_error_per_image_per_loop[loop_nr,image_nr] = np.mean(masked_amplitude_error)
+            real_space_error_metric += np.linalg.norm(masked_amplitude_error)**2
+
+            # if loop_nr == 28:
+            #     fig, axes = plt.subplots(2,3)
+            #     axes[0,0].matshow(raw_image)
+            #     axes[0,1].matshow(masked_error)
+            #     axes[0,2].matshow(error)
+            #     axes[1,0].matshow(np.log(np.abs(current_spectrum)))
+            #     axes[1,1].matshow(np.log(np.abs(current_lens_spectrum)))
+            #     if type(retain_mask) == int:
+            #         axes[1,2].matshow(error)
+            #     else:
+            #         axes[1,2].matshow(retain_mask)
+
+            #     fig.suptitle(f"{np.mean(amplitude_error)} {np.mean(masked_amplitude_error)}")
+            #     plt.show()
 
             # calculate update terms
             if loop_nr<start_EPRY_at_iteration:
@@ -141,6 +167,12 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
             
         # update error and step size    
         normalized_real_space_error_metric[loop_nr] = real_space_error_metric/real_space_error_metric_normalization_factor
+        # if loop_nr == 27:
+        #     fig, axes = plt.subplots(1,1)
+        #     axes.plot(amplitude_error_per_image_per_loop[loop_nr])
+        #     axes.plot(masked_amplitude_error_per_image_per_loop[loop_nr])
+        #     fig.suptitle(f"{loop_nr}, {alpha}")
+        #     plt.show()
 
         if loop_nr > start_adaptive_steps_at_iteration:
             alpha, beta = update_step_sizes(alpha, beta, eta,
@@ -150,10 +182,12 @@ def main_algorithm_loop(recovered_object_spectrum_guess, update_order, low_res_i
             if alpha<converged_alpha:
                 normalized_real_space_error_metric=normalized_real_space_error_metric[:loop_nr]
                 convergence_index=convergence_index[:loop_nr]
+                amplitude_error_per_image_per_loop=amplitude_error_per_image_per_loop[:loop_nr]
+                masked_amplitude_error_per_image_per_loop=masked_amplitude_error_per_image_per_loop[:loop_nr]
                 break
 
 
-    return recovered_object_spectrum, pupil, convergence_index, normalized_real_space_error_metric
+    return recovered_object_spectrum, pupil, convergence_index, normalized_real_space_error_metric, amplitude_error_per_image_per_loop, masked_amplitude_error_per_image_per_loop
 
 
 def get_object_phase_correction(imaging_system: Imaging_system, correct_spherical_wave_phase, correct_Fresnel_phase, complex_type):

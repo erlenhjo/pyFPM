@@ -13,3 +13,5 @@ class Algorithm_result:
     low_res_image: np.ndarray
     recovered_CTF: np.ndarray
     imaging_system: Imaging_system
+    amplitude_error: np.ndarray
+    masked_amplitude_error: np.ndarray

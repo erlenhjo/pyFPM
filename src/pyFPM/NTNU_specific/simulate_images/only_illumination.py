@@ -8,13 +8,13 @@ import numpy as np
 
 def simulate_illumination(lens: Lens, camera: Camera,
                           correct_spherical_wave_illumination, correct_Fresnel_propagation, 
-                          arraysize, calibration_parameters, patch_offset=[0,0]):
+                          arraysize, calibration_parameters, patch_offset=[0,0], limit_LED_indices = None):
     noise_fraction = 0 
     zernike_coefficients = np.array([0,0,0])
 
     LED_array = MAIN_LED_ARRAY
 
-    pixel_scale_factor = 4
+    pixel_scale_factor = 2
 
     amplitude_image = np.ones(shape=(camera.raw_image_size[1]*pixel_scale_factor, camera.raw_image_size[0]*pixel_scale_factor))
     phase_image = np.zeros(shape=amplitude_image.shape)
@@ -37,8 +37,9 @@ def simulate_illumination(lens: Lens, camera: Camera,
         Fresnel_correction = correct_Fresnel_propagation,
         spherical_illumination_correction = correct_spherical_wave_illumination,
         patch_offset=patch_offset,
-        use_Fresnel_shift=False,
-        calibration_parameters=calibration_parameters
+        use_Fresnel_shift=correct_Fresnel_propagation,
+        calibration_parameters=calibration_parameters,
+        limit_LED_indices = limit_LED_indices
     )
 
     patch_size = camera.raw_image_size
