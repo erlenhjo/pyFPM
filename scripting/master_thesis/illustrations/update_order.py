@@ -20,7 +20,7 @@ def illustrate_update_order():
 
     setup_parameters, data_patch, imaging_system, illumination_pattern, applied_pupil, _\
         = simulate_2x(high_res_complex_object, noise_fraction=0, zernike_coefficients=zernike_coefficients, 
-                      spherical_illumination=True, patch_offset=[0, 0], use_aperture_shift=False, arraysize=7)
+                      spherical_illumination=True, patch_offset=[0, 0], use_Fresnel_shift=False, arraysize=7)
     
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3,3), constrained_layout = True)
     cax = ax.pcolor(np.arange(-3,4), np.arange(-3,4), illumination_pattern.update_order_matrix[13:20,13:20])
@@ -34,7 +34,6 @@ def illustrate_update_order():
     cbar.set_label("Update index")
     
     fig.savefig(illustration_folder / "illustrate_update_order.pdf")
-    fig.savefig(illustration_folder / "illustrate_update_order.png")
     
 
 if __name__ == "__main__":
