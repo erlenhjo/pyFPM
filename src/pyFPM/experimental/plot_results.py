@@ -460,6 +460,7 @@ def plot_pupil_amp_and_coefficients_comparative(
         defocus_distance = defocus_distance_from_zernike_coefficient(defocus_coefficient, numerical_aperture, frequency)
     
         print(f"Defocus ({label}): {defocus_distance*1e6} um from {defocus_coefficient}")
+    print(f"Spherical aberration change ({labels[1]}-{labels[0]}):", zernike_coefficients_list[1][11]-zernike_coefficients_list[0][11])
 
     plot_zernike_coefficients_comparative(axes_coefficients, zernike_coefficients_list, colors=["b","r"], labels=labels)
     if (zernike_coefficient_limits[0] is not None) and (zernike_coefficient_limits[1] is not None):
