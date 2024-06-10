@@ -56,11 +56,8 @@ def main():
                                          setup_parameters, calibration_parameters, array_size,
                                          NA_ratios=[0.85,1,1.15], NA_colors=["red", "yellow", "red"])
     
-    fig1.savefig(main_result_folder / "comparison_BF_edge_singel_illum.png")
     fig1.savefig(main_result_folder / "comparison_BF_edge_singel_illum.pdf")
-    fig2.savefig(main_result_folder / "comparison_BF_edge_singel_usaf.png")
     fig2.savefig(main_result_folder / "comparison_BF_edge_singel_usaf.pdf")
-    fig3.savefig(main_result_folder / "comparison_BF_edge_singel_sim.png")
     fig3.savefig(main_result_folder / "comparison_BF_edge_singel_sim.pdf")
     plt.show()
 

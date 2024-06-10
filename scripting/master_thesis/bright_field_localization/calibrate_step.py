@@ -14,12 +14,12 @@ main_data_folder = Path("E:") / "BFL step"
 main_result_folder = Path.cwd() / "results" / "master_thesis" / "BFL"
 
 def main():
-    calibrate=False
+    calibrate=True
     plot=True
 
-    multi_step_comp_2x(calibrate=calibrate, plot=plot)
-    #multi_step_inf_10x(calibrate=calibrate, plot=plot)
-    multi_step_tele_3x(calibrate=calibrate, plot=plot)
+    #multi_step_comp_2x(calibrate=calibrate, plot=plot)
+    multi_step_inf_10x(calibrate=calibrate, plot=plot)
+    #multi_step_tele_3x(calibrate=calibrate, plot=plot)
     #multi_step_comp_2x_corner(calibrate=calibrate, plot=plot)
 
 algorithm_parameters = NBFL_parameters(

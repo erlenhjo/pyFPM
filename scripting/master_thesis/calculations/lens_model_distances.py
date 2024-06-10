@@ -1,99 +1,79 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def test_1():
-    focal_length = 36e-3
-    extension_lengths = [100e-3, 5.6e-3, 2e-3]
-    z_2 = sum(extension_lengths)
-    z_1 = 1/(1/focal_length-1/z_2)
-    magnification = z_2/z_1
+from pyFPM.NTNU_specific.components import TELECENTRIC_3X, COMPACT_2X_CALIBRATED
 
+C_mount_extension_length_contribution = 17.5e-3
+tube_length = 152.5e-3
+extension_length = C_mount_extension_length_contribution + tube_length
+total_length = 280e-3
 
-    print(focal_length)
-    print(z_2)
-    print(z_1)
-    print(magnification)
+def non_telecentric_distances(f_L, K):
+    z_1 = f_L * (1+1/K)
+    z_2 = f_L * (1+K)
+    return z_1, z_2
 
-    wavelength=587.6e-9
-    diameter = 6e-3
+def effective_object_to_aperture_distance(z_1, a_1):
+    return (1/z_1 - a_1/z_1**2)**(-1)
 
-    NA = diameter/(2*z_1)
-    print(NA)
+def aperture_distance(z_1, z_q):
+    return z_1 * (1 - z_1/z_q)
 
-def test_1_2():
-    focal_length = 60.33e-3
-    magnification = 2
-    z_2 = (1+magnification)*focal_length
-    z_1 = (1+1/magnification)*focal_length
+def telecentric_distances(f_L, K):
+    z_1 = f_L * (1+1/K)
+    z_2 = f_L * K
+    return z_1, z_2
 
-    print(focal_length)
-    print(z_2)
-    print(z_1)
-    print(magnification)
-
-    wavelength=587.6e-9
-    diameter = 11e-3
-
-    NA = diameter/(2*z_1)
-    print(NA)
-
-
-
-def test_2():
-    wavelength = 520e-9
-    f_0 = 1 /wavelength
-    magnification = 2
-    pixel_size = 6.5e-6/magnification
-    NA = 0.055
-    cutoff_frequency = NA*f_0
-    M = 256
-
-    max_f = 1 / (2 * pixel_size)
-    spatial_frequencies_x = np.linspace(start = -max_f, stop = max_f, num = M, endpoint = True)  
-    spatial_frequencies_y = np.linspace(start = -max_f, stop = max_f, num = M, endpoint = True)
-
-    fx_mesh, fy_mesh = np.meshgrid(spatial_frequencies_x, spatial_frequencies_y)
-
-    print(spatial_frequencies_x[1]-spatial_frequencies_x[0])
-    print(1/(M*pixel_size))
-    CTF = fx_mesh**2 + fy_mesh**2 < cutoff_frequency**2
-
-    plt.matshow(CTF)
-    plt.show()
-
-def test_3():
-    wavelength = 520e-9
-    magnification = 4
-    image_pixel_size = 2.5e-6
-    z_1 = 12.5e-3
-    lens_diameter = 2.4e-3
-    M = 512
+def compact_2X_calibrated():
+    objective_size = 18e-3
+    lens = COMPACT_2X_CALIBRATED
+    focal_length = lens.focal_length
+    magnification = lens.magnification
+    calibrated_z_q = lens.effective_object_to_aperture_distance 
+    working_distance = lens.working_distance
     
-    lens_pixel_size = wavelength * z_1 * magnification / (M*image_pixel_size)
+    z_1, z_2 = non_telecentric_distances(f_L=focal_length, K=magnification)
+    a_1 = aperture_distance(z_1=z_1, z_q=calibrated_z_q)
+
+    print("Compact 2X")
+    print(f"z_1: {1000*z_1:.1f} mm")
+    print(f"z_2: {1000*z_2:.1f} mm")
+    print(f"WD: {1000*working_distance:.1f} mm")
+    print(f"a_1: {1000*a_1:.1f} mm")
+    print(f"objective_size: {1000*objective_size:.1f} mm")
 
 
-    lens_x = np.arange(start = -M//2, stop = M//2) * lens_pixel_size  
-    lens_y = np.arange(start = -M//2, stop = M//2) * lens_pixel_size
 
-    lens_x_mesh, lens_y_mesh = np.meshgrid(lens_x, lens_y)
 
-    CTF = lens_x_mesh**2 + lens_y_mesh**2 < (lens_diameter/2)**2
 
-    plt.pcolor(lens_x*1000, lens_y*1000, CTF)
-    plt.show()
+def telecentric_3X():
+    objective_size = 33e-3
+    lens = TELECENTRIC_3X
+    focal_length = lens.focal_length
+    magnification = lens.magnification
+    calibrated_z_q = lens.effective_object_to_aperture_distance 
+    working_distance = lens.working_distance
+        
+    z_1, z_2 = telecentric_distances(f_L=focal_length, K=magnification)
+    z_1_non_tele, z_2_non_tele = non_telecentric_distances(f_L=focal_length, K=magnification)
 
-def test_fujinon():
-    wavelength = 520e-9
-    magnification = 0.1767
-    image_pixel_size = 2.74e-6
-    numerical_aperture = 0.044
+    print("Telecentric 3X")
+    print(f"z_1: {1000*z_1:.1f} mm")
+    print(f"z_2: {1000*z_2:.1f} mm")
+    print(f"z_1 (non-tele): {1000*z_1_non_tele:.1f} mm")
+    print(f"z_2 (non-tele): {1000*z_2_non_tele:.1f} mm")
+    print(f"WD: {1000*working_distance:.1f} mm")
+    print(f"a_1: {1000*focal_length:.1f} mm")
+    print(f"objective_size: {1000*objective_size:.1f} mm")
 
-    print(image_pixel_size, wavelength/(2*numerical_aperture))
+
+
+
 
 
 if __name__=="__main__":
-    #test_2()
-    #test_3()
-    #test_1_2()
+    compact_2X_calibrated()
+    telecentric_3X()
 
-    test_fujinon()
+
+

@@ -43,6 +43,6 @@ def calculate_centers_and_radius(LED_n, LED_m, LED_pitch, pixel_size,
     centers_y = (LEDs_y + delta_y) / pixel_size \
                 / (1 + distance_ratio)
     
-    return centers_x, centers_y, radius
+    return centers_x, centers_y, np.abs(radius)
 
 

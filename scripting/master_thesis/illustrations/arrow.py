@@ -65,9 +65,12 @@ class Arrow_text:
 # needs ylim, xlim to be updated?
 def add_arrow(fig: plt.Figure, ax_from: plt.Axes, ax_to: plt.Axes, coord_from, coord_to, 
               arrow_style: Arrow_style, arrow_text: Arrow_text|None, 
-              axes_coordinates = False):
+              axes_coordinates = False, axes_are_subfigures = False):
     
-    if axes_coordinates:
+    if axes_are_subfigures and axes_coordinates:
+        data_transform_from = ax_from.transSubfigure
+        data_transform_to = ax_to.transSubfigure
+    elif axes_coordinates:
         data_transform_from = ax_from.transAxes
         data_transform_to = ax_to.transAxes
     else: # data coordinates
@@ -90,7 +93,8 @@ def add_arrow(fig: plt.Figure, ax_from: plt.Axes, ax_to: plt.Axes, coord_from, c
         connectionstyle = arrow_style.connection_style, 
         arrowstyle = arrow_style.arrow_style, 
         alpha = arrow_style.alpha,
-        mutation_scale = arrow_style.mutation_scale
+        mutation_scale = arrow_style.mutation_scale,
+        zorder=100
     )
     fig.add_artist(arrow)
 
@@ -105,7 +109,7 @@ def add_arrow(fig: plt.Figure, ax_from: plt.Axes, ax_to: plt.Axes, coord_from, c
             verticalalignment = "center",
             horizontalalignment = "center",
             fontsize = arrow_text.font_size,
-            zorder = 10
+            zorder = 100
         )
         fig.add_artist(text)
 

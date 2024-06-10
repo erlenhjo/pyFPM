@@ -17,8 +17,8 @@ A_overlap = np.sum(circle_1 & circle_2)
 print(A_overlap/A1)
 
 def get_overlap(z_0, d, NA):    
-    Q = d / z_0 / NA
-    return 1/np.pi * (2 * np.arccos(Q/2) - Q * np.sqrt(1-(Q/2)**2))
+    Q = d / 2 / z_0 / NA
+    return 2/np.pi * (np.arccos(Q) - Q * np.sqrt(1-(Q)**2))
 
 d = 6e-3
 z_0 = np.linspace(0e-3, 250e-3, 1000)

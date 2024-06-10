@@ -50,7 +50,6 @@ def illustrate_BF_edge():
                                                   spherical=True, Fresnel=True, 
                                                   z_LED=200e-3, arraysize=array_size)
     fig.savefig(illustration_folder / "illustrate_BF_edge.pdf")
-    fig.savefig(illustration_folder / "illustrate_BF_edge.png")
 
 
 if __name__ == "__main__": 

@@ -117,7 +117,6 @@ def illustrate_zernike_decomposition():
               coord_from=(400,1300), coord_to=(-100,1300),
               arrow_style=arrow_style, arrow_text=arrow_text_2)
 
-    fig.savefig(illustration_folder / "zernike_example.png")
     fig.savefig(illustration_folder / "zernike_example.pdf")
 
     

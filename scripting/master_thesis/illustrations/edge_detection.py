@@ -47,7 +47,7 @@ def illustrate_edge_detection_from_simulation(lens, camera,
     fig = illustrate_edge_detection(data_patch=data_patch, setup_parameters=setup_parameters)
 
     fig.savefig(illustration_folder / "illustrate_edge_detection.pdf")
-    fig.savefig(illustration_folder / "illustrate_edge_detection.png")
+
 
 
 def illustrate_edge_detection(data_patch: Data_patch, setup_parameters: Setup_parameters):

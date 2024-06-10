@@ -111,13 +111,14 @@ def load_images(datadirpath, image_files, center_indices, max_array_size, desire
             limited_import_patch = limited_import_patch,
             limited_import_shift = limited_import_shift
             )
+        
         images.append(image)
-
+        
     return LED_indices, np.array(images)
      
 
 def load_single_image(datadirpath, file, binning_factor, limited_import_patch, limited_import_shift):
-    full_image = np.array(Image.open(os.path.join(datadirpath, file)))
+    full_image = np.array(Image.open(os.path.join(datadirpath, file)), dtype=np.uint32) # note int type
 
     if limited_import_patch is not None: # only supported with center at [0,0] currently
         patch_start, patch_end = calculate_patch_start_and_end(
@@ -138,20 +139,12 @@ def bin_image(image, binning_factor):
     binning_shift = image_size % binning_factor / 2
     image = image[int(np.floor(binning_shift[0])):image_size[0]-int(np.ceil(binning_shift[0])),
                   int(np.floor(binning_shift[1])):image_size[1]-int(np.ceil(binning_shift[1]))]
-    # print(image_size)
-    # print(np.array(image.shape))
-    # binned_image_size = image_size//binning_factor
-    # print(binned_image_size)
-    # print(np.array(image.shape) // binning_factor)
-    # print(binning_shift)    
-    # print(np.array(image.shape) % binning_factor)
-    # input()
 
     for dx in range(binning_factor):
         for dy in range(binning_factor):
             binned_image = binned_image + image[dy::binning_factor,
                                                 dx::binning_factor]
-
+            
     return binned_image / (binning_factor**2)
 
 

@@ -6,7 +6,15 @@ from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
 
 
+
+
+
 def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_parameters, array_size: int):
+    fig, axes = plt.subplots(nrows=array_size, ncols=array_size, figsize=(7,7), constrained_layout = True)
+    plot_bright_field_images_internal(axes, data_patch, setup_parameters, array_size)
+    return fig
+
+def plot_bright_field_images_internal(axes, data_patch: Data_patch, setup_parameters: Setup_parameters, array_size: int):
     LED_indices = data_patch.LED_indices
 
     center_indices = setup_parameters.LED_info.center_indices
@@ -18,8 +26,6 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
     x_max = x_min + array_size
 
     max_intensity = np.max(data_patch.amplitude_images)**2
-
-    fig, axes = plt.subplots(nrows=array_size, ncols=array_size, figsize=(7,7), constrained_layout = True)
 
     for image_nr, indices in enumerate(LED_indices):
         x,y = indices
@@ -28,12 +34,20 @@ def plot_bright_field_images(data_patch: Data_patch, setup_parameters: Setup_par
             n = (array_size-1) - (x_max-x-1)
             axes[m,n].matshow(data_patch.amplitude_images[image_nr]**2, vmin=0, vmax=max_intensity)
             axes[m,n].axis("off")
-    return fig
 
 
 def plot_bright_field_images_with_BF_edge(data_patch: Data_patch, setup_parameters: Setup_parameters, 
                                           calibration_parameters: LED_calibration_parameters, 
                                           array_size: int):
+    fig, axes = plt.subplots(nrows=array_size, ncols=array_size, figsize=(7,7), constrained_layout = True)
+    plot_bright_field_images_with_BF_edge_internal(axes, data_patch, setup_parameters, 
+                                                    calibration_parameters, array_size)
+    return fig
+
+
+def plot_bright_field_images_with_BF_edge_internal(axes, data_patch: Data_patch, setup_parameters: Setup_parameters, 
+                                                    calibration_parameters: LED_calibration_parameters, 
+                                                    array_size: int):
     LED_indices = data_patch.LED_indices
 
     center_indices = setup_parameters.LED_info.center_indices
@@ -45,8 +59,6 @@ def plot_bright_field_images_with_BF_edge(data_patch: Data_patch, setup_paramete
     x_max = x_min + array_size
 
     max_intensity = np.max(data_patch.amplitude_images)**2
-
-    fig, axes = plt.subplots(nrows=array_size, ncols=array_size, figsize=(7,7), constrained_layout = True)
 
     for image_nr, indices in enumerate(LED_indices):
         x,y = indices
@@ -65,7 +77,6 @@ def plot_bright_field_images_with_BF_edge(data_patch: Data_patch, setup_paramete
             circle = plt.Circle(center, radius, fill=False, color="r", linestyle="dashed")
             axes[m,n].add_patch(circle)
             
-    return fig
 
 def calculate_BF_edge(setup_parameters: Setup_parameters, calibration_parameters: LED_calibration_parameters,
                       LED_n, LED_m):

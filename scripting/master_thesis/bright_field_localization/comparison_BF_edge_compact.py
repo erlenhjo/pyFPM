@@ -31,7 +31,6 @@ def main():
                                                             calibration_parameters, 
                                                             lenses, lens_colors, array_size)
     
-    fig.savefig(main_result_folder / "comparison_BF_edge.png")
     fig.savefig(main_result_folder / "comparison_BF_edge.pdf")
     plt.show()
 

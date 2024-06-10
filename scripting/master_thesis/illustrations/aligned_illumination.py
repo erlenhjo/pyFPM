@@ -15,5 +15,4 @@ fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(2.5,2.5), constrained_layout =
 ax.matshow(image)
 ax.set_axis_off()
 
-fig.savefig(illustration_folder / "illustrate_alignment.png")
 fig.savefig(illustration_folder / "illustrate_alignment.pdf")
