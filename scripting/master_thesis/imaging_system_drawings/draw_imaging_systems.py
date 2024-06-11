@@ -127,7 +127,7 @@ def draw_imaging_systems():
 
         ax.set_ylim(-23e-3, 23e-3)
 
-        fig.savefig(illustration_folder / f"illustrate_imaging_systems_{diagram_nr}.pdf")
+        fig.savefig(illustration_folder / f"illustrate_imaging_systems_{diagram_nr}.pdf", dpi=500)
 
 def calculate_lens_y(first_y, second_y, first_distance, second_distance, focal_length):
     return (second_y+first_y*(second_distance/first_distance))/(1+second_distance/first_distance-second_distance/focal_length)

@@ -23,10 +23,10 @@ plot = True
 
 
 def main():
-    # telecentric3x_usaf_window()
-    # plt.close("all")
-    # telecentric3x_usaf_windowless()
-    # plt.close("all")
+    telecentric3x_usaf_window()
+    plt.close("all")
+    telecentric3x_usaf_windowless()
+    plt.close("all")
     compare_zernike()
     plt.close("all")
 

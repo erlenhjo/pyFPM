@@ -58,80 +58,80 @@ def plot_pickled_experiment(experiment_name, result_folder,
             fig = plot_overview(algorithm_result=algorithm_result, title=file_name,
                                 max_j=plot_parameters.max_zernike_j)
             plot_path = main_plot_path / "overview"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.object_overview:
             fig = plot_object_overview(algorithm_result=algorithm_result)
             plot_path = main_plot_path / "recovered object overview"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_phase:
             fig = plot_object_phase(algorithm_result=algorithm_result)
             plot_path = main_plot_path / "recovered phase"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_phase_with_zoom:
             fig = plot_object_phase_with_zoom(algorithm_result=algorithm_result,
                                               zoom_location=plot_parameters.recovered_phase_zoom_location,
                                               zoom_ratio=plot_parameters.zoom_ratio)
             plot_path = main_plot_path / "recovered phase with zoom"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_phase_zoom_only:
             fig = plot_object_phase_zoom_only(algorithm_result=algorithm_result,
                                               zoom_ratio=plot_parameters.zoom_ratio)
             plot_path = main_plot_path / "recovered phase zoom only"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.raw_image_with_zoom:
             fig = plot_low_res_intensity_with_zoom(algorithm_result=algorithm_result,
                                                   zoom_location=plot_parameters.low_res_intensity_zoom_location,
                                               zoom_ratio=plot_parameters.zoom_ratio)
             plot_path = main_plot_path / "raw image with zoom"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_intensity_with_zoom:
             fig = plot_object_intensity_with_zoom(algorithm_result=algorithm_result,
                                                   zoom_location=plot_parameters.recovered_intensity_zoom_location,
                                                   zoom_ratio=plot_parameters.zoom_ratio)
             plot_path = main_plot_path / "recovered intensity with zoom"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_intensity_zoom_only:
             fig = plot_object_intensity_zoom_only(algorithm_result=algorithm_result,
                                               zoom_ratio=plot_parameters.zoom_ratio)
             plot_path = main_plot_path / "recovered intensity zoom only"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
 
         if plot_types.recovered_spectrum:
             fig = plot_spectrum(algorithm_result=algorithm_result)
             plot_path = main_plot_path / "recovered spectrum"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_pupil_overview:
             fig = plot_pupil_overview(algorithm_result=algorithm_result,
                                 max_j=plot_parameters.max_zernike_j,
                                 zernike_coefficient_max=plot_parameters.zernike_coefficient_max)
             plot_path = main_plot_path / "pupil_overview"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_pupil_amplitude:
             fig = plot_pupil_amplitude(algorithm_result=algorithm_result)
             plot_path = main_plot_path / "pupil_amplitude"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_pupil_phase:
             fig = plot_pupil_phase(algorithm_result=algorithm_result)
             plot_path = main_plot_path / "pupil_phase"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
         if plot_types.recovered_pupil_coefficients:
             fig = plot_pupil_coefficients(algorithm_result=algorithm_result,
                                     max_j=plot_parameters.max_zernike_j,
                                     zernike_coefficient_max=plot_parameters.zernike_coefficient_max)
             plot_path = main_plot_path / "pupil_coefficients"
-            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+            fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)
 
 
 
@@ -160,4 +160,4 @@ def compare_experiment_pupils(experiment_names, result_folder,
     
     file_name = "pupils_comparative_"+lens_name
     plot_path = result_folder / file_name
-    fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight")
+    fig.savefig(plot_path.with_suffix(f".{plot_parameters.format}"), format = plot_parameters.format, bbox_inches="tight", dpi=1000)

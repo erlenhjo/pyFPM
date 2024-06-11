@@ -181,8 +181,7 @@ def plot_BFL_step_experiments_combined(raw_result_folders: List[Path],
     fig.align_ylabels([axes_x, axes_y, axes_rot])
 
     plot_path = result_folder / f"combined_results"
-    fig.savefig(plot_path.with_suffix(f".pdf"), format = "pdf")
-    fig.savefig(plot_path.with_suffix(f".png"), format = "png")
+    fig.savefig(plot_path.with_suffix(f".pdf"), format = "pdf", dpi=1000)
 
 
 

@@ -15,7 +15,7 @@ cb = mpl.colorbar.ColorbarBase(ax, orientation='vertical',
                                label='Phase'
                                )
 
-fig.savefig(illustration_folder / "phase_colorbar_viridis.pdf", bbox_inches='tight')
+fig.savefig(illustration_folder / "phase_colorbar_viridis.pdf", bbox_inches='tight', dpi=500)
 
 
 

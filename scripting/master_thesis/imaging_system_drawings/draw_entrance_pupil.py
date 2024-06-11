@@ -125,7 +125,7 @@ def draw_imaging_systems():
 
 
 
-        fig.savefig(illustration_folder / f"illustrate_entrance_pupil_{diagram_nr}.pdf")
+        fig.savefig(illustration_folder / f"illustrate_entrance_pupil_{diagram_nr}.pdf", dpi=500)
 
 def calculate_lens_y(first_y, second_y, first_distance, second_distance, focal_length):
     return (second_y+first_y*(second_distance/first_distance))/(1+second_distance/first_distance-second_distance/focal_length)

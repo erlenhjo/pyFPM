@@ -1,6 +1,6 @@
 from pyFPM.experimental.plot_illumination import plot_bright_field_images_with_BF_edge
 from pyFPM.NTNU_specific.simulate_images.only_illumination import simulate_illumination
-from pyFPM.setup.Setup_parameters import Lens, Lens_type
+from pyFPM.setup.Setup_parameters import Lens
 from pyFPM.setup.Data import Data_patch
 from pyFPM.setup.Setup_parameters import Setup_parameters
 from pyFPM.setup.Imaging_system import LED_calibration_parameters
@@ -17,11 +17,11 @@ from skimage.filters import threshold_otsu
 lens = Lens(
     NA = 0.05,
     magnification = 2,
+    effectiv_object_to_aperture_distance = 90e-3,
     focal_length = 60e-3,
     working_distance = None,
     depth_of_field = None,
     max_FoV_sensor = None,
-    lens_type = Lens_type.SINGLE_LENS
 )
 camera = IDS_U3_31J0CP_REV_2_2
 array_size = 3
@@ -46,7 +46,7 @@ def illustrate_edge_detection_from_simulation(lens, camera,
 
     fig = illustrate_edge_detection(data_patch=data_patch, setup_parameters=setup_parameters)
 
-    fig.savefig(illustration_folder / "illustrate_edge_detection.pdf")
+    fig.savefig(illustration_folder / "illustrate_edge_detection.pdf", dpi=1000)
 
 
 
@@ -154,14 +154,6 @@ def plotting(image, binary_image, edge_image, edge_points):
     )
 
 
-    # axes_0.set_xlim() # needed for some reason?
-    # axes_0.set_ylim()
-    # axes_1.set_xlim()
-    # axes_1.set_ylim()
-    # axes_2.set_xlim()
-    # axes_2.set_ylim()
-    # axes_3.set_xlim()
-    # axes_3.set_ylim()
 
     fig.tight_layout()
 

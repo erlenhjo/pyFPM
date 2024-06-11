@@ -33,7 +33,7 @@ def illustrate_update_order():
     cbar = plt.colorbar(cax, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label("Update index")
     
-    fig.savefig(illustration_folder / "illustrate_update_order.pdf")
+    fig.savefig(illustration_folder / "illustrate_update_order.pdf", dpi=1000)
     
 
 if __name__ == "__main__":

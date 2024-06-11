@@ -23,10 +23,10 @@ plot = True
 
 
 def main():
-    # compact2x_usaf_window()
-    # plt.close("all")
-    # compact2x_usaf_windowless()
-    # plt.close("all")
+    compact2x_usaf_window()
+    plt.close("all")
+    compact2x_usaf_windowless()
+    plt.close("all")
     compare_zernike()
     plt.close("all")
 

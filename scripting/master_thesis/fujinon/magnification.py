@@ -39,8 +39,7 @@ def plot_dots():
 
     fig = overlay_grid_points(image, grid_points)
 
-    fig.savefig(fujinon_result_folder / "fujinon_magnification.png")
-    fig.savefig(fujinon_result_folder / "fujinon_magnification.pdf")
+    fig.savefig(fujinon_result_folder / "fujinon_magnification.pdf", dpi=500)
 
 
 def get_grid_points(image_shape, pixel_size, dot_spacing, rotation, center_shift):

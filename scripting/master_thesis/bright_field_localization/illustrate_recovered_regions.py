@@ -27,10 +27,10 @@ def main():
 
     fig_center.savefig(result_folder / "recovered_region_center.pdf", 
                        format = "pdf", 
-                       bbox_inches="tight")
+                       bbox_inches="tight", dpi=500)
     fig_corner.savefig(result_folder / "recovered_region_corner.pdf", 
                        format = "pdf", 
-                       bbox_inches="tight")
+                       bbox_inches="tight", dpi=500)
 
 def create_figure(image, offset):
     fig, axes = plt.subplots(1, 1, constrained_layout=True)

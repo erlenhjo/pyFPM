@@ -53,7 +53,8 @@ def multi_step_fujinon(calibrate, plot):
                                 experiment_name=experiment_name,
                                 relative_LED_distances=relative_LED_distances,
                                 main_data_folder = main_data_folder,
-                                main_result_folder = main_result_folder)
+                                main_result_folder = main_result_folder,
+                                filter_factor=1000)
         
 
 

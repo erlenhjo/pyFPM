@@ -29,13 +29,13 @@ def main():
     
     fig_calib.savefig(result_folder / "quadratic_phase_calibrated.pdf", 
                        format = "pdf", 
-                       bbox_inches="tight")
+                       bbox_inches="tight", dpi=500)
     fig_uncalib.savefig(result_folder / "quadratic_phase_uncalibrated.pdf", 
                        format = "pdf", 
-                       bbox_inches="tight")
+                       bbox_inches="tight", dpi=500)
     fig_diff.savefig(result_folder / "quadratic_phase_difference.pdf", 
                        format = "pdf", 
-                       bbox_inches="tight")
+                       bbox_inches="tight", dpi=500)
 
 def get_quadratic_phases(lens):
     LED_array = MAIN_LED_ARRAY 

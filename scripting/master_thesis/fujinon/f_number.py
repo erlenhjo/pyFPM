@@ -83,10 +83,7 @@ for n, (inset_axes_position, image, title) in enumerate(zip(inset_axes_pos, imag
         im.set_clim(vmin=np.min(image), vmax=np.max(image))
 
 
-
-
-fig.savefig(fujinon_result_folder / "fujinon_fnumber.png")
-fig.savefig(fujinon_result_folder / "fujinon_fnumber.pdf")
+fig.savefig(fujinon_result_folder / "fujinon_fnumber.pdf", dpi=500, bbox_inches="tight")
 
 
 

@@ -31,7 +31,8 @@ def simulate_imaging_system():
         pixel_scale_factor = 1,
         patch_offset = [0,0],
         patch_size = setup_parameters.camera.raw_image_size,
-        calibration_parameters=LED_calibration_parameters(200e-3,0,0,0)
+        calibration_parameters=LED_calibration_parameters(200e-3,0,0,0),
+        binned_image_size = setup_parameters.camera.raw_image_size
         )
     return imaging_system
 
@@ -117,7 +118,7 @@ def illustrate_zernike_decomposition():
               coord_from=(400,1300), coord_to=(-100,1300),
               arrow_style=arrow_style, arrow_text=arrow_text_2)
 
-    fig.savefig(illustration_folder / "zernike_example.pdf")
+    fig.savefig(illustration_folder / "zernike_example.pdf", dpi=500)
 
     
 

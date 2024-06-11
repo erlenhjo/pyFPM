@@ -18,14 +18,18 @@ max_array_size = 13
 data_folder = Path.cwd() / "data"
 main_result_folder = Path.cwd() / "results" / "master_thesis" / "BFL_recovery"
 
-recover = True
+recover = False
 plot = True
 
 def main():
-    # compact2x_usaf_uncalibrated()
-    # compact2x_usaf_semicalibrated()
-    # compact2x_usaf_calibrated()
+    compact2x_usaf_uncalibrated()
+    plt.close("all")
+    compact2x_usaf_semicalibrated()
+    plt.close("all")
+    compact2x_usaf_calibrated()
+    plt.close("all")
     compact2x_usaf_calibrated_lens_only()
+    plt.close("all")
 
     if plot:
         plt.show()

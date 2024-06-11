@@ -22,10 +22,10 @@ recover = False
 plot = True
 
 def main():
-    # inf10x_usaf_window()
-    # plt.close("all")
-    # inf10x_usaf_windowless()
-    # plt.close("all")
+    inf10x_usaf_window()
+    plt.close("all")
+    inf10x_usaf_windowless()
+    plt.close("all")
     compare_zernike()
     plt.close("all")
 
