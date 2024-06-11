@@ -1,1 +1,3 @@
-This project contains the code used in my project thesis at NTNU during the fall of 2023 pertaining to Fourier Ptychography recovery, and will soon include the code used for my Master thesis.
+This project contains the code used in my project and master thesis at NTNU during 2023/2024 pertaining to Fourier Ptychography recovery.
+
+The "requirements.txt" file probably contains the necessary packages.
